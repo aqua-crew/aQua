@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aqua Test</title>
+    <style>
+        body {
+            margin: 0;
+        }
+        img {
+            display: inline-block;
+            border: 2px solid transparent;
+            box-sizing: border-box;
+        }
+
+        .unselectable  {
+
+        }
+
+        .my-editor {
+            width: 1200px;
+            height: 1200px;
+            margin: 0 auto;
+        }
+
+        .aqua {
+            position: relative;
+            height: 100%;
+            font-size: 0;
+        }
+        .aqua-header {
+            height: 50px;
+            line-height: 50px;
+            background-color: rgba(42, 46, 58, 1);
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            font-size: 0;
+            cursor: default;
+            pointer-events: none;
+        }
+            .left {}
+            .logo {
+                display: inline-block;
+                margin: 0 12px;
+                width: 30px;
+                height: 30px;
+                background-color: white;
+                border-radius: 50%;
+                vertical-align: middle;
+            }
+            .title {
+                display: inline-block;
+                font-family: "Consolas";
+                font-size: 20px;
+                color: rgba(255, 255, 255, 1);
+                vertical-align: middle;
+            }
+            .Q {
+                color: rgba(118, 218, 255, 1);
+                padding: 0 .5px;
+            }
+
+        .bg {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(42, 46, 58, .95);
+            /*background: url('./images/aqua-chan.png') no-repeat 50% 20%;*/
+            /*background-size: cover;*/
+        }
+            .bg-image {
+                position: absolute;
+                right: 0;
+                bottom: 0;
+                z-index: -1;
+                opacity:  .95;
+                width: 50%;
+            }
+
+        .bg .aqua-chan {
+            width: 100%;
+        }
+
+        /* Editor */
+        .aqua-editor {
+            position: relative;
+            height: 100%;
+            font-family: Consolas;
+        }
+
+        /* Container */
+        .selected-container, .selection-container {
+            position: absolute;
+            left: 0;
+            right: 0;
+        }
+        .selection-container {
+            margin-left: 50px;
+        }
+        .selection-part {
+            display: none;
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            height: 25px;
+            background-color: rgba(255, 255, 255, .05);
+        }
+        .selected-container .selected-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 25px;
+            background-color: rgba(255, 255, 255, .05);
+        }
+        .inputer-container, .cursor-container {
+            position: absolute;
+        }
+        .inputer-locator {
+            position: absolute;
+        }
+        .inputer {
+            position: absolute;
+            left: 0;
+            top: 0;
+            border: 0;
+            resize: none;
+            width: 0;
+            height: 22px;
+            line-height: 22px;
+            opacity: 0;
+            outline: currentcolor none medium;
+            white-space: pre;
+        }
+        .anchor {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 1px;
+            height: 22px;
+            background-color: rgba(118, 218, 255, .85);
+        }
+
+        .aqua-viewport {
+            position: relative;
+            height: 100%;
+            overflow-y: hidden;
+        }
+        .aqua-components {
+            margin-left: 50px; /* $prefix-length */
+            cursor: text;
+        }
+
+        /* Line about */
+        .line {
+            position: relative;
+            line-height: 24px;
+            font-size: 12px;
+        }
+            .prefix {
+                position: absolute;
+                left: -50px; /* $prefix-length */
+                width: 30px;
+                padding: 0 8px 0 2px;
+                text-align: right;
+                color: rgba(118, 218, 255, .5);
+                cursor: default;
+                user-select: none;
+            }
+            .suffix {
+                margin: 0;
+                overflow-wrap: break-word;
+                white-space: pre-wrap;
+                word-break: normal;
+                color: rgba(255, 255, 255, 1);
+            }
+            code {
+                margin-right: 0.1px; /* 修复 chrome 下的 getClientRects 不符合预期行为的问题 */
+            }
+    </style>
+</head>
+<body>
+    <div class="center">
+        <div class="misc" style="height: 100px;"></div>
+        <div class="my-editor">
+            <!-- 这里开始是 editor 的内容 start -->
+            <div class="aqua theme-aqua">
+                <div class="aqua-header">
+                    <div class="left">
+                        <div class="logo"></div>
+                        <div class="title">a<span class="Q">Q</span>ua</div>
+                    </div>
+                </div>
+                <div class="aqua-editor" id="aqua-editor">
+                    <div class="bg">
+                        <img id="aq" class="bg-image" src="./images/aqua-chan.png" />
+                    </div>
+                    <div class="aqua-viewport" id="aqua-scroller">
+                        <div class="aqua-components" id="aqua-components">
+                            <div class="inputer-container">
+                                <div class="inputer" id="inputer-locator"><textarea id="inputer" class="inputer" autocomplete="off" autocapitalize="off" autocorrect="off" wrap="off" tabindex="0"></textarea></div>
+                            </div>
+                            <div class="cursor-container">
+                                <i id="cursor" class="anchor" style="top: 0; left: 0;"></i>
+                            </div>
+                            <div class="selected-container">
+                                <div class="selected-line" id="selected-line"></div>
+                            </div>
+                            <div class="selection-container"><div class="selection" id="selection"><div class="selection-part" class="selected-line" style="top: 0px; left: 0; height: 0px;"></div><div class="selection-part" class="selected-line" style="top: 0px; height: 0px;"></div><div class="selection-part" class="selected-line" style="top: 0px; right: 0px; height: 0px;"></div></div>
+                            </div>
+                            <div class="line-container" id="lines-container">
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">1</div>
+                                    <div class="suffix"><code>Aqua Ch. 湊あくあ</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">2</div>
+                                    <div class="suffix"><code>直播时间：<img src="./images/aqua-eat.jpg" />4小时前</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">3</div>
+                                    <div class="suffix"><code>人生二回目のサクセス！</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">4</div>
+                                    <div class="suffix"><code>最強のホームラン王を目指して最強のホームラン王を目指して最強のホームラン王を目指して最強のホームラン王を目指して最強のホームラン王を目指して最強のホームラン王を目指して最強のホームラン王を目指して最強のホームラン王を目指して最強のホームラン王を目指して最強のホームラン王を目指して最強のホームラン王を目指して最強のホームラン王を目指して最強のホームラン王を目指して</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">5</div>
+                                    <div class="suffix"><code>▷◁－－－－－－－－－－－－－－－－－－－－－－－－－▷◁ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">6</div>
+                                    <div class="suffix"><code>湊あくあ10万人記念ボイス販売がいよいよスタート！</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">7</div>
+                                    <div class="suffix"><code>みんな、もう聞いてくれたかな？？？くれたかな！？</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">8</div>
+                                    <div class="suffix"><code>ほんっとに一生懸命考えたから、聞いてくれると嬉しいなぁ・・・</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">9</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">10</div>
+                                    <div class="suffix"><code>【⇩購入場所はこちら】</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">11</div>
+                                    <div class="suffix"><code>国内の方→https://hololive.booth.pm/items/1449313</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">12</div>
+                                    <div class="suffix"><code>海外の方→https://www.geekjack.net/cover/langua...</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">13</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">14</div>
+                                    <div class="suffix"><code>感想は　#湊あくあ10万人記念ボイス　まで！</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">15</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">16</div>
+                                    <div class="suffix"><code>グッズイラストを担当してくださった</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">17</div>
+                                    <div class="suffix"><code>やすゆきせんせえのTwitter➡https://twitter.com/yasu00kamiki</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">18</div>
+                                    <div class="suffix"><code>▷◁－－－－－－－－－－－－－－－－－－－－－－－－－▷◁ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">19</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">20</div>
+                                    <div class="suffix"><code>⚓バーチャルメイド、湊あくあ（Minato Aqua）です。 </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">21</div>
+                                    <div class="suffix"><code>おかげさまでチャンネル登録者数が100000人を突破しました！！！ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">22</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">23</div>
+                                    <div class="suffix"><code>いつも見てくださる皆様ホントにありがとうございます！ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">24</div>
+                                    <div class="suffix"><code>これからも頑張るので応援よろしくおねがいします！ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">25</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">26</div>
+                                    <div class="suffix"><code>ζ*(・ヮ・)*ζっhttps://twitter.com/minatoaqua </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">27</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">28</div>
+                                    <div class="suffix"><code>▷◁－－－－－－－－－－－－－－－－－－－－－－－－－▷◁ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">29</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">30</div>
+                                    <div class="suffix"><code>⚓湊あくあ　メンバーシップ登録開始です！ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">31</div>
+                                    <div class="suffix"><code>【特典】 ⚓名前の横にメンバーバッチの追加 </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">32</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">33</div>
+                                    <div class="suffix"><code>⚓専用絵文字の使用可能！（随時追加予定） </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">34</div>
+                                    <div class="suffix"><code>【登録方法】 ⚓YoutubeGamingの「メンバーになる」から登録できます！</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">35</div>
+                                <div class="suffix"><code></code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">36</div>
+                                    <div class="suffix"><code>登録はこちら➡https://bit.ly/2SqExRc </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">37</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">38</div>
+                                    <div class="suffix"><code>▷◁－－－－－－－－－－－－－－－－－－－－－－－－－▷◁ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">39</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">40</div>
+                                    <div class="suffix"><code>⚓湊あくあ黒歴史ボイス販売 boothにて湊あくあ個人ボイスが販売されました！ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">41</div>
+                                    <div class="suffix"><code>はじめての個人ボイスなのでよかったら聞いてね！ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">42</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">43</div>
+                                    <div class="suffix"><code>HPはこちら➡https://hololive.booth.pm/items/1161272 </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">44</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">45</div>
+                                    <div class="suffix"><code>▷◁－－－－－－－－－－－－－－－－－－－－－－－－－▷◁ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">46</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">47</div>
+                                    <div class="suffix"><code>⚓Twitter https://twitter.com/minatoaqua </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">48</div>
+                                    <div class="suffix"><code>⚓チャンネル登録 https://www.youtube.com/channel/UC1op...</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">49</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">50</div>
+                                    <div class="suffix"><code>▷◁－－－－－－－－－－－－－－－－－－－－－－－－－▷◁ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">51</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">52</div>
+                                    <div class="suffix"><code>⚓ファン関連 </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">53</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">54</div>
+                                    <div class="suffix"><code>【生放送関連のツイート】 #湊あくあ生放送 </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">55</div>
+                                    <div class="suffix"><code>【湊あくあ関連のツイート】 #湊あくあ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">56</div>
+                                    <div class="suffix"><code>【ファンアート】 #あくあーと </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">57</div>
+                                    <div class="suffix"><code>【マーク】⚓ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">58</div>
+                                    <div class="suffix"><code>【ファンの呼び名】あくあクルー </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">59</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">60</div>
+                                    <div class="suffix"><code>【プレゼント宛先】規則➡https://www.hololive.tv/contact </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">61</div>
+                                    <div class="suffix"><code>〒173-0003 東京都板橋区加賀1丁目6番1号 ネットデポ新板橋 </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">62</div>
+                                    <div class="suffix"><code>カバー株式会社 ホロライブ プレゼント係分　湊あくあ宛 </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">63</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">64</div>
+                                    <div class="suffix"><code>▷◁－－－－－－－－－－－－－－－－－－－－－－－－－▷◁ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">65</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">66</div>
+                                    <div class="suffix"><code>⚓Special Thanks </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">67</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">68</div>
+                                    <div class="suffix"><code>【Tag】 </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">69</div>
+                                    <div class="suffix"><code>柊椋/らぎちゃん　https://twitter.com/hiiragiryo </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">70</div>
+                                    <div class="suffix"><code>【Illustration】 </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">71</div>
+                                    <div class="suffix"><code>のやま　https://twitter.com/noyama8888 </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">72</div>
+                                    <div class="suffix"><code>あぐりりんこ　https://www.pixiv.net/member.php?id=1...</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">73</div>
+                                    <div class="suffix"><code>【Music】 </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">74</div>
+                                    <div class="suffix"><code>甘茶　 http://amachamusic.chagasi.com/ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">75</div>
+                                    <div class="suffix"><code>DOVA-SYNDROME　https://dova-s.jp/ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">76</div>
+                                    <div class="suffix"><code>【Inst】 </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">77</div>
+                                    <div class="suffix"><code>カラオケ歌っちゃ王　http://bit.ly/2EVjf9p </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">78</div>
+                                    <div class="suffix"><code>カラオケ再現所@KEISUKEO.　http://bit.ly/2ZbpGwu </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">79</div>
+                                    <div class="suffix"><code>野田工房　https://dtm-nodakoubou.net/ </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">80</div>
+                                    <div class="suffix"><code>ハイカラサウンド　http://bit.ly/2Z9dg8u </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">81</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">82</div>
+                                    <div class="suffix"><code>Support the stream: https://streamlabs.com/aquach </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">83</div>
+                                <div class="suffix"><code>    </code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">84</div>
+                                    <div class="suffix"><code>▷◁－－－－－－－－－－－－－－－－－－－－－－－－－▷◁</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">85</div>
+                                    <div class="suffix"><code>类别</code></div>
+                                </div>
+                                <div class="line">
+                                    <div aqua-is-line-number="true" class="prefix">86</div>
+                                    <div class="suffix"><code>游戏</code></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fg"></div>
+                </div>
+            </div>
+            <!-- 这里开始是 editor 的内容 end -->
+        </div>
+
+        <div class="misc" style="height: 100px;"></div>
+
+        <div id="editor" class="my-editor"></div>
+
+        <div class="misc" style="height: 100px;"></div>
+
+        <div id="con"></div>
+
+        <div id="receiver" class="contentEditor" contenteditable="true" style="width: 1000px; min-height: 1000px; background-color: rgba(0, 0, 0, .1)"></div>
+    </div>
+
+    <script src="./src/index.js"></script>
+    <script>
+        const $receiver = document.getElementById('receiver')
+
+        const DTI = {
+            handle(dataTransferItem, handler) {
+                const { kind, type } = dataTransferItem
+
+                if (kind === 'string') {
+                    console.error('find string', type)
+                    if (type.match('^text/plain')) {
+                        dataTransferItem.getAsString(handler.text)
+                    } else if (type.match('^text/html')) {
+                        dataTransferItem.getAsString(handler.html)
+                    } else {
+                        console.error(`Unknown tpye ${type} in string`)
+                    }
+                }
+
+                if (kind === 'file') {
+                    console.warn('find file', type)
+                    if (type.match('^image/')) {
+                        dataTransferItem.getAsFile(handler.file)
+                    } else {
+                        console.error(`Unknown tpye ${type} in file`)
+                    }
+                }
+            }
+        }
+
+        $receiver.addEventListener('paste', event => {
+            const items = event.clipboardData.items
+
+            for (let i = 0, len = items.length; i < len; i++) {
+                DTI.handle(items[i], {
+                    text: text => {
+                        console.info('text', text)
+                    },
+
+                    html: html => {
+                        console.info('html', html)
+                        const $test = document.getElementById('con')
+                        const regexp = new RegExp(/^(<!--StartFragment-->)([\s\S]*)(<!--EndFragment-->)/, 'gm')
+
+                        const c = regexp.exec(html)[2]
+                        console.error(c)
+                        $test.innerHTML = c
+                    },
+
+                    file: file => {
+                        console.info('file', file)
+                    }
+                })
+            }
+        })
+    </script>
+</body>
+</html>
