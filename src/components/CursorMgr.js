@@ -7,6 +7,10 @@ class CursorMgr {
         this.cursors = []
     }
 
+    init() {
+        this.create()
+    }
+
     get size() {
         return this.cursors.length
     }
@@ -36,6 +40,8 @@ class CursorMgr {
         cursors = this.cursors,
         filter = cursor => true,
         acc = true,
+        update = true,
+        force = false,
     } = {}) {
         const accCoord = {
             logicalY: 0,
@@ -54,7 +60,10 @@ class CursorMgr {
 
             filter(cursor) && cb(cursor)
 
-            cursor.updateCoord()
+            cursor.updateCoord({
+                update,
+                force,
+            })
             cursor.updateSelection()
 
             const after = cursor.coord.clone()
@@ -80,12 +89,8 @@ class CursorMgr {
             cursor.coord.assign(coord)
         }
 
-        // cursor.id = Math.random().toString(36).substr(2)
-
         this.main = cursor
         this.cursors.push(cursor)
-
-        // console.info('this.cursors', this.cursors.map(cursor => cursor.id))
 
         return cursor
     }

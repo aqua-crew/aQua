@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <title>Aqua Test</title>
     <style>
+        .aqua-beacon {
+            position: absolute;
+            height: 0;
+        }
         body {
             margin: 0;
+            background-color: rgba(35, 35, 35, .7);
         }
         img {
             display: inline-block;
@@ -96,9 +101,6 @@
             left: 0;
             right: 0;
         }
-        .selection-container {
-            margin-left: 50px;
-        }
         .selection-part {
             display: none;
             position: absolute;
@@ -113,6 +115,8 @@
             right: 0;
             height: 25px;
             background-color: rgba(255, 255, 255, .05);
+
+            border-left: 1px solid rgba(255, 255, 255, .6);
         }
         .inputer-container, .cursor-container {
             position: absolute;
@@ -145,17 +149,39 @@
         .aqua-viewport {
             position: relative;
             height: 100%;
+
             overflow-y: hidden;
         }
+        .aqua-scroller {
+            transform: translateY(0);
+            transition: transform 0.25s ease-out;
+        }
         .aqua-components {
-            margin-left: 50px; /* $prefix-length */
+            position: relative;
             cursor: text;
+        }
+            .full-width-container {
+                position: absolute;
+                left: 0;
+                right: 0;
+            }
+            .line-width-container {
+                position: relative;
+                margin-left: 50px; /* $prefix-length */
+                height: 0;
+            }
+        .measure-container {
+            position: absolute;
+            visibility: hidden;
+            opacity: 0;
+            right: 0;
+            left: 0;
         }
 
         /* Line about */
         .line {
             position: relative;
-            line-height: 24px;
+            line-height: 25px;
             font-size: 12px;
         }
             .prefix {
@@ -176,14 +202,16 @@
                 color: rgba(255, 255, 255, 1);
             }
             code {
+                line-height: 25px;
                 margin-right: 0.1px; /* 修复 chrome 下的 getClientRects 不符合预期行为的问题 */
+                font-family: inherit;
             }
     </style>
 </head>
 <body>
     <div class="center">
         <div class="misc" style="height: 100px;"></div>
-        <div class="my-editor">
+        <div class="my-editor" style="visibility: hidden;">
             <!-- 这里开始是 editor 的内容 start -->
             <div class="aqua theme-aqua">
                 <div class="aqua-header">
@@ -606,6 +634,7 @@
 
         $receiver.addEventListener('paste', event => {
             const items = event.clipboardData.items
+            console.error('items', items)
 
             for (let i = 0, len = items.length; i < len; i++) {
                 DTI.handle(items[i], {

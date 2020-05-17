@@ -1,32 +1,37 @@
 const { Content } = require('../models/index')
-const { ContentType } = require('../enums/index')
-const { DOM, SpeicalCharSet } = require('../utils/index')
+const { DOM, SpecialCharSet } = require('../utils/index')
 
 class ContentMgr {
     constructor(aqua) {
         this.aqua = aqua
+        this.processor = aqua.processorMgr
     }
 
-    parse(raw, lang = this.aqua.state.mod.lang) {
-        lang = this.aqua.langMgr.getLang(lang)
+    traverse(data, cb) {
+        if (typeof data === 'string') {
+            cb(data)
 
-        return lang.parse(raw)
+            return
+        }
+
+        for (let asset = data; asset !== null; asset = asset.next) {
+            cb(asset)
+        }
     }
 
-    tokenize(contents, lang = this.aqua.state.mod.lang) {
-        const tokens = []
-        lang = this.aqua.langMgr.getLang(lang)
+    // parse(raw, lang = this.aqua.state.mod.lang) {
+    //     lang = this.aqua.modeMgr.getLang(lang)
 
-        contents.traverseAll(contentIns => {
-            const type = contentIns.type
-            if (type === ContentType.IMAGE) {
-                tokens.push({
-                    type: 'image',
-                    value: contentIns.value,
-                })
-            } else if (type === ContentType.TEXT) {
-                lang.tokenize(contentIns.value, tokens)
-            }
+    //     return lang.parse(raw)
+    // }
+
+    tokenize(assets, mode = this.aqua.state.mod.mode) {
+        let tokens = []
+
+        lang = this.aqua.modeMgr.getLang(lang)
+
+        this.traverse(assets, asset => {
+            tokens = tokens.concat(this.processor.tokenize(asset, lang))
         })
 
         return tokens
@@ -34,8 +39,7 @@ class ContentMgr {
 
     toElements(tokens) {
         const elements = []
-
-        let $root = DOM.f()
+        const $root = DOM.f()
 
         for (let i = 0; i < tokens.length; i++) {
             const token = tokens[i]
@@ -60,7 +64,7 @@ class ContentMgr {
             }
 
             if (type === 'image') {
-                const $child = DOM.e('img', {'class': 'aqua-block-' + token.type, 'src': token.value}, [DOM.t(token.value)])
+                const $child = DOM.e('img', {'class': 'aqua-block-' + token.type, 'src': token.value})
 
                 DOM.appendChild(
                     $root,
@@ -98,16 +102,24 @@ class ContentMgr {
         if (len === 0) {
             DOM.appendChild(
                 $root,
-                DOM.e('span', {'class': 'aqua-block-empty'}, DOM.t(SpeicalCharSet.ZeroWidthSpace)),
+                DOM.e('span', {'class': 'aqua-block-empty'}, DOM.t(SpecialCharSet.ZeroWidthSpace)),
             )
         }
 
-        for (let i = 0; i < tokens.length; i++) {
+        for (let i = 0; i < len; i++) {
             const token = tokens[i]
             const type = token.type
 
-            const $child = type === 'image' ? DOM.e('img', {'class': 'aqua-block-' + token.type, 'src': token.value}, [DOM.t(token.value)]) :
-                type ? DOM.e('span', {'class': 'aqua-block-' + token.type}, [DOM.t(token.value)]) : DOM.t(token.value)
+            let $child = null
+            if (type === 'image') {
+                $child = DOM.e('img', {'class': 'aqua-block-' + token.type, 'src': token.value})
+
+                $child.onload = function() {
+
+                }
+            } else {
+                $child = type ? DOM.e('span', {'class': 'aqua-block-' + token.type}, [DOM.t(token.value)]) : DOM.t(token.value)
+            }
 
             DOM.appendChild(
                 $root,

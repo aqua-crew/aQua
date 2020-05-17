@@ -1,106 +1,84 @@
-const { Noop } = require('../utils/index')
-
 class Chunk {
     constructor({
-        type = 'chunk',
         parent = null,
-        onCreated = Noop,
-        onIncreased = Noop,
-        onDecreased = Noop,
+        children = [],
+        size = 0,
+        height = 0,
+        status = null,
+        tag = null,
+        level = 0,
+        chunkVolume = 20,
+        volume = 128,
     } = {}) {
-        this.type = type
-        this._parent = null
-        this._children = []
         this._size = 0
-
-        this.onCreated = onCreated
-        this.onIncreased = onIncreased
-        this.onDecreased = onDecreased
-
-        this.onCreated && this.onCreated(parent)
+        this.parent = parent
+        this.children = children
+        this.size = size
+        this.height = height
+        this.status = status
+        this.tag = tag
+        this.level = level
+        this.chunkVolume = chunkVolume
+        this.volume = volume
     }
 
-    get children() {
-        return this._children
+    get(index) {
+        return this.children[index]
     }
 
-    get parent() {
-        return this._parent
-    }
-
-    set parent(value) {
-        if (this._parent === value) {
+    set size(s) {
+        if (this.level === 0) {
             return
         }
 
-        this.parent && this.onMoved(value, this._parent)
-        this._parent = value
-    }
-
-    set size(value) {
-        if (this.type === 'chunk') {
-            this._size = value
-        } else {
-            this.children.length = value
-        }
+        this._size = s
     }
 
     get size() {
-        return this.type === 'chunk' ? this._size : this.children.length
+        return this.level === 0 ? this.children.length : this._size
     }
 
-    splice(offset = 1, deleteNum = 0, objs) {
-        if (deleteNum > 0) {
-            const deletes = this.getChildren(offset, offset + deleteNum)
-            this.onDecreased(deletes)
+    get length() {
+        return this.children.length
+    }
+
+    bubble(cb) {
+        if (cb(this) === false) {
+            return null
         }
 
-        if (objs.length > 0) {
-            this.onIncreased(objs)
-        }
+        return this.parent !== null ? this.parent.bubble(cb) : null
+    }
 
-        if (this.type === 'line') {
-            return this.children.splice(offset, deleteNum, ...objs)
-        }
+    clone(options = {}) {
+        return new Chunk({
+            parent: this.parent,
+            children: [],
+            size: 0,
+            height: 0,
+            status: this.status,
+            tag: this.tag,
+            level: this.level,
+            chunkVolume: this.chunkVolume,
+            volume: this.volume,
+            ...options,
+        })
+    }
 
-        if (this.type === 'chunk') {
-            const parentChildren = this.parent.children
-            const index = parentChildren.indexOf(this)
-
-            return parentChildren.splice(index + offset, deleteNum, ...objs)
+    splice(start, deleteCount, items = null) {
+        if (items !== null) {
+            return this.children.splice(start, deleteCount, ...items)
+        } else {
+            return this.children.splice(start, deleteCount)
         }
     }
 
-    bubble(fn) {
-        fn(this)
-
-        return this.parent !== null ? this.parent.bubble(fn) : null
-    }
-
-    getChildren(start = 0, end = Infinity) {
-        const children = []
-        const len = this.children.length
-
-        if (end > len) {
-            end = len
-        }
-
-        for (let i = start; i < end; i++) {
-            children.push(this.children[i])
-        }
-
-        return children
-    }
-
-    /* Once */
-    init(chunks) {
-        if (!Array.isArray(chunks)) {
-            chunks = [chunks]
-        }
-
-        for (let i = 0; i < chunks.length; i++) {
-            this.children.push(chunks[i])
-        }
+    /**
+     * 不检测 parent 的存在，请求前必须保证 parent 的存在
+     * @return {number} 自身在 parent 中的 index
+     */
+    selfIndex() {
+        return this.parent.children.indexOf(this)
     }
 }
 

@@ -10,5 +10,8 @@
     "editor"
   ],
   "author": "ayarin",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "sass": "^1.26.3"
+  }
 }

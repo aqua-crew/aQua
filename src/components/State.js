@@ -3,11 +3,14 @@ class State {
         this.mod = {
             line: null,
             cursor: null,
-            lang: null,
         }
 
         this.aqua = {
             active: false,
+        }
+
+        this.file = {
+            suffix: 'txt',
         }
 
         this.ui = {

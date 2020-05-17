@@ -124,11 +124,12 @@ class Kizuna {
     on(ele, eventType, fn) {
         if (eventType === 'scroll') {
             this.on(ele, 'mousewheel', event => {
-                event.delta = event.wheelDelta
+                event.delta = event.wheelDelta > 0 ? -1 : 1
                 fn(event)
             })
+
             this.on(ele, 'DOMMouseScroll', event => {
-                event.delta = -event.detail
+                event.delta = event.detail > 0 ? 1 : -1
                 fn(event)
             })
 
@@ -220,11 +221,7 @@ class Kizuna {
     }
 
     filterInput(event) {
-
-    }
-
-    filterScroll(event) {
-
+        console.error('event', event)
     }
 
     setKeyboardKeyAlias(name, code) {

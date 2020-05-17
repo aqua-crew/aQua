@@ -1,21 +1,21 @@
 const Chunk = require('./Chunk')
 const Content = require('./Content')
 const Coord = require('./Coord')
-const DocTree = require('./DocTree')
+const Doc = require('./Doc')
+const ExtendedLine = require('./ExtendedLine')
 const Line = require('./Line')
-const MeasuredLine = require('./MeasuredLine')
-const Pool = require('./Pool')
 const Selection = require('./Selection')
 const Snippet = require('./Snippet')
+const Viewport = require('./Viewport')
 
 module.exports = {
     Chunk,
     Content,
     Coord,
-    DocTree,
+    Doc,
+    ExtendedLine,
     Line,
-    MeasuredLine,
-    Pool,
     Selection,
     Snippet,
+    Viewport,
 }

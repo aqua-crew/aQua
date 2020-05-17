@@ -1,7 +1,12 @@
 class Snippet {
-    constructor(start, end) {
-        this.start = null
-        this.end = null
+    constructor(start = null, end = null, states = null) {
+        this.start = start
+        this.end = end
+        this.states = states
+    }
+
+    freeze() {
+
     }
 }
 

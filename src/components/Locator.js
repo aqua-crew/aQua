@@ -2,52 +2,54 @@ const CURSOR_HEIGHT = 22
 const LINE_HEIGHT = 24
 const FONT_SIZE = 12
 
+const { Algorithm } = require('../utils/index')
+
 class Locator {
     constructor(aqua) {
         this.aqua = aqua
+
+        this.lineMgr = aqua.lineMgr
+        this.doc = aqua.docMgr
+        this.korwa = aqua.korwa
     }
 
-    /**
-     * [getCoordByPhysical description]
-     * @param  {Number} x physicalX
-     * @param  {Number} y physicalY
-     * @return {Coord}
-     */
-    getCoordByPhysical(y, x) {
-        const doc = this.aqua.docMgr.doc
+    getCoordByLayout($y, $x) {
+        let $rawY = $y
+        let $rawX = $x
+        const doc = this.doc
 
-        if (y < 0) {
-            y = 0
-            x = 0
+        const maxHeight = doc.height
+
+        if ($rawY > maxHeight) {
+            $rawY = maxHeight
+            $rawX = Infinity
+        } else if ($rawY < 0) {
+            $rawY = 0
+            $rawX = 0
         }
 
-        if (y > doc.height) {
-            y = doc.height
-            x = Infinity
-        }
-
-        const lineNum = this.aqua.contentMgr.getLineIns(y, 'physical').lineNum
-        const box = this.aqua.uiMgr.get('lineCntr').getBoundingClientRect()
-        const measuredLine = this.aqua.lineMgr.getMeasuredLine(lineNum)
-        const lineRects = measuredLine.getClientRects()
-        const insideY = measuredLine.getInsideLogicalY(y)
-        let fixedX = x
-        let fixedY = this.transformToCursorPhysicalY(measuredLine.getInsidePhysicalY(insideY))
+        const line = doc.getLineByHeight($rawY)
+        const lineNum = line.staticLineNum
+        const extendedLine = this.lineMgr.extendLine(lineNum)
+        const lineRects = extendedLine.getClientRects()
+        const insideY = extendedLine.getInsideY($rawY)
         const rect = lineRects[insideY]
+        const measureRect = this.korwa.getLineWidthRect()
+        const $xMax = rect.right - measureRect.left
+        const $xMin = rect.left - measureRect.left
 
-        if (x > rect.right - box.left) {
-            x = rect.right - box.left
+        if ($rawX > $xMax) {
+            $rawX = $xMax
+        } else if ($rawX < $xMin) {
+            $rawX = $xMin
         }
 
-        if (x < rect.left - box.left) {
-            x = 0
-        }
+        let x = -1
 
-        binarySearch(0, measuredLine.getLength(), (center) => {
-            const charRect = measuredLine.getElementRect(center)
-
-            const top = charRect.bottom - box.top
-            const charRectInsideY = measuredLine.getInsideLogicalY(top)
+        Algorithm.binarySearch(0, line.length, center => {
+            const charRect = extendedLine.getElementRect(center)
+            const top = charRect.bottom - measureRect.top
+            const charRectInsideY = extendedLine.getInsideY(top)
 
             if (insideY > charRectInsideY) {
                 return 1
@@ -57,85 +59,80 @@ class Locator {
                 return -1
             }
 
-            const left = charRect.left - box.left
-            if (x < left) {
+            const left = charRect.left - measureRect.left
+            if ($rawX < left) {
                 return -1
             }
 
-            const right = charRect.right - box.left
-            if (x > right) {
+            const right = charRect.right - measureRect.left
+            if ($rawX > right) {
                 return 1
             }
 
             const half = charRect.width / 2
-            if (x - left < half) {
+            if ($rawX - left < half) {
                 x = center
-                fixedX = left
+                $x = left
             } else {
                 x = center + 1
-                fixedX = right
+                $x = right
             }
 
             return 0
         })
 
         return {
-            physicalY: fixedY,
-            physicalX: fixedX,
-            logicalX: x,
             logicalY: lineNum,
+            logicalX: x,
+            physicalY: this.transformToCursorPhysicalY(extendedLine.transformToLayoutY(insideY)),
+            physicalX: $x,
             insideY,
             maxInsideY: lineRects.length - 1,
         }
-
-        function binarySearch(start, end, checkFn) {
-            const center = parseInt((start + end) / 2)
-            const result = checkFn(center)
-
-            return result < 0 ? binarySearch(start, center, checkFn) :
-                result > 0 ? binarySearch(center, end, checkFn) : center
-        }
     }
 
-    /**
-     * [getCoordByLogical description]
-     * @param  {Number} x logicalX
-     * @param  {Number} y logicalY
-     * @return {Coord}
-     */
-    getCoordByLogical(y, x) {
-        const doc = this.aqua.docMgr.doc
+    getCoordByCoord(y, x) {
+        const doc = this.doc
+        const yMax = doc.size
 
         if (y < 0) {
             y = 0
+        } else if (y > yMax) {
+            y = yMax - 1
         }
 
-        if (y > doc.size) {
-            y = doc.size - 1
+        const line = this.doc.getLine(y)
+        const extendedLine = this.lineMgr.extendLine(y)
+        const xMax = line.length
+
+        if (xMax === 0) {
+            return {
+                logicalY: y,
+                logicalX: 0,
+                physicalY: this.transformToCursorPhysicalY(extendedLine.transformToLayoutY(0)),
+                physicalX: 0,
+                insideY: 0,
+                maxInsideY: 0,
+            }
         }
 
         if (x < 0) {
             x = 0
+        } else if (x > xMax) {
+            x = xMax
         }
 
-        const measuredLine = this.aqua.lineMgr.getMeasuredLine(y)
-        const len = measuredLine.getLength()
-        let isLast = false
-        if (x >= len) {
-            x = len - 1
-            isLast = true
-        }
-
-        const charRect = measuredLine.getElementRect(x)
-        const box = this.aqua.uiMgr.get('lineCntr').getBoundingClientRect()
-        const insideY = measuredLine.getInsideLogicalY(charRect.bottom - box.top)
-        const lineRects = measuredLine.getClientRects()
+        const measureRect = this.korwa.getLineWidthRect()
+        const xAtLast = x === xMax // 如果是最后一格, 取 charRect 按照最后一个字取, 只不过在返回的时候返回 rect 的右边部分
+        const charRect = extendedLine.getElementRect(xAtLast ? x - 1 : x)
+        const insideY = extendedLine.getInsideY(charRect.bottom - measureRect.top)
+        const lineRects = extendedLine.getClientRects()
 
         return {
-            physicalY: this.transformToCursorPhysicalY(measuredLine.getInsidePhysicalY(insideY)),
-            physicalX: isLast ? charRect.right - box.left : charRect.left - box.left,
-            logicalX: isLast ? x + 1 : x, // 如果是最后一行, 那么x应该为那行的字符长度, 但是由于 measuredLine.getElementRect 不允许这样的位置, 所以之前会 -1, 这里需要 +1
             logicalY: y,
+            logicalX: x,
+            physicalY: this.transformToCursorPhysicalY(extendedLine.transformToLayoutY(insideY)),
+            physicalX: xAtLast ? charRect.right - measureRect.left : charRect.left - measureRect.left,
             insideY,
             maxInsideY: lineRects.length - 1,
         }

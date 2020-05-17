@@ -4,6 +4,11 @@ const e = FnHelper.getClosure(DOM, 'e')
 const t = FnHelper.getClosure(DOM, 't')
 
 module.exports = {
+    /* Beacon Test Only */
+    beacon: function(payload) {
+        return e('div', {'class': 'aqua-beacon'})
+    },
+
     /* Host */
     aqua: function(payload) {
         return e('div', {'class': 'aqua theme-aqua'})
@@ -19,9 +24,34 @@ module.exports = {
         return e('div', {'class': 'aqua-viewport'})
     },
 
+    scroller: function(payload) {
+        return e('div', {'class': 'aqua-scroller'})
+    },
+
     /* Components Container */
     components: function(payload) {
         return e('div', {'class': 'aqua-components'})
+    },
+
+    fullWidthCntr: function(payload) {
+        return e('div', {'class': 'full-width-container'})
+    },
+
+    lineWidthCntr: function(payload) {
+        return e('div', {'class': 'line-width-container'})
+    },
+
+    /* Measures */
+    measureCntr: function(payload) {
+        return e('div', {'class': 'measure-container'})
+    },
+
+    lineNumMeasure: function(payload) {
+        return e('div', {'class': 'line-num-measure'})
+    },
+
+    modsMeasure: function(payload) {
+        return e('div', {'class': 'mods-measure'})
     },
 
     /* Container in Components Container */

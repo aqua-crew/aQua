@@ -1,5 +1,5 @@
 module.exports = {
-    e(tag, props = null, children = []) {
+    e(tag, props = null, children = null) {
         const node = document.createElement(tag)
 
         if (props) {
@@ -11,7 +11,9 @@ module.exports = {
             }
         }
 
-        this.appendChild(node, children)
+        if (children) {
+            this.appendChild(node, children)
+        }
 
         return node
     },
@@ -44,6 +46,10 @@ module.exports = {
         return parent.removeChild(children)
     },
 
+    clear(ele) {
+        ele.innerHTML = ''
+    },
+
     _appendChild(parent, children) {
         return parent.appendChild(this._toFragment(children))
     },
@@ -57,12 +63,16 @@ module.exports = {
 
         if (Array.isArray(eles)) {
             for (let i = 0; i < eles.length; i++) {
-                $f.appendChild(eles[i])
+                $f.appendChild(this._toEle(eles[i]))
             }
         } else {
-            $f.appendChild(eles)
+            $f.appendChild(this._toEle(eles))
         }
 
         return $f
     },
+
+    _toEle(obj) {
+        return typeof obj === 'string' ? this.t(obj) : obj
+    }
 }

@@ -4,10 +4,12 @@ const DOM = require('./DOM')
 const FnHelper = require('./FnHelper')
 const Khala = require('./Khala')
 const Range = require('./Range')
+const SizeObserver = require('./SizeObserver')
 const Kizuna = require('./Kizuna')
+const rAF = require('./rAF')
 const Noop = require('./Noop')
 const Iterator = require('./Iterator')
-const SpeicalCharSet = require('./SpeicalCharSet')
+const SpecialCharSet = require('./SpecialCharSet')
 
 module.exports = {
     Algorithm,
@@ -16,8 +18,10 @@ module.exports = {
     FnHelper,
     Khala,
     Range,
+    SizeObserver,
     Kizuna,
+    rAF,
     Noop,
     Iterator,
-    SpeicalCharSet,
+    SpecialCharSet,
 }

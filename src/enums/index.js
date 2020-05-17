@@ -1,5 +1,5 @@
-const ContentType = require('./ContentType')
+const LineStatus = require('./LineStatus')
 
 module.exports = {
-    ContentType,
+    LineStatus,
 }

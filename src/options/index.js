@@ -15,6 +15,10 @@ module.exports = {
         foreground($ctnr, DOM) {},
     },
 
+    scroller: {
+
+    },
+
     options: {
         readOnly: false,
         multipleCursors: true,

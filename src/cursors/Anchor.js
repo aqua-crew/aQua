@@ -9,7 +9,6 @@ class Anchor extends Cursor {
         this.aqua = aqua
 
         this.coord = new Coord
-        this.base = new Coord
         this.selection = new Selection
 
         this.$cursor = null
@@ -52,18 +51,20 @@ class Anchor extends Cursor {
 
         if (force || this.state.moved !== 'none') {
             this.state.moved === 'physical' ? this.updateCoordByPhysical() : this.updateCoordByLogical()
-            update && this.$update()
+            this.state.moved = 'none'
         }
 
-        this.state.moved = 'none'
+        if (update) {
+            this.$update()
+        }
     }
 
     updateCoordByPhysical() {
-        this.coord.assign(this.aqua.locator.getCoordByPhysical(this.physicalY, this.physicalX))
+        this.coord.assign(this.aqua.locator.getCoordByLayout(this.physicalY, this.physicalX))
     }
 
     updateCoordByLogical() {
-        this.coord.assign(this.aqua.locator.getCoordByLogical(this.logicalY, this.logicalX))
+        this.coord.assign(this.aqua.locator.getCoordByCoord(this.logicalY, this.logicalX))
     }
 
     release() {
@@ -85,11 +86,11 @@ class Anchor extends Cursor {
 
     /* Render */
     renderDataOfSelection() {
-        const measuredBase = this.aqua.lineMgr.getMeasuredBase()
+        const scrollerRect = this.aqua.korwa.getScrollerRect()
         const selectLines = this.selection.selectLines
         const start = this.selection.start
         const end = this.selection.end
-        const lineHeight = this.aqua.optionMgr.options.lineHeight
+        const lineHeight = this.aqua.korwa.getSingleLineHeight()
 
         if (selectLines === 0) {
             return [
@@ -121,7 +122,7 @@ class Anchor extends Cursor {
                     top: start.physicalY,
                     height: lineHeight,
                     left: start.physicalX,
-                    right: measuredBase.width - end.physicalX,
+                    right: scrollerRect.width - end.physicalX,
                 },
                 {
                     open: false,
@@ -155,7 +156,7 @@ class Anchor extends Cursor {
                     open: true,
                     top: end.physicalY,
                     height: lineHeight,
-                    right: measuredBase.width - end.physicalX,
+                    right: scrollerRect.width - end.physicalX,
                 },
             ]
         }
@@ -177,7 +178,7 @@ class Anchor extends Cursor {
                 {
                     open: true,
                     top: end.physicalY,
-                    right: measuredBase.width - end.physicalX,
+                    right: scrollerRect.width - end.physicalX,
                     height: lineHeight,
                 },
             ]
@@ -221,7 +222,7 @@ class Anchor extends Cursor {
             },
 
             get: function(obj, prop) {
-                if (prop === 'physicalY' || prop === 'logicalY' || prop === 'physicalX' || prop === 'logicalX' || prop === 'insideY') {
+                if (prop === 'physicalY' || prop === 'logicalY' || prop === 'physicalX' || prop === 'logicalX' || prop === 'insideY' || prop === 'maxInsideY') {
                     return obj.coord[prop]
                 }
 

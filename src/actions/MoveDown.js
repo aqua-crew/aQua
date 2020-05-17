@@ -11,7 +11,7 @@ class MoveDown extends Action {
     }
 
     exec(aqua, event, state = {}) {
-        const max = aqua.lineMgr.getSize() - 1
+        const max = aqua.docMgr.size - 1
 
         const fn = (cursor, clearSelection = true) => {
             if (clearSelection) {
@@ -24,7 +24,11 @@ class MoveDown extends Action {
                 return
             }
 
-            cursor.logicalY = cursor.logicalY + 1
+            if (cursor.insideY < cursor.maxInsideY) {
+                cursor.insideY = cursor.insideY + 1
+            } else {
+                cursor.logicalY = cursor.logicalY + 1
+            }
         }
 
         if (state.cursor) {

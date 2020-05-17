@@ -14,9 +14,10 @@ class Enter extends Action {
         console.error(this.name)
 
         aqua.cursorMgr.traverse(cursor => {
-            aqua.contentMgr.write('', cursor.coord)
+            aqua.write(['', ''], cursor.coord)
         })
     }
 }
 
 module.exports = Enter
+

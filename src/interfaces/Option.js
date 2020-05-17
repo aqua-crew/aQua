@@ -2,6 +2,7 @@ class Option {
     constructor() {
         this.alias = []
         this.value = null
+        this.desc = ''
         this.request = false
     }
 

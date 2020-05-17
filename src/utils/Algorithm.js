@@ -1,5 +1,5 @@
 module.exports = {
-    binarySearch(start, end, checkFn) {
+    binarySearch: function binarySearch(start, end, checkFn) {
         const center = parseInt((start + end) / 2)
         const result = checkFn(center)
 

@@ -35,6 +35,13 @@ class Coord {
         })
     }
 
+    extract() {
+        return {
+            y: this.logicalY,
+            x: this.logicalX,
+        }
+    }
+
     greater(coord, equal = false) {
         const diffY = this.logicalY - coord.logicalY
 

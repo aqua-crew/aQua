@@ -1,4 +1,4 @@
-const { MeasuredLine, Line } = require('../models/index')
+const { ExtendedLine, Line } = require('../models/index')
 const { DOM } = require("../utils/index")
 
 class LineMgr {
@@ -6,16 +6,18 @@ class LineMgr {
         this.aqua = aqua
 
         this.mods = Object.create(null)
+
+        this.$cntr = null
+        this.$children = null
     }
 
-    /**
-     * Line 与 Mode 存的是实例, 因为他们是一个 Handler. Cursor 存的是构造函数, 因为需要返回实例
-     * @param  {[type]} Line [description]
-     * @return {[type]}      [description]
-     */
-    load(Line) {
-        const mod = new Line(this.aqua)
-        this.mods[Line.name] = mod
+    init() {
+        this.$cntr = this.aqua.uiMgr.get('lineCntr')
+        this.$children = this.aqua.uiMgr.get('lineCntr').children
+    }
+
+    load(mod) {
+        this.mods[mod.name] = mod
 
         if (!this.aqua.state.mod.line) {
             this.aqua.state.mod.line = mod
@@ -27,10 +29,11 @@ class LineMgr {
      * @param  {Array<Content>} contents
      * @return {Array<Line>}
      */
-    toLines(contents) {
+    toLines(contents, start = 0, end = contents.length) {
+        console.error('yes??')
         const lines = []
 
-        for (let i = 0; i < contents.length; i++) {
+        for (let i = start; i < end; i++) {
             lines[i] = new Line({
                 content: contents[i]
             })
@@ -39,115 +42,99 @@ class LineMgr {
         return lines
     }
 
-    getTop(lineNum) {
-        return this.getLine(lineNum).getBoundingClientRect().top - this.getMeasuredBase().top
+    extendLine(lineNum) {
+        return new ExtendedLine(this.get$Line(lineNum), this.aqua.korwa)
     }
 
-    getLineRects(lineNum) {
-        return this.getLine(lineNum).children[1].firstChild.getClientRects()
-    }
+    // getTop(lineNum) {
+    //     return this.getLine(lineNum).getBoundingClientRect().top - this.getMeasuredBase().top
+    // }
 
-    getLine(lineNum) {
-        const $line = this.aqua.uiMgr.get('lineCntr').children[lineNum]
+    // getLineRects(lineNum) {
+    //     return this.getLine(lineNum).children[1].firstChild.getClientRects()
+    // }
+
+    // TODO
+    get$Line(lineNum, viewport = this.aqua.viewport){
+        const $line = viewport.get$Line(lineNum)
+
+        if (!$line) {
+
+        }
 
         return $line
     }
 
-    getMeasuredBase() {
-        return this.aqua.uiMgr.get('lineCntr').getBoundingClientRect()
-    }
+    // getLine(lineNum, viewport = this.aqua.viewport) {
+    //     const $line = viewport.get$Line(lineNum)
 
-    getMeasuredLine(lineNum) {
-        return new MeasuredLine(this.getLine(lineNum), this.getMeasuredBase(), lineNum)
-    }
+    //     if (!$line) {
 
-    getMeasuredLineRect(lineNum) {
-        const rect = this.getLine(lineNum).getBoundingClientRect()
-        const box = this.getMeasuredBase()
+    //     }
 
-        return {
-            left: rect.left - box.left,
-            right: rect.right - box.left,
-            top: rect.top - box.top,
-            bottom: rect.bottom - box.top,
-        }
-    }
+    //     return $line
+    // }
 
-    getCurrentBlock(lineNum, x) {
-        const measuredLine = this.getMeasuredLine(lineNum)
+    // getMeasuredBase() {
+    //     return this.aqua.uiMgr.get('lineCntr').getBoundingClientRect()
+    // }
 
-        return measuredLine.getCurrentBlock(x)
-    }
+    // getMeasuredLine(lineNum) {
+    //     return new MeasuredLine(this.getLine(lineNum), this.aqua.korwa)
+    // }
 
-    /**
-     * 获得文档大小
-     * @return {Number}
-     */
-    getSize() {
-        const doc = this.aqua.contentMgr.doc
-        return doc.size
-    }
+    // getMeasuredLineRect(lineNum) {
+    //     const rect = this.getLine(lineNum).getBoundingClientRect()
+    //     const box = this.getMeasuredBase()
 
-    /**
-     * 获得单行长度
-     * @param  {Number} lineNum [行号]
-     * @return {Number}
-     */
-    getLength(lineNum) {
-        const measuredLine = this.getMeasuredLine(lineNum)
+    //     return {
+    //         left: rect.left - box.left,
+    //         right: rect.right - box.left,
+    //         top: rect.top - box.top,
+    //         bottom: rect.bottom - box.top,
+    //     }
+    // }
 
-        return measuredLine.getLength()
-    }
+    // getCurrentBlock(lineNum, x) {
+    //     const measuredLine = this.getMeasuredLine(lineNum)
 
-    /* Insert */
-    insert(elements, startLineNum, mod = this.aqua.state.mod.line) {
-        mod = this.getMod(mod)
+    //     return measuredLine.getCurrentBlock(x)
+    // }
 
-        const $root = DOM.f()
-        const len = elements.length
+    // /**
+    //  * 获得文档大小
+    //  * @return {Number}
+    //  */
+    // getSize() {
+    //     console.error('yes')
+    //     const doc = this.aqua.contentMgr.doc
+    //     return doc.size
+    // }
 
-        for (let i = 0; i < len; i++) {
-            DOM.appendChild($root, mod.create(elements[i]))
-        }
+    // *
+    //  * 获得单行长度
+    //  * @param  {Number} lineNum [行号]
+    //  * @return {Number}
+    //
+    // getLength(lineNum) {
+    //     const measuredLine = this.getMeasuredLine(lineNum)
 
-        DOM.appendChild(this.aqua.uiMgr.get('lineCntr'), $root, startLineNum)
+    //     return measuredLine.getLength()
+    // }
 
-        this.updateLineNum(startLineNum)
-    }
-
-    update(elements, startLineNum = 0, mod = this.aqua.state.mod.line) {
-        const $lineCntr = this.aqua.uiMgr.get('lineCntr')
-        const $children = $lineCntr.children
-        const len = elements.length
-
-        for (let i = 0; i < len; i++) {
-            const lineNum = startLineNum + i
-            DOM.replaceChild($lineCntr, elements[lineNum], $children[lineNum])
-        }
-
-        this.updateLineNum(startLineNum)
-    }
-
-    updateLineNum(start = 0, effect = 0) {
-        const startLineNum = this.aqua.optionMgr.get('line').start
-        const $children = this.aqua.uiMgr.get('lineCntr').children
-        const len = $children.length
-
-        const end = effect === 0 ? len : Math.min(start + effect, len)
-
-        for (let i = start; i < end; i++) {
-            $children[i].firstChild.textContent = i + startLineNum
-        }
+    create($content) {
+        return this.getMod().create($content)
     }
 
     /* Private */
     mount($fragment) {
         const $lineCntr = this.aqua.uiMgr.get('lineCntr')
+
         this.aqua.uiMgr.mount($lineCntr, $fragment)
     }
 
     getMod(name = null) {
-        if (typeof name !== 'string') {
+        if (typeof name !== 'string' && name) {
             return name
         }
 
