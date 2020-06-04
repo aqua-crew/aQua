@@ -43,7 +43,7 @@ class LineMgr {
     }
 
     extendLine(lineNum) {
-        return new ExtendedLine(this.get$Line(lineNum), this.aqua.korwa)
+        return new ExtendedLine(this.$getLine(lineNum), this.aqua.korwa)
     }
 
     // getTop(lineNum) {
@@ -55,7 +55,7 @@ class LineMgr {
     // }
 
     // TODO
-    get$Line(lineNum, viewport = this.aqua.viewport){
+    $getLine(lineNum, viewport = this.aqua.viewport){
         const $line = viewport.get$Line(lineNum)
 
         if (!$line) {

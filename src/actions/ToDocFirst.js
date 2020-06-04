@@ -12,9 +12,8 @@ class ToDocFirst extends Action {
 
     exec(aqua, event) {
         aqua.cursorMgr.traverse(cursor => {
-            cursor.logicalY = 0
-            cursor.logicalX = 0
-            cursor.updateCoord()
+            cursor.y = 0
+            cursor.x = 0
         }, {
             acc: false,
         })

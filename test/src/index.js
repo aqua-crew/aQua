@@ -114,6 +114,12 @@ const aqua = new Aqua({
         },
     },
 
+    assets: {
+        image: {
+            allow: ['inline', 'block']
+        },
+    },
+
     options: {
         readOnly: false,
         multipleCursors: true,
@@ -146,7 +152,7 @@ const aqua = new Aqua({
 // aqua.write(' +exec autoexec') // BUG <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 aqua.write('1')
 aqua.docMgr.write(content.split('\n'), {
-    logicalY: 1000,
+    y: 1000,
 })
 aqua.docMgr.write(content.split('\n'))
 // aqua.docMgr.write('          '.split('\n'))

@@ -12,9 +12,8 @@ class ToDocLast extends Action {
 
     exec(aqua, event) {
         aqua.cursorMgr.traverse(cursor => {
-            cursor.logicalY = Infinity
-            cursor.logicalX = Infinity
-            cursor.updateCoord()
+            cursor.y = Infinity
+            cursor.x = Infinity
         }, {
             acc: false,
         })

@@ -17,20 +17,20 @@ class MoveRight extends Action {
             }
 
             const max = aqua.docMgr.size - 1
-            const lineLen = aqua.docMgr.getLine(cursor.logicalY).length
+            const lineLen = aqua.docMgr.getLine(cursor.y).length
 
-            if (cursor.logicalX >= lineLen) {
-                if (cursor.logicalY === max) {
+            if (cursor.x >= lineLen) {
+                if (cursor.y === max) {
                     return
                 }
 
-                cursor.logicalY = cursor.logicalY + 1
-                cursor.logicalX = 0
+                cursor.y = cursor.y + 1
+                cursor.x = 0
 
                 return
             }
 
-            cursor.logicalX = cursor.logicalX + 1
+            cursor.x = cursor.x + 1
         }
 
         if (state.cursor) {

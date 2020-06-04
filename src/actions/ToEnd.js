@@ -16,7 +16,7 @@ class ToEnd extends Action {
                 cursor.selection.reset()
             }
 
-            cursor.logicalX = Infinity
+            cursor.x = Infinity
         }
 
         if (state.cursor) {

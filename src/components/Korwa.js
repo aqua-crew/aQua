@@ -32,7 +32,7 @@ class Korwa {
             const contentRect = entry.contentRect
 
             this.aqua.viewport.height = contentRect.height
-            this.aqua.renderer.render(this.aqua.viewport)
+            this.aqua.renderer.renderViewport(this.aqua.viewport)
         })
 
         this.lineNumCntrWidth = 50
@@ -66,13 +66,16 @@ class Korwa {
         }
     }
 
-    /* Public */
     getSingleLineHeight(mod = this.aqua.state.mod.line) {
         return this.lineHeight[mod.name]
     }
 
-    measure($ele) {
+    getClientRect($ele) {
         return $ele.getBoundingClientRect()
+    }
+
+    getClientRects($ele) {
+        return $ele.getClientRects()
     }
 
     measureHeight(lineOrData, modName) {
@@ -81,7 +84,7 @@ class Korwa {
         DOM.clear($measure.children[1].firstChild)
         DOM.appendChild($measure.children[1].firstChild, this.aqua.processorMgr.transformToElements(lineOrData))
 
-        return this.measure($measure).height
+        return this.getClientRect($measure).height
     }
 
     getMeasurer(key, lineOrData, modName) {
@@ -122,10 +125,6 @@ class Korwa {
         }
 
         return heights
-    }
-
-    measureViewport() {
-        return this.aqua.uiMgr.get('viewport').getBoundingClientRect()
     }
 }
 

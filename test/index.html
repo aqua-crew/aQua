@@ -32,6 +32,7 @@
             position: relative;
             height: 100%;
             font-size: 0;
+            contain: strict;
         }
         .aqua-header {
             height: 50px;
@@ -96,27 +97,30 @@
         }
 
         /* Container */
-        .selected-container, .selection-container {
+        .selected-line-container, .selection-container {
             position: absolute;
             left: 0;
             right: 0;
         }
-        .selection-part {
-            display: none;
+        .selection {
             position: absolute;
             left: 0px;
             right: 0px;
             height: 25px;
-            background-color: rgba(255, 255, 255, .05);
+            background-color: rgba(255, 255, 255, .15);
         }
-        .selected-container .selected-line {
+        .selected-line-container .selected-line {
             position: absolute;
-            left: 0;
-            right: 0;
-            height: 25px;
+            height: 0;
+            top: 0;
+            opacity: 0;
+            border-left: 1px solid rgba(255, 255, 255, .6);
+            /* 使用 transition: height,top,opaicty,; 在火狐下几率会失效 */
+            transition-property: height, top, opacity;
+            transition-duration: 0.2s;
+            transition-timing-function: ease-out;
             background-color: rgba(255, 255, 255, .05);
 
-            border-left: 1px solid rgba(255, 255, 255, .6);
         }
         .inputer-container, .cursor-container {
             position: absolute;
@@ -144,6 +148,8 @@
             width: 1px;
             height: 22px;
             background-color: rgba(118, 218, 255, .85);
+
+            transition: transform 0.2s ease-out;
         }
 
         .aqua-viewport {
@@ -203,7 +209,7 @@
             }
             code {
                 line-height: 25px;
-                margin-right: 0.1px; /* 修复 chrome 下的 getClientRects 不符合预期行为的问题 */
+                margin-right: 0.1px; /* 修复 chrome 下的 getClientRects 不符合预期行为的问题, 以及撑开行高 */
                 font-family: inherit;
             }
     </style>
@@ -232,7 +238,7 @@
                             <div class="cursor-container">
                                 <i id="cursor" class="anchor" style="top: 0; left: 0;"></i>
                             </div>
-                            <div class="selected-container">
+                            <div class="selected-line-container">
                                 <div class="selected-line" id="selected-line"></div>
                             </div>
                             <div class="selection-container"><div class="selection" id="selection"><div class="selection-part" class="selected-line" style="top: 0px; left: 0; height: 0px;"></div><div class="selection-part" class="selected-line" style="top: 0px; height: 0px;"></div><div class="selection-part" class="selected-line" style="top: 0px; right: 0px; height: 0px;"></div></div>

@@ -12,17 +12,15 @@ class MoveUpAsTerminal extends Action {
 
     exec(aqua, event, state = {}) {
         aqua.cursorMgr.traverse(cursor => {
-            if (cursor.selection.selectLines === 0) {
-                cursor.selection.setBase(cursor.coord)
+            if (cursor.selection.isCollapsed()) {
+                cursor.selection.base = cursor.coord
             }
 
             aqua.actionMgr.exec('MoveUp', event, {
                 cursor,
             })
 
-            cursor.updateCoord()
-
-            cursor.selection.setTerminal(cursor.coord)
+            cursor.selection.terminal = cursor.coord
         }, {
             acc: false,
         })

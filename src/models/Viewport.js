@@ -101,6 +101,8 @@ class Viewport {
         return this.$lines[lineNum - start]
     }
 
+
+
     getLine(lineNum) {
         // const { start, end } = this.renderArea
 

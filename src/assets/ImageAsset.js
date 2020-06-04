@@ -45,7 +45,7 @@ class ImageAsset extends Asset {
         return new ImageAsset(this.data)
     }
 
-    /* Private */
+    /* Rare */
     _delete() {
         const deleteData = this.data
         this.data = null

@@ -1,49 +1,53 @@
 class Coord {
     constructor({
-        logicalY = 0,
-        logicalX = 0,
-        physicalY = 0,
-        physicalX = 0,
+        y = 0,
         insideY = 0,
         maxInsideY = 0,
+        x = 0,
     } = {}) {
-        this.logicalY = logicalY
-        this.logicalX = logicalX
-        this.physicalY = physicalY
-        this.physicalX = physicalX
+        this.y = y
         this.insideY = insideY
         this.maxInsideY = maxInsideY
+        this.x = x
     }
 
     assign(coord) {
-        this.logicalY = coord.logicalY
-        this.logicalX = coord.logicalX
-        this.physicalY = coord.physicalY
-        this.physicalX = coord.physicalX
+        this.y = coord.y
+        this.x = coord.x
         this.insideY = coord.insideY
         this.maxInsideY = coord.maxInsideY
     }
 
     clone() {
         return new Coord({
-            logicalY: this.logicalY,
-            logicalX: this.logicalX,
-            physicalY: this.physicalY,
-            physicalX: this.physicalX,
+            y: this.y,
+            x: this.x,
             insideY: this.insideY,
             maxInsideY: this.maxInsideY,
         })
     }
 
+    reset({
+        y = 0,
+        x = 0,
+    } = {}) {
+        this.y = y
+        this.x = x
+    }
+
     extract() {
-        return {
-            y: this.logicalY,
-            x: this.logicalX,
-        }
+        const coord = Object.create(null)
+
+        coord.y = this.y
+        coord.x = this.x
+        coord.insideY = this.insideY
+        coord.maxInsideY = this.maxInsideY
+
+        return coord
     }
 
     greater(coord, equal = false) {
-        const diffY = this.logicalY - coord.logicalY
+        const diffY = this.y - coord.y
 
         if (diffY > 0) {
             return true
@@ -53,7 +57,7 @@ class Coord {
             return false
         }
 
-        const diffX = this.logicalX - coord.logicalX
+        const diffX = this.x - coord.x
 
         if (diffX > 0) {
             return true
@@ -67,7 +71,7 @@ class Coord {
     }
 
     less(coord, equal = false) {
-        const diffY = this.logicalY - coord.logicalY
+        const diffY = this.y - coord.y
 
         if (diffY < 0) {
             return true
@@ -77,7 +81,7 @@ class Coord {
             return true
         }
 
-        const diffX = this.logicalX - coord.logicalX
+        const diffX = this.x - coord.x
 
         if (diffX < 0) {
             return true
@@ -91,7 +95,7 @@ class Coord {
     }
 
     equal(coord) {
-        return this.logicalY === coord.logicalY && this.logicalX === coord.logicalX
+        return this.y === coord.y && this.x === coord.x
     }
 }
 

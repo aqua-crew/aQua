@@ -16,20 +16,16 @@ class LeftMousedown extends Action {
             aqua.cursorMgr.removeAll()
         }
 
-        const rect = aqua.korwa.getScrollerRect()
+        const rect = aqua.korwa.getLineWidthRect()
 
         aqua.cursorMgr.traverse(cursor => {
             if (event.target.getAttribute('aqua-is-line-number')) return
 
-            cursor.physicalY = event.clientY - rect.top
-            cursor.physicalX = event.clientX - rect.left - aqua.korwa.lineNumCntrWidth
+            cursor.$y = event.clientY - rect.top
+            cursor.$x = event.clientX - rect.left
 
-            cursor.updateCoord({
-                update: false
-            })
-
-            cursor.selection.setBase(cursor.coord)
-            cursor.selection.setTerminal(cursor.coord)
+            cursor.selection.base = cursor.coord
+            cursor.selection.terminal = cursor.coord
         }, {
             filter: cursor => cursor === aqua.cursorMgr.main
         })

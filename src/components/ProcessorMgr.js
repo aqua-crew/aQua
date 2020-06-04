@@ -21,7 +21,7 @@ class ProcessorMgr {
         const $root = DOM.f()
 
         if (line.length === 0) {
-            DOM.appendChild($root, DOM.e('span', {'class': 'aqua-block-empty'}, DOM.t(SpecialCharSet.ZeroWidthSpace)))
+            DOM.appendChild($root, DOM.e('span', {'class': 'aqua-block-empty'}))
 
             return $root
         }

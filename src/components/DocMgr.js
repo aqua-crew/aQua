@@ -106,7 +106,7 @@ class DocMgr {
     }
 
     write(contents, coord = new Coord) {
-        const startLineNum = coord.logicalY
+        const startLineNum = coord.y
 
         if (!Array.isArray(contents)) {
             contents = [contents]
@@ -122,13 +122,13 @@ class DocMgr {
 
             if (contents.length > 1) {
                 const lines = Line.toInstances(contents, 1)
-                lines[lines.length - 1].write(line.delete(coord.logicalX))
+                lines[lines.length - 1].write(line.delete(coord.x))
                 this.doc.insert(startLineNum + 1, lines)
 
                 effectLines = effectLines.concat(lines)
             }
 
-            line.write(contents[0], coord.logicalX)
+            line.write(contents[0], coord.x)
         } else {
             const lines = Line.toInstances(contents)
             this.doc.insert(startLineNum, lines)
@@ -149,21 +149,21 @@ class DocMgr {
      * @return {Array<Assets>}       [description]
      */
     read(start, end) {
-        const startLineNum = start.logicalY
-        const endLineNum = end.logicalY
-        const distance = end.logicalY - start.logicalY
+        const startLineNum = start.y
+        const endLineNum = end.y
+        const distance = end.y - start.y
 
         if (distance === 0) {
             const { chunk, offset } = this.doc.get(startLineNum)
             const line = chunk.get(offset)
 
-            return [line.read(start.logicalX, end.logicalX)]
+            return [line.read(start.x, end.x)]
         }
 
         const lines = this.doc.getLeaves(startLineNum, endLineNum + 1)
 
-        const firstLineContent = lines[0].read(start.logicalX)
-        const endLineContent = lines[1].read(0, end.logicalX)
+        const firstLineContent = lines[0].read(start.x)
+        const endLineContent = lines[1].read(0, end.x)
 
         if (distance === 1) {
             return [firstLineContent, endLineContent]
@@ -186,8 +186,8 @@ class DocMgr {
         // this.correctCoord(start)
         // this.correctCoord(end)
 
-        const startLineNum = start.logicalY
-        const endLineNum = end.logicalY
+        const startLineNum = start.y
+        const endLineNum = end.y
         const distance = endLineNum - startLineNum
 
         let effectLines = []
@@ -196,7 +196,7 @@ class DocMgr {
         if (distance === 0) {
             const { chunk, offset } = this.doc.search(startLineNum)
             const line = chunk.get(offset)
-            const deletedData = line.delete(start.logicalX, end.logicalX)
+            const deletedData = line.delete(start.x, end.x)
 
             effectLines = [line]
         }
@@ -206,8 +206,8 @@ class DocMgr {
             const startLine = lines[0]
             const lastLine = lines[1]
 
-            startLine.delete(start.logicalX)
-            startLine.write(lastLine.read(end.logicalX))
+            startLine.delete(start.x)
+            startLine.write(lastLine.read(end.x))
 
             lastLine.release()
             this.doc.remove(endLineNum, 1)
@@ -222,8 +222,8 @@ class DocMgr {
             const startLine = lines[0]
             const lastLine = lines[lines.length - 1]
 
-            startLine.delete(start.logicalX)
-            startLine.write(lastLine.read(end.logicalX))
+            startLine.delete(start.x)
+            startLine.write(lastLine.read(end.x))
 
             Line.setStatus(lines.slice(1), LineStatus.DELETED)
             this.doc.remove(startLineNum + 1, endLineNum - startLineNum)
@@ -290,19 +290,19 @@ class DocMgr {
     correctCoord(coord) {
         const yMax = this.doc.size
 
-        const logicalY = coord.logicalY
+        const y = coord.y
 
-        if (logicalY < 0 || logicalY >= yMax) {
-            coord.logicalY = yMax - 1
-            coord.logicalX = this.getLastLine().length
+        if (y < 0 || y >= yMax) {
+            coord.y = yMax - 1
+            coord.x = this.getLastLine().length
 
             return coord
         }
 
-        const xMax = this.getLine(logicalY).length
-        const x = coord.logicalX
+        const xMax = this.getLine(y).length
+        const x = coord.x
 
-        coord.logicalX = x < 0 ? 0 : x > xMax ? xMax : x
+        coord.x = x < 0 ? 0 : x > xMax ? xMax : x
 
         return coord
     }

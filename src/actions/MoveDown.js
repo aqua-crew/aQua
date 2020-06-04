@@ -18,8 +18,8 @@ class MoveDown extends Action {
                 cursor.selection.reset()
             }
 
-            if (cursor.logicalY === max) {
-                cursor.logicalX = Infinity
+            if (cursor.y === max) {
+                cursor.x = Infinity
 
                 return
             }
@@ -27,7 +27,8 @@ class MoveDown extends Action {
             if (cursor.insideY < cursor.maxInsideY) {
                 cursor.insideY = cursor.insideY + 1
             } else {
-                cursor.logicalY = cursor.logicalY + 1
+                cursor.y = cursor.y + 1
+                cursor.insideY = 0
             }
         }
 

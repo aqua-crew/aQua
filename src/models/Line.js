@@ -136,7 +136,7 @@ class Line {
                 content = new StringAsset(content)
             }
 
-             /* 1 */
+            /* 1 */
             if (x === 0) {
                 content.setTail(this.data)
                 this.data = content
@@ -363,17 +363,17 @@ class Line {
      * 找到 start 对应的 asset
      * @param  {Number} start
      * @param  {Number} end
-     * @param  {Asset} startData
+     * @param  {Asset} startAsset
      * @return {start<Number>, end<Number>, asset<Asset>}
      */
-    _transformXs(start, end, startData = this.data) {
+    _transformXs(start, end, startAsset = this.data) {
         let result = null
 
         if (start === 0) {
             return {
                 start,
                 end,
-                asset: startData,
+                asset: startAsset,
             }
         }
 
@@ -394,7 +394,7 @@ class Line {
             }
 
             return false
-        }, startData)
+        }, startAsset)
 
         if (!result) {
             const len = this.length
@@ -410,23 +410,23 @@ class Line {
         return result
     }
 
-    _removeEmpty(startData = this.data) {
+    _removeEmpty(startAsset = this.data) {
         this.traverse(asset => {
             if (asset.isEmpty()) {
                 return
             }
 
-            startData.setNext(asset)
+            startAsset.setNext(asset)
 
             return false
-        }, startData.next)
+        }, startAsset.next)
 
-        if (startData.isEmpty()) {
-            if (startData === this.data) {
-                this.data = startData.next || ''
-                startData.next && startData.next.setPrev(null)
+        if (startAsset.isEmpty()) {
+            if (startAsset === this.data) {
+                this.data = startAsset.next || ''
+                startAsset.next && startAsset.next.setPrev(null)
             } else {
-                startData.prev.setNext(startData.next)
+                startAsset.prev.setNext(startAsset.next)
             }
         }
     }

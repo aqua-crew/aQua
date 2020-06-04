@@ -16,18 +16,18 @@ class MoveLeft extends Action {
                 cursor.selection.reset()
             }
 
-            if (cursor.logicalX <= 0) {
-                if (cursor.logicalY === 0) {
+            if (cursor.x <= 0) {
+                if (cursor.y === 0) {
                     return
                 }
 
-                cursor.logicalY = cursor.logicalY - 1
-                cursor.logicalX = Infinity
+                cursor.y = cursor.y - 1
+                cursor.x = Infinity
 
                 return
             }
 
-            cursor.logicalX = cursor.logicalX - 1
+            cursor.x = cursor.x - 1
         }
 
         if (state.cursor) {

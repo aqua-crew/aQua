@@ -1,6 +1,6 @@
 const { Khala, Kizuna, Noop, Iterator, DataTransferItemHandler } = require('./utils/index')
 const { DefaultOptions } = require('./options/index')
-const { History, Locator, State, Korwa, LineMgr, ContentMgr, CursorMgr, ActionMgr, OptionMgr, UIMgr, ProcessorMgr, Renderer, SelectedMgr, DocMgr, PluginMgr, Scroller, ViewportMgr } = require('./components/index')
+const { History, Locator, State, Korwa, LineMgr, ContentMgr, CursorMgr, ActionMgr, OptionMgr, UIMgr, ProcessorMgr, Renderer, DocMgr, PluginMgr, Scroller, ViewportMgr } = require('./components/index')
 const { Coord, Content } = require('./models/index')
 const Lines = require('./lines/index')
 const Cursors = require('./cursors/index')
@@ -27,7 +27,6 @@ class Aqua {
             this.lifetimes.on(name, options.lifetimes[name])
         }
 
-
         this.pluginMgr = new PluginMgr(this)
         this.scroller = new Scroller(this)
         this.processorMgr = new ProcessorMgr(this)
@@ -39,7 +38,6 @@ class Aqua {
         this.actionMgr = new ActionMgr(this)
         this.contentMgr = new ContentMgr(this)
         this.docMgr = new DocMgr(this)
-        this.selectedMgr = new SelectedMgr(this)
         this.locator = new Locator(this)
         this.viewportMgr = new ViewportMgr(this)
         this.renderer = new Renderer(this)
@@ -84,7 +82,7 @@ class Aqua {
         this.viewportMgr.init({
             $padding: this.uiMgr.get('lineCntr'),
             y: 0,
-            height: this.korwa.measureViewport().height,
+            height: this.korwa.getViewportRect().height,
             lps: 10,
         })
 
@@ -95,8 +93,9 @@ class Aqua {
             min: 0,
         })
 
-        this.selectedMgr.init()
         this.renderer.init()
+
+        this.docMgr.write('')
         this.cursorMgr.init()
 
         // const resizeObserver = new ResizeObserver(entreis => {
@@ -114,7 +113,7 @@ class Aqua {
         let ACC = 0
         function genCoord() {
             return new Coord({
-                logicalY: ACC++,
+                y: ACC++,
             })
         }
 
@@ -122,7 +121,7 @@ class Aqua {
         const contents = []
         for (let i = 0; i < 1; i++) {
             const coord = genCoord()
-            contents.push('#' + (coord.logicalY + 1))
+            contents.push('#' + (coord.y + 1))
         }
 
         this.docMgr.write(contents)
@@ -135,8 +134,8 @@ class Aqua {
 
         setTimeout(() => {
             this.docMgr.write(c, {
-                logicalY: 11,
-                logicalX: 200,
+                y: 11,
+                x: 200,
             })
         }, 1000)
 
@@ -154,9 +153,9 @@ class Aqua {
 
         //         console.error('---------------------')
         //         for (let i = 0; i < 100; i++) {
-        //             const logicalY = Math.random() < 1 ? this.docMgr.doc.root.size : parseInt(this.docMgr.doc.root.size * Math.random())
+        //             const y = Math.random() < 1 ? this.docMgr.doc.root.size : parseInt(this.docMgr.doc.root.size * Math.random())
         //             this.docMgr.write('Peko', {
-        //                 logicalY,
+        //                 y,
         //             })
         //         }
 
@@ -179,8 +178,8 @@ class Aqua {
         // const sec = 1000
         // for (; performance.now() - start < sec; i++) {
         //     this.docMgr.write(new StringAsset('A'), {
-        //         logicalY: i,
-        //         logicalX: 0,
+        //         y: i,
+        //         x: 0,
         //     })
         // }
         // console.error(`Insert With CustomData ${i / sec * 1000} qps/second`)
@@ -196,13 +195,13 @@ class Aqua {
         //     console.error('Read Content',
         //         this.docMgr.read(
         //             new Coord({
-        //                 logicalY: 0,
-        //                 logicalX: 0,
+        //                 y: 0,
+        //                 x: 0,
         //             }),
 
         //             new Coord({
-        //                 logicalY: Infinity,
-        //                 logicalX: Infinity,
+        //                 y: Infinity,
+        //                 x: Infinity,
         //             })
         //         )
         //     )
@@ -228,10 +227,6 @@ class Aqua {
         // this.khala.once('docUpdated', () => {
         //     console.error('docUpdated', this.contentMgr.doc)
             // this.cursorMgr.create()
-
-            // this.cursorMgr.traverse(cursor => {
-            //     this.selectedMgr.update(cursor)
-            // })
         // })
     }
 
@@ -265,7 +260,7 @@ class Aqua {
                         scroller
                             components
                                 fullWidthCntr
-                                    selectedCntr
+                                    selectedLineCntr
                                 lineWidthCntr
                                     measureCntr
                                         lineNumMeasure

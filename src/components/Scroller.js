@@ -57,9 +57,7 @@ class Scroller {
     }
 
     scrollTo(y = this.y) {
-        requestAnimationFrame(() => {
-            this.aqua.khala.emit('scroll', y, this.y)
-        })
+        this.aqua.khala.emit('scroll', y, this.y)
 
         if (this.y === y) {
             return

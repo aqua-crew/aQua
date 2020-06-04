@@ -1,7 +1,7 @@
+const DisposablePool = require('./DisposablePool')
 const LinePool = require('./LinePool')
-const SelectedLinePool = require('./SelectedLinePool')
 
 module.exports = {
+    DisposablePool,
     LinePool,
-    SelectedLinePool,
 }

@@ -16,13 +16,18 @@ class MoveUp extends Action {
                 cursor.selection.reset()
             }
 
-            if (cursor.logicalY === 0) {
-                cursor.logicalX = 0
+            if (cursor.y === 0) {
+                cursor.x = 0
 
                 return
             }
 
-            cursor.logicalY = cursor.logicalY - 1
+            if (cursor.insideY > 0) {
+                cursor.insideY = cursor.insideY - 1
+            } else {
+                cursor.y = cursor.y - 1
+                cursor.insideY = cursor.maxInsideY
+            }
         }
 
         if (state.cursor) {

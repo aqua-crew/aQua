@@ -9,6 +9,10 @@ class CursorMgr {
 
     init() {
         this.create()
+        this.traverse(cursor => {
+            cursor.y = 0
+            cursor.x = 0
+        })
     }
 
     get size() {
@@ -31,12 +35,14 @@ class CursorMgr {
         return this
     }
 
-    /**
-    const options = {
-        filter: () => true
+    pureTraverse(cb, cursors = this.cursors) {
+        for (let i = 0; i < cursors.length; i++) {
+            cb(cursors[i])
+        }
     }
-    */
+
     traverse(cb, {
+        viewport = this.aqua.viewport,
         cursors = this.cursors,
         filter = cursor => true,
         acc = true,
@@ -44,39 +50,49 @@ class CursorMgr {
         force = false,
     } = {}) {
         const accCoord = {
-            logicalY: 0,
-            logicalX: 0,
+            y: 0,
+            x: 0,
         }
 
         for (let i = 0; i < cursors.length; i++) {
             const cursor = cursors[i]
 
             if (acc) {
-                cursor.logicalY = cursor.logicalY + accCoord.logicalY
-                cursor.logicalX = cursor.logicalX + accCoord.logicalX
+                if (accCoord.y !== 0) { // cursor.y 的 set 会进行 inside 计算, 这里做判断避免多余的计算
+                    cursor.y = cursor.y + accCoord.y
+                }
+
+                if (accCoord.y !== 0) {
+                    cursor.x = cursor.x + accCoord.x
+                }
             }
 
             const before = cursor.coord.clone()
 
             filter(cursor) && cb(cursor)
 
-            cursor.updateCoord({
-                update,
-                force,
-            })
-            cursor.updateSelection()
+            // cursor.updateCoord({
+            //     update,
+            //     force,
+            // })
+            // cursor.updateSelection()
 
             const after = cursor.coord.clone()
 
-            accCoord.logicalY = after.logicalY - before.logicalY
-            accCoord.logicalX = after.logicalX - before.logicalX
+            accCoord.y = after.y - before.y
+            accCoord.x = after.x - before.x
         }
 
+        this.aqua.renderer.render('cursor', viewport)
+        this.aqua.renderer.render('selection', viewport)
+        this.aqua.renderer.render('inputer', viewport)
+        this.aqua.renderer.render('selectedLine', viewport)
+        // 渲染光标
+        // 渲染选区
         // this.detect() /* 检测光标与选区的冲突 */
         // this.updateUI() /* 渲染光标视图 */
 
         // this.aqua.uiMgr.get('inputerLocator').style.cssText = `top: 0; left: 0; display: none;` // 重新渲染输入框位置的预置条件
-        this.aqua.uiMgr.get('inputerLocator').style.cssText = `top: ${this.main.physicalY}px; left: ${this.main.physicalX}px; display: block;`
 
         return this
     }
@@ -100,17 +116,6 @@ class CursorMgr {
             exceptions = [exceptions]
         }
 
-        for (let i = 0; i < exceptions.length; i++) {
-            const cursor = exceptions[i]
-            cursor.cure()
-        }
-
-        const cursors = this.cursors
-        for (let i = 0; i < cursors.length; i++) {
-            const cursor = cursors[i]
-            cursor.release()
-        }
-
         this.cursors = exceptions
     }
 
@@ -124,7 +129,6 @@ class CursorMgr {
             const index = this.cursors.indexOf(cursor)
 
             if (index !== -1) {
-                cursor.release()
                 this.cursors.splice(index, 1)
             }
         }
@@ -132,9 +136,9 @@ class CursorMgr {
 
     resort() {
         this.cursors.sort((cursorA, cursorB) => {
-            const minusY = cursorA.logicalY - cursorB.logicalY
+            const minusY = cursorA.y - cursorB.y
 
-            return minusY === 0 ? cursorA.logicalX - cursorB.logicalX : minusY
+            return minusY === 0 ? cursorA.x - cursorB.x : minusY
         })
     }
 

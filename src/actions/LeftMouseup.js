@@ -12,20 +12,15 @@ class LeftMouseup extends Action {
     exec(aqua, event, state) {
         state.mousedown = false
 
-        const rect = aqua.korwa.getScrollerRect()
+        const rect = aqua.korwa.getLineWidthRect()
 
         aqua.cursorMgr.traverse(cursor => {
             if (event.target.getAttribute('aqua-is-line-number')) return
 
-            cursor.physicalY = event.clientY - rect.top
-            cursor.physicalX = event.clientX - rect.left - aqua.korwa.lineNumCntrWidth
+            cursor.$y = event.clientY - rect.top
+            cursor.$x = event.clientX - rect.left
 
-            cursor.updateCoord({
-                update: false
-            })
-
-            cursor.selection.setTerminal(cursor.coord)
-            cursor.updateSelection()
+            cursor.selection.terminal = cursor.coord
         }, {
             filter: cursor => cursor === aqua.cursorMgr.main
         })

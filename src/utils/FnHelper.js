@@ -1,7 +1,7 @@
 const FnHelper = {
-    getClosure(obj, fn) {
-        return obj[fn].bind(obj)
-    },
+    limit(fn, debounceTimeout, throttleTimeout) {
+
+    }
 }
 
 module.exports = FnHelper

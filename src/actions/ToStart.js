@@ -16,7 +16,7 @@ class ToStart extends Action {
                 cursor.selection.reset()
             }
 
-            cursor.logicalX = 0
+            cursor.x = 0
         }
 
         if (state.cursor) {

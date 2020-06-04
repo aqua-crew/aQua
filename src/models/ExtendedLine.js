@@ -5,10 +5,15 @@ const FONT_SIZE = 12
 
 class ExtendedLine {
     constructor($line, korwa) {
+        this.$line = $line
         this.$code = $line.children[1].firstChild
         this.korwa = korwa
 
         this.updateMap()
+    }
+
+    get length() {
+        return this.map[this.map.length - 1]
     }
 
     updateMap() {
@@ -71,14 +76,14 @@ class ExtendedLine {
         }
     }
 
-    getInsideY(y) {
+    getInsideY($y) {
         const lineRects = this.getClientRects()
         let insideY = lineRects.length - 1
 
         for (; insideY >= 0; insideY--) {
             const bottom = this.transformToRealBottom(lineRects[insideY].bottom) - this.korwa.getScrollerRect().top // (lineHeight - fontSize) / 2
 
-            if (y > bottom) {
+            if ($y > bottom) {
                 break
             }
         }
@@ -88,15 +93,16 @@ class ExtendedLine {
 
     transformToLayoutY(insideY) {
         const rects = this.getClientRects()
+
         return rects[insideY].bottom - this.korwa.getScrollerRect().top
     }
 
-    getClientRects() {
-        return this.$code.getClientRects()
+    getClientRect() {
+        return this.korwa.getClientRect(this.$line)
     }
 
-    getLength() {
-        return this.map[this.map.length - 1]
+    getClientRects() {
+        return this.korwa.getClientRects(this.$code)
     }
 
     genMap() {
@@ -117,8 +123,13 @@ class ExtendedLine {
         return map
     }
 
-    transformToRealBottom(y) {
-        return y + (LINE_HEIGHT - FONT_SIZE) / 2
+    transformToRealBottom($y) {
+        return $y + (LINE_HEIGHT - FONT_SIZE) / 2
+    }
+
+    getInsideLineHeight(insideY = 0) {
+        const rects = this.getClientRects()
+        const maxInsideY = rects.length - 1
     }
 }
 
