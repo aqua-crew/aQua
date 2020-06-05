@@ -6,12 +6,11 @@ class CursorRenderer {
         this.applyName = 'cursor'
 
         this.cursors = aqua.cursorMgr
-        this.cursorPool = new DisposablePool(aqua.uiMgr.get('cursorCntr'), 'cursor')
+        this.pool = new DisposablePool(aqua.uiMgr.get('cursorCntr'), 'cursor')
     }
 
     render(viewport) {
-        console.error('Emit Cursor Render')
-        this.cursorPool.resetUnuse()
+        this.pool.resetUnuse()
 
         const renderArea = viewport.getRenderArea()
 
@@ -23,13 +22,14 @@ class CursorRenderer {
             this.renderCursor(cursor)
         })
 
-        this.cursorPool.clearUnuse()
+        this.pool.clearUnuse()
     }
 
     renderCursor(cursor) {
-        const $cursor = this.cursorPool.get()
+        const $cursor = this.pool.get()
+        const layout = cursor.updateLayout()
 
-        this.updateCursor($cursor, cursor.updateLayout())
+        this.updateCursor($cursor, layout)
     }
 
     updateCursor($cursor, layout) {

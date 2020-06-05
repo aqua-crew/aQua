@@ -14,11 +14,17 @@ class InputerRenderer {
     render(viewport) {
         const cursor = this.cursors.main
 
-        rAF(() => {
-            setTimeout(() => {
-                this.$inputerLocator.style.cssText = `display: block; top: ${cursor.$y}px; left: ${cursor.$x}px;`
-            }, 100)
-        })
+        if (!cursor) {
+            return
+        }
+
+
+
+        // rAF(() => {
+        //     setTimeout(() => {
+        //         this.$inputerLocator.style.cssText = `display: block; top: ${cursor.$y}px; left: ${cursor.$x}px;`
+        //     }, 100)
+        // })
     }
 }
 

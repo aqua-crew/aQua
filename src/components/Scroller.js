@@ -1,3 +1,5 @@
+const { rAF } = require('../utils/index')
+
 class Scroller {
     constructor(aqua, options) {
         this.aqua = aqua
@@ -56,24 +58,26 @@ class Scroller {
         }
     }
 
-    scrollTo(y = this.y) {
-        this.aqua.khala.emit('scroll', y, this.y)
-
-        if (this.y === y) {
-            return
-        }
-
-        this.y = this.correctY(y)
+    scrollTo(y = this.y, scrollOnly = false) {
+        this.y = y = this.correctY(y)
 
         clearTimeout(this.timeoutId)
 
         if (new Date().getTime() - this.lastScroll >= 17) {
             this.lastScroll = new Date().getTime()
-            this.$el.style.transform = `translateY(-${y}px)`
+            rAF(() => {
+                this.$el.style.transform = `translateY(-${y}px)`
+            })
+
+            !scrollOnly && this.aqua.khala.emit('scroll', y, this.y)
         } else {
             this.timeoutId = setTimeout(() => {
                 this.lastScroll = new Date().getTime()
-                this.$el.style.transform = `translateY(-${y}px)`
+                rAF(() => {
+                    this.$el.style.transform = `translateY(-${y}px)`
+                })
+
+                !scrollOnly && this.aqua.khala.emit('scroll', y, this.y)
             }, 17)
         }
     }

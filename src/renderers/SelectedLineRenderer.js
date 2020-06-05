@@ -13,8 +13,6 @@ class SelectedLineRenderer {
     }
 
     render(viewport) {
-        console.error('Emit SelectedLine Render')
-
         this.pool.resetUnuse()
         this.selected = Object.create(null)
 

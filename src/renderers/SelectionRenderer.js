@@ -8,13 +8,13 @@ class SelectionRenderer {
         this.korwa = aqua.korwa
         this.locator = aqua.locator
         this.cursors = aqua.cursorMgr
-        this.selectionPool = new DisposablePool(aqua.uiMgr.get('selectionCntr'), 'selection')
+        this.pool = new DisposablePool(aqua.uiMgr.get('selectionCntr'), 'selection')
     }
 
     render(viewport) {
         const renderArea = viewport.getRenderArea()
 
-        this.selectionPool.resetUnuse()
+        this.pool.resetUnuse()
 
         this.cursors.pureTraverse(cursor => {
             if (cursor.selection.isCollapsed()) {
@@ -36,7 +36,7 @@ class SelectionRenderer {
             this.renderSelection(cursor.selection)
         })
 
-        this.selectionPool.clearUnuse()
+        this.pool.clearUnuse()
     }
 
     renderSelection(selection) {
@@ -44,7 +44,7 @@ class SelectionRenderer {
         let $selections = []
 
         for (let i = count; i > 0; i--) {
-            $selections.push(this.selectionPool.get())
+            $selections.push(this.pool.get())
         }
 
         this._renderSelection($selections, selection.getStart(), selection.getEnd(), count)

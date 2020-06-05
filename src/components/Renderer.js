@@ -31,18 +31,19 @@ class Renderer {
         let timeoutId = null
         docWatcher.off('change')
         docWatcher.on('change', data => {
+            console.warn('Changed', data)
             const lines = data.effectLines
 
             LineHelper.setHeight(lines, this.korwa.measureLinesHeight(lines))
             docWatcher.emit('resize', lines)
 
             clearTimeout(timeoutId)
-            if (new Date().getTime() - lastChange > 16) {
+            if (new Date().getTime() - lastChange > 17) {
                 this.renderViewport(viewport, true)
             } else {
                 timeoutId = setTimeout(() => {
                     this.renderViewport(viewport, true)
-                }, 8)
+                }, 17)
             }
 
             lastChange = new Date().getTime()
@@ -50,11 +51,7 @@ class Renderer {
         })
 
         khala.off('scroll')
-        khala.on('scroll', (y, lastY = -1) => {
-            if (y === lastY) {
-                return
-            }
-
+        khala.on('scroll', y => {
             viewport.update(y)
 
             this.renderViewport(viewport)
@@ -76,16 +73,14 @@ class Renderer {
         const oldRenderArea = viewport.getRenderArea()
         const renderArea = viewport.updateRenderArea(renderStart, renderEnd)
 
+        viewport.pad(this.doc.getLineWithHeight(renderArea.start).top)
+
         this.render('line', viewport, renderArea, oldRenderArea)
-        setTimeout(() => {
-            this.render('cursor', viewport)
-            this.render('inputer', viewport)
-            this.render('selection', viewport)
-        })
+        this.render('cursor', viewport)
+        this.render('inputer', viewport)
+        this.render('selection', viewport)
         this.render('selectedLine', viewport)
         this.render('lineNum', viewport)
-
-        viewport.pad(this.doc.getLineWithHeight(renderArea.start).top)
     }
 
     render(applyName, ...payload) {

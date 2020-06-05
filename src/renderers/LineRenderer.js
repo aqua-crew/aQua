@@ -12,11 +12,10 @@ class LineRenderer {
 
         this.$lineCntr = aqua.uiMgr.get('lineCntr')
 
-        this.linePool = new LinePool
+        this.pool = new LinePool
     }
 
     render(viewport, renderArea, oldRenderArea) {
-        console.error('Emit Line Render')
         const oldLines = viewport.lines
         const lines = viewport.lines = this.doc.getLines(renderArea.start, renderArea.end)
 
@@ -116,7 +115,7 @@ class LineRenderer {
                     }
                 }
 
-                const $line = this.linePool.size > 0 ? this.linePool.get() : this.lineMgr.create()
+                const $line = this.pool.size > 0 ? this.pool.get() : this.lineMgr.create()
                 $list[curIndex] = $line
                 this.patchLine(line, $line)
             }
@@ -196,7 +195,7 @@ class LineRenderer {
         // 为了健壮还是做了判断...
         if ($line.parentNode) {
             $line.remove()
-            this.linePool.put($line)
+            this.pool.put($line)
         }
     }
 }

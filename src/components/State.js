@@ -1,12 +1,10 @@
 class State {
     constructor() {
+        active: false,
+
         this.mod = {
             line: null,
             cursor: null,
-        }
-
-        this.aqua = {
-            active: false,
         }
 
         this.file = {

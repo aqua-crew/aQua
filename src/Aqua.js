@@ -97,7 +97,6 @@ class Aqua {
 
         this.docMgr.write('')
         this.cursorMgr.init()
-
         // const resizeObserver = new ResizeObserver(entreis => {
         //     const contentRect = entreis[0].contentRect
         //     console.error(contentRect.height)
@@ -313,7 +312,10 @@ class Aqua {
         this.kizuna.on($viewport, 'mousedown', event => {
             event.preventDefault()
             this.kizuna.filterMousedown(event)
-            this.uiMgr.get('inputer').focus() /* focus() 调用要在设置 $inputer 位置之后哦 */
+
+            if (!this.state.focus) {
+                this.uiMgr.get('inputer').focus({ preventScroll: true })
+            }
         })
 
         this.kizuna.on($viewport, 'mousemove', event => {
@@ -324,7 +326,6 @@ class Aqua {
         this.kizuna.on($viewport, 'mouseup', event => {
             event.preventDefault()
             this.kizuna.filterMouseup(event)
-            this.uiMgr.get('inputer').focus() /* focus() 调用要在设置 $inputer 位置之后哦 */
         })
 
         this.kizuna.on($viewport, 'scroll', event => {
@@ -363,7 +364,17 @@ class Aqua {
 
     loadInputerEvents() {
         const $inputer = this.uiMgr.get('inputer')
+
         $inputer.focus()
+
+        this.kizuna.on($inputer, 'focus', event => {
+            this.state.focus = true
+        })
+
+        this.kizuna.on($inputer, 'blur', event => {
+            this.state.focus = false
+        })
+
         this.kizuna.on($inputer, 'input', event => {
             event.preventDefault()
             console.error('event', event)
