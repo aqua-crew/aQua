@@ -47,17 +47,17 @@ class SelectionRenderer {
             $selections.push(this.pool.get())
         }
 
-        this._renderSelection($selections, selection.getStart(), selection.getEnd(), count)
+        this.updateSelection($selections, selection.getStart(), selection.getEnd(), count)
     }
 
-    _renderSelection($selections, start, end) {
+    updateSelection($selections, start, end) {
         const count = $selections.length
         const lineHeight = this.korwa.getSingleLineHeight()
 
-        if (count === 1) {
-            const startLayout = this.locator.getLayoutByCoord(start.y, start.x)
-            const endLayout = this.locator.getLayoutByCoord(end.y, end.x)
+        const startLayout = this.locator.getLayoutByCoord(start.y, start.x, start.insideY)
+        const endLayout = this.locator.getLayoutByCoord(end.y, end.x, end.insideY)
 
+        if (count === 1) {
             rAF(() => {
                 $selections[0].style.cssText = `top: ${startLayout.y}px; left: ${startLayout.x}px; width: ${endLayout.x - startLayout.x}px; height: ${lineHeight}px`
             })
@@ -66,9 +66,6 @@ class SelectionRenderer {
         }
 
         if (count === 2) {
-            const startLayout = this.locator.getLayoutByCoord(start.y, start.x)
-            const endLayout = this.locator.getLayoutByCoord(end.y, end.x)
-
             rAF(() => {
                 $selections[0].style.cssText = `top: ${startLayout.y}px; left: ${startLayout.x}px; right: 0; height: ${lineHeight}px`
                 $selections[1].style.cssText = `top: ${endLayout.y}px; left: 0; width: ${endLayout.x}px; height: ${lineHeight}px`
@@ -78,9 +75,6 @@ class SelectionRenderer {
         }
 
         if (count === 3) {
-            const startLayout = this.locator.getLayoutByCoord(start.y, start.x)
-            const endLayout = this.locator.getLayoutByCoord(end.y, end.x)
-
             rAF(() => {
                 $selections[0].style.cssText = `top: ${startLayout.y}px; left: ${startLayout.x}px; right: 0; height: ${lineHeight}px`
                 $selections[1].style.cssText = `top: ${endLayout.y}px; left: 0; width: ${endLayout.x}px; height: ${lineHeight}px`

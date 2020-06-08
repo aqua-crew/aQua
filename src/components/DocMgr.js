@@ -3,16 +3,14 @@ const { LineStatus, DocUpdateOptions } = require('../enums/index')
 
 class DocMgr {
     constructor(aqua) {
-        this.aqua = aqua
+        this.docWatcher = aqua.docWatcher
 
         this.doc = new Doc
     }
 
     init() {
-        const docWatcher = this.aqua.docWatcher
-
-        docWatcher.off('resize')
-        docWatcher.on('resize', lines => {
+        this.docWatcher.off('resize')
+        this.docWatcher.on('resize', lines => {
             if (!lines) {
                 return
             }
@@ -136,7 +134,7 @@ class DocMgr {
             effectLines = lines
         }
 
-        this.aqua.docWatcher.emit('change', {
+        this.docWatcher.emit('change', {
             effectLineNum: startLineNum,
             effectLines,
             source: 'write',
@@ -233,7 +231,7 @@ class DocMgr {
             effectCount = lines.length - 1
         }
 
-        this.aqua.docWatcher.emit('change', {
+        this.docWatcher.emit('change', {
             effectLineNum: startLineNum,
             effectLines,
             source: 'delete',

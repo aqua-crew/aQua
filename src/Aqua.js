@@ -255,6 +255,9 @@ class Aqua {
                 bgCntr
                 editor
                     viewport
+                        inputerCntr
+                            inputerLocator
+                                inputer
                         beacon
                         scroller
                             components
@@ -264,9 +267,6 @@ class Aqua {
                                     measureCntr
                                         lineNumMeasure
                                         modsMeasure
-                                    inputerCntr
-                                        inputerLocator
-                                            inputer
                                     cursorCntr
                                     selectionCntr
                                     lineCntr

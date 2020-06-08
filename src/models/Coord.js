@@ -40,8 +40,8 @@ class Coord {
 
         coord.y = this.y
         coord.x = this.x
-        coord.insideY = this.insideY
-        coord.maxInsideY = this.maxInsideY
+        // coord.insideY = this.insideY
+        // coord.maxInsideY = this.maxInsideY
 
         return coord
     }

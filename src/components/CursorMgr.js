@@ -84,9 +84,10 @@ class CursorMgr {
         }
 
         this.aqua.renderer.render('cursor', viewport)
-        this.aqua.renderer.render('selection', viewport)
         this.aqua.renderer.render('inputer', viewport)
+        this.aqua.renderer.render('selection', viewport)
         this.aqua.renderer.render('selectedLine', viewport)
+
         // 渲染光标
         // 渲染选区
         // this.detect() /* 检测光标与选区的冲突 */

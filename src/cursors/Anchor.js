@@ -65,7 +65,7 @@ class Anchor {
     }
 
     updateLayout() {
-        const layout = this.aqua.locator.getLayoutByCoord(this.y, this.x)
+        const layout = this.aqua.locator.getLayoutByCoord(this.y, this.x, this.insideY !== this.maxInsideY ? this.insideY : null)
 
         this.layout.y = layout.y
         this.layout.x = layout.x

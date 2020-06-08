@@ -73,59 +73,59 @@ class Locator {
         let x = -1
 
         if ($x >= $xMax) {
-            x = extendedLine.length
+            $x = $xMax
         } else if ($x < $xMin) {
-            x = 0
+            $x = $xMin
+        }
+
+        if (maxInsideY === 0) {
+            Algorithm.binarySearch(0, extendedLine.length, (center, lastCenter) => {
+                const charRect = extendedLine.getElementRect(center)
+
+                const left = charRect.left - measureRect.left
+                if ($x < left) {
+                    return -1
+                }
+
+                const right = charRect.right - measureRect.left
+                if ($x > right) {
+                    return 1
+                }
+
+                const half = charRect.width / 2
+                x = $x - left < half ? center : center + 1
+
+                return 0
+            })
         } else {
-            if (maxInsideY === 0) {
-                Algorithm.binarySearch(0, extendedLine.length, (center, lastCenter) => {
-                    const charRect = extendedLine.getElementRect(center)
+            Algorithm.binarySearch(0, extendedLine.length, center => {
+                const charRect = extendedLine.getElementRect(center)
+                const top = charRect.bottom - measureRect.top
+                const charRectInsideY = extendedLine.getInsideY(top)
 
-                    const left = charRect.left - measureRect.left
-                    if ($x < left) {
-                        return -1
-                    }
+                if (insideY > charRectInsideY) {
+                    return 1
+                }
 
-                    const right = charRect.right - measureRect.left
-                    if ($x > right) {
-                        return 1
-                    }
+                if (insideY < charRectInsideY) {
+                    return -1
+                }
 
-                    const half = charRect.width / 2
-                    x = $x - left < half ? center : center + 1
+                const left = charRect.left - measureRect.left
+                if ($x < left) {
+                    return -1
+                }
 
-                    return 0
-                })
-            } else {
-                Algorithm.binarySearch(0, extendedLine.length, center => {
-                    const charRect = extendedLine.getElementRect(center)
-                    const top = charRect.bottom - measureRect.top
-                    const charRectInsideY = extendedLine.getInsideY(top)
+                const right = charRect.right - measureRect.left
+                if ($x > right) {
+                    return 1
+                }
 
-                    if (insideY > charRectInsideY) {
-                        return 1
-                    }
+                const half = charRect.width / 2
+                x = $x - left < half ? center : center + 1
 
-                    if (insideY < charRectInsideY) {
-                        return -1
-                    }
-
-                    const left = charRect.left - measureRect.left
-                    if ($x < left) {
-                        return -1
-                    }
-
-                    const right = charRect.right - measureRect.left
-                    if ($x > right) {
-                        return 1
-                    }
-
-                    const half = charRect.width / 2
-                    x = $x - left < half ? center : center + 1
-
-                    return 0
-                })
-            }
+                return 0
+            })
         }
 
         return x
@@ -155,59 +155,59 @@ class Locator {
         let x = -1
 
         if ($x >= $xMax) {
-            x = extendedLine.length
+            $x = $xMax
         } else if ($x < $xMin) {
-            x = 0
+            $x = $xMin
+        }
+
+        if (maxInsideY === 0) {
+            Algorithm.binarySearch(0, extendedLine.length, (center, lastCenter) => {
+                const charRect = extendedLine.getElementRect(center)
+
+                const left = charRect.left - measureRect.left
+                if ($x < left) {
+                    return -1
+                }
+
+                const right = charRect.right - measureRect.left
+                if ($x > right) {
+                    return 1
+                }
+
+                const half = charRect.width / 2
+                x = $x - left < half ? center : center + 1
+
+                return 0
+            })
         } else {
-            if (maxInsideY === 0) {
-                Algorithm.binarySearch(0, extendedLine.length, (center, lastCenter) => {
-                    const charRect = extendedLine.getElementRect(center)
+            Algorithm.binarySearch(0, extendedLine.length, center => {
+                const charRect = extendedLine.getElementRect(center)
+                const top = charRect.bottom - measureRect.top
+                const charRectInsideY = extendedLine.getInsideY(top)
 
-                    const left = charRect.left - measureRect.left
-                    if ($x < left) {
-                        return -1
-                    }
+                if (insideY > charRectInsideY) {
+                    return 1
+                }
 
-                    const right = charRect.right - measureRect.left
-                    if ($x > right) {
-                        return 1
-                    }
+                if (insideY < charRectInsideY) {
+                    return -1
+                }
 
-                    const half = charRect.width / 2
-                    x = $x - left < half ? center : center + 1
+                const left = charRect.left - measureRect.left
+                if ($x < left) {
+                    return -1
+                }
 
-                    return 0
-                })
-            } else {
-                Algorithm.binarySearch(0, extendedLine.length, center => {
-                    const charRect = extendedLine.getElementRect(center)
-                    const top = charRect.bottom - measureRect.top
-                    const charRectInsideY = extendedLine.getInsideY(top)
+                const right = charRect.right - measureRect.left
+                if ($x > right) {
+                    return 1
+                }
 
-                    if (insideY > charRectInsideY) {
-                        return 1
-                    }
+                const half = charRect.width / 2
+                x = $x - left < half ? center : center + 1
 
-                    if (insideY < charRectInsideY) {
-                        return -1
-                    }
-
-                    const left = charRect.left - measureRect.left
-                    if ($x < left) {
-                        return -1
-                    }
-
-                    const right = charRect.right - measureRect.left
-                    if ($x > right) {
-                        return 1
-                    }
-
-                    const half = charRect.width / 2
-                    x = $x - left < half ? center : center + 1
-
-                    return 0
-                })
-            }
+                return 0
+            })
         }
 
         return {
@@ -218,7 +218,7 @@ class Locator {
         }
     }
 
-    getLayoutByCoord(y, x) {
+    getLayoutByCoord(y, x, preferInsideY) {
         const yMax = this.doc.size
 
         if (y < 0) {
@@ -246,12 +246,37 @@ class Locator {
 
         const measureRect = this.korwa.getLineWidthRect()
         const xAtLast = x === xMax // 如果是最后一格, 取 charRect 按照最后一个字取, 只不过在返回的时候返回 rect 的右边部分
-        const charRect = extendedLine.getElementRect(xAtLast ? x - 1 : x)
-        const insideY = extendedLine.getInsideY(charRect.bottom - measureRect.top)
+
+        let charRectDirection = ''
+        let charRect = null
+        let insideY = -1
+
+        charRect = extendedLine.getElementRect(xAtLast ? x - 1 : x)
+        insideY = extendedLine.getInsideY(charRect.bottom - measureRect.top)
+
+        let $x = -1
+
+        if (preferInsideY == null) {
+            charRectDirection = xAtLast ? 'right' : 'left'
+        } else {
+            const diff = preferInsideY - insideY
+
+            if (diff === 1) {
+                charRect = extendedLine.getElementRect(x + 1)
+                charRectDirection = 'left'
+            } else if (diff === -1) {
+                charRect = extendedLine.getElementRect(x - 1)
+                charRectDirection = 'right'
+            } else {
+                charRectDirection = 'left'
+            }
+
+            insideY = preferInsideY
+        }
 
         return {
             y: this.transformToCursorPhysicalY(extendedLine.transformToLayoutY(insideY)),
-            x: xAtLast ? charRect.right - measureRect.left : charRect.left - measureRect.left,
+            x: charRect[charRectDirection] - measureRect.left,
         }
     }
 

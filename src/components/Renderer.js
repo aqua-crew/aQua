@@ -8,18 +8,22 @@ class Renderer {
     constructor(aqua) {
         this.aqua = aqua
 
-        this.renderers = Object.create(null)
+        this.renderers = null
 
         this.doc = aqua.docMgr
         this.korwa = aqua.korwa
     }
 
-    init() {
+    initRenders(Renders) {
+        this.renderers = Object.create(null)
+
         Object.keys(Renderers).forEach(name => {
             const render = new Renderers[name](this.aqua)
             this.renderers[render.applyName] = render
         })
+    }
 
+    initEvents() {
         const viewport = this.aqua.viewport
         const docWatcher = this.aqua.docWatcher
         const khala = this.aqua.khala
@@ -31,7 +35,7 @@ class Renderer {
         let timeoutId = null
         docWatcher.off('change')
         docWatcher.on('change', data => {
-            console.warn('Changed', data)
+            // console.warn('Changed', data)
             const lines = data.effectLines
 
             LineHelper.setHeight(lines, this.korwa.measureLinesHeight(lines))
@@ -56,6 +60,11 @@ class Renderer {
 
             this.renderViewport(viewport)
         })
+    }
+
+    init() {
+        this.initRenders(Renderers)
+        this.initEvents()
     }
 
     renderViewport(viewport = this.aqua.viewport, force = false) {
