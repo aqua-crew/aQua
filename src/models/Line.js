@@ -259,12 +259,12 @@ class Line {
         return head
     }
 
-    getId() {
-        if (this.id) {
-            return this.id
+    get id() {
+        if (this._id) {
+            return this._id
         }
 
-        return this.id = (new Date().getTime() + Math.random()).toString(36).substring(2)
+        return this._id = 'L' + (new Date().getTime() + Math.random()).toString(36).replace('.', '')
     }
 
     traverse(cb, data = this.data) {

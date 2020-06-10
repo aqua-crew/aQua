@@ -1,41 +1,17 @@
-const { DOM, SizeObserver } = require('../utils/index')
+const { DOM, Echo } = require('../utils/index')
+const Measurers = require('../measurers/index')
 
 class Korwa {
     constructor(aqua) {
         this.aqua = aqua
-
-        this.$measures = Object.create(null)
-        this.lineHeight = Object.create(null)
-
-        this.$asyncMeasurers = Object.create(null)
     }
 
     init() {
-        const $f = DOM.f()
-        const $modsMeasure = this.aqua.uiMgr.get('modsMeasure')
-        const mods = this.aqua.lineMgr.mods
+        const extend = this.extend.bind(this)
 
-        for (let name in mods) {
-            const mod = mods[name]
-            const $measure = mod.create()
-            this.$measures[mod.name] = $measure
-            DOM.appendChild($f, $measure)
-        }
-
-        DOM.appendChild($modsMeasure, $f)
-
-        this.measureSingleLineHeight()
-
-        const resizeObserver = new SizeObserver
-
-        resizeObserver.observe(this.aqua.uiMgr.get('viewport'), entry => {
-            const contentRect = entry.contentRect
-
-            this.aqua.viewport.height = contentRect.height
-            this.aqua.renderer.renderViewport(this.aqua.viewport)
+        Object.keys(Measurers).forEach(name => {
+            new Measurers[name](this.aqua, extend, Korwa)
         })
-
-        this.lineNumCntrWidth = 50
     }
 
     getViewportRect() {
@@ -50,26 +26,6 @@ class Korwa {
         return aqua.uiMgr.get('lineWidthCntr').getBoundingClientRect()
     }
 
-    createMeasure(mod = this.aqua.state.mod.line) {
-        const $modsMeasure = this.aqua.uiMgr.get('modsMeasure')
-        const $measure = mod.create()
-        DOM.appendChild($modsMeasure, $measure)
-
-        return $measure
-    }
-
-    measureSingleLineHeight() {
-        const $measures = this.$measures
-
-        for (let modName in $measures) {
-            this.lineHeight[modName] = this.measureHeight({ data: '' }, modName)
-        }
-    }
-
-    getSingleLineHeight(mod = this.aqua.state.mod.line) {
-        return this.lineHeight[mod.name]
-    }
-
     getClientRect($ele) {
         return $ele.getBoundingClientRect()
     }
@@ -78,53 +34,30 @@ class Korwa {
         return $ele.getClientRects()
     }
 
-    measureHeight(lineOrData, modName) {
-        const $measure = this.$measures[modName]
+    extend(functionOrKey, value, isDefineProperty = false) {
+        let key = ''
 
-        DOM.clear($measure.children[1].firstChild)
-        DOM.appendChild($measure.children[1].firstChild, this.aqua.processorMgr.transformToElements(lineOrData))
+        if (typeof functionOrKey === 'function') {
+            const fn = functionOrKey
+            const fnNames = fn.name.split(' ') // if fn return by Function.prototype.bind , fn.name = 'bound fn'
 
-        return this.getClientRect($measure).height
-    }
-
-    getMeasurer(key, lineOrData, modName) {
-        const $asyncMeasurers = this.$asyncMeasurers
-        let measurer = $asyncMeasurers[key]
-
-        if (measurer) {
-            return measurer
+            value = fn
+            key = fnNames[fnNames.length - 1]
+        } else {
+            key = functionOrKey
         }
 
-        const $measure = this.createMeasure(modName)
-
-        measurer = function() {
-            const height = $measure.getBoundingClientRect().height
-            console.error('measure', height)
-            delete $asyncMeasurers[key]
-            // $measure.remove()
-
-            return height
+        if (this[key]) {
+            Echo.error('Korwa.prototype.extend', `key ${key} exist`)
         }
 
-        $asyncMeasurers[key] = measurer
+        if (isDefineProperty) {
+            Object.defineProperty(this, key, value)
 
-        DOM.appendChild($measure.children[1].firstChild, this.aqua.processorMgr.transformToElements(lineOrData))
-
-        return measurer
-    }
-
-    measureLinesHeight(lines, {
-        viewport = null,
-        startFrom = -1,
-    } = {}) {
-        const heights = []
-
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i]
-            heights.push(this.measureHeight(line, 'Text'))
+            return
         }
 
-        return heights
+        this[key] = value
     }
 }
 

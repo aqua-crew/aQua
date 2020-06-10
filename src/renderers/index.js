@@ -4,6 +4,7 @@ const LineNumRenderer = require('./LineNumRenderer')
 const LineRenderer = require('./LineRenderer')
 const SelectedLineRenderer = require('./SelectedLineRenderer')
 const SelectionRenderer = require('./SelectionRenderer')
+const TrackerRenderer = require('./TrackerRenderer')
 
 module.exports = {
     CursorRenderer,
@@ -12,4 +13,5 @@ module.exports = {
     LineRenderer,
     SelectedLineRenderer,
     SelectionRenderer,
+    TrackerRenderer,
 }

@@ -268,7 +268,7 @@ class Locator {
                 charRect = extendedLine.getElementRect(x - 1)
                 charRectDirection = 'right'
             } else {
-                charRectDirection = 'left'
+                charRectDirection = xAtLast ? 'right' : 'left'
             }
 
             insideY = preferInsideY

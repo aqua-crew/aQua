@@ -8,8 +8,6 @@ class Action {
         this.shortcuts = []
         this.eventType = 'keyboard' // or 'mouse'
         this.track = false
-        this.before = true
-        this.after = true
     }
 
     exec() {}

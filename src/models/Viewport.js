@@ -1,7 +1,9 @@
 class Viewport {
     constructor({
         y = 0,
+        x = 0,
         height = 0,
+        width = 0,
         $padding = null,
         padding = 0,
         lps = 0,
@@ -10,7 +12,9 @@ class Viewport {
         status = Object.create(null),
     } = {}) {
         this.y = y
+        this.x = x
         this.height = height
+        this.width = width
         this.$padding = $padding
         this.padding = 0
         this.lps = lps // Lines Per Screen
@@ -91,7 +95,7 @@ class Viewport {
         }
     }
 
-    get$Line(lineNum) {
+    $getLine(lineNum) {
         const { start, end } = this.renderArea
 
         if (lineNum < start || lineNum > end) {

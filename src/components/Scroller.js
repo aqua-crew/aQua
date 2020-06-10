@@ -58,26 +58,27 @@ class Scroller {
         }
     }
 
-    scrollTo(y = this.y, scrollOnly = false) {
+    scrollTo(y = this.y, force = false) {
         this.y = y = this.correctY(y)
 
         clearTimeout(this.timeoutId)
 
         if (new Date().getTime() - this.lastScroll >= 17) {
             this.lastScroll = new Date().getTime()
+            this.aqua.khala.emit('scroll', y, this.y, force)
+
             rAF(() => {
                 this.$el.style.transform = `translateY(-${y}px)`
             })
 
-            !scrollOnly && this.aqua.khala.emit('scroll', y, this.y)
         } else {
             this.timeoutId = setTimeout(() => {
                 this.lastScroll = new Date().getTime()
+                this.aqua.khala.emit('scroll', y, this.y, force)
+
                 rAF(() => {
                     this.$el.style.transform = `translateY(-${y}px)`
                 })
-
-                !scrollOnly && this.aqua.khala.emit('scroll', y, this.y)
             }, 17)
         }
     }

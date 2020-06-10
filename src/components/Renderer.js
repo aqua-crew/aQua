@@ -55,10 +55,10 @@ class Renderer {
         })
 
         khala.off('scroll')
-        khala.on('scroll', y => {
+        khala.on('scroll', (y, lastY, force) => {
             viewport.update(y)
 
-            this.renderViewport(viewport)
+            this.renderViewport(viewport, force)
         })
     }
 

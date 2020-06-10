@@ -35,6 +35,10 @@ class CursorMgr {
         return this
     }
 
+    getMain(cb) {
+        cb(this.main)
+    }
+
     pureTraverse(cb, cursors = this.cursors) {
         for (let i = 0; i < cursors.length; i++) {
             cb(cursors[i])
@@ -84,16 +88,13 @@ class CursorMgr {
         }
 
         this.aqua.renderer.render('cursor', viewport)
+        this.aqua.renderer.render('tracker', viewport)
         this.aqua.renderer.render('inputer', viewport)
         this.aqua.renderer.render('selection', viewport)
         this.aqua.renderer.render('selectedLine', viewport)
 
-        // 渲染光标
-        // 渲染选区
         // this.detect() /* 检测光标与选区的冲突 */
         // this.updateUI() /* 渲染光标视图 */
-
-        // this.aqua.uiMgr.get('inputerLocator').style.cssText = `top: 0; left: 0; display: none;` // 重新渲染输入框位置的预置条件
 
         return this
     }
@@ -106,10 +107,14 @@ class CursorMgr {
             cursor.coord.assign(coord)
         }
 
-        this.main = cursor
+        this.setMain(cursor)
         this.cursors.push(cursor)
 
         return cursor
+    }
+
+    setMain(cursor) {
+        this.main = cursor
     }
 
     removeAll(exceptions = this.main) {

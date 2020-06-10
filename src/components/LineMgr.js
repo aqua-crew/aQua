@@ -46,20 +46,12 @@ class LineMgr {
         return new ExtendedLine(this.$getLine(lineNum), this.aqua.korwa)
     }
 
-    // getTop(lineNum) {
-    //     return this.getLine(lineNum).getBoundingClientRect().top - this.getMeasuredBase().top
-    // }
-
-    // getLineRects(lineNum) {
-    //     return this.getLine(lineNum).children[1].firstChild.getClientRects()
-    // }
-
     // TODO
     $getLine(lineNum, viewport = this.aqua.viewport){
-        const $line = viewport.get$Line(lineNum)
+        let $line = viewport.$getLine(lineNum)
 
         if (!$line) {
-
+            $line = this.aqua.korwa.$getLine(lineNum)
         }
 
         return $line
@@ -73,10 +65,6 @@ class LineMgr {
     //     }
 
     //     return $line
-    // }
-
-    // getMeasuredBase() {
-    //     return this.aqua.uiMgr.get('lineCntr').getBoundingClientRect()
     // }
 
     // getMeasuredLine(lineNum) {

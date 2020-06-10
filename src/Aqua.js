@@ -125,11 +125,15 @@ class Aqua {
 
         this.docMgr.write(contents)
 
-        const c = new ImageAsset({
-            src: aqua,
-        })
+        // const c = new ImageAsset({
+        //     src: aqua,
+        // })
 
-        c.setNext(new StringAsset('aqua aqua'))
+        // c.setNext(new StringAsset('aqua aqua'))
+
+        const c = new StringAsset('aqua aqua')
+
+
 
         setTimeout(() => {
             this.docMgr.write(c, {
@@ -265,7 +269,6 @@ class Aqua {
                                     selectedLineCntr
                                 lineWidthCntr
                                     measureCntr
-                                        lineNumMeasure
                                         modsMeasure
                                     cursorCntr
                                     selectionCntr

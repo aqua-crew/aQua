@@ -11,6 +11,8 @@ const Noop = require('./Noop')
 const Iterator = require('./Iterator')
 const SpecialCharSet = require('./SpecialCharSet')
 
+const Echo = require('./Echo')
+
 module.exports = {
     Algorithm,
     DataTransferItemHandler,
@@ -24,4 +26,6 @@ module.exports = {
     Noop,
     Iterator,
     SpecialCharSet,
+
+    Echo: new Echo,
 }

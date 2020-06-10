@@ -8,24 +8,24 @@ module.exports = {
     UPDATED: 3,
 
     explain(num) {
-        if (num === -1) {
-            return 'DELETED'
-        }
-
-        if (num === 0) {
-            return 'HIDDEN'
+        if (num === 2) {
+            return 'DONE'
         }
 
         if (num === 1) {
             return 'CREATED'
         }
 
-        if (num === 2) {
-            return 'DONE'
-        }
-
         if (num === 3) {
             return 'UPDATED'
+        }
+
+        if (num === -1) {
+            return 'DELETED'
+        }
+
+        if (num === 0) {
+            return 'HIDDEN'
         }
     }
 }

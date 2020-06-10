@@ -11,6 +11,11 @@ class PageDown extends Action {
     }
 
     exec(aqua, event) {
+        aqua.do(cursor => {
+            cursor.$y = cursor.$y + aqua.viewport.height
+        }, {
+            acc: false,
+        })
         console.error(this.name)
     }
 }

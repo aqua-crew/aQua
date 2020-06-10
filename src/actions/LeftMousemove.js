@@ -7,7 +7,6 @@ class LeftMousemove extends Action {
         this.desc = 'Locate'
         this.shortcuts = ['LeftMousemove']
         this.eventType = 'mouse'
-        this.before = false
     }
 
     exec(aqua, event, state) {

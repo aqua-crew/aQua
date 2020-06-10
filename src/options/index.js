@@ -1,6 +1,7 @@
 module.exports = {
     el: null,
     content: '',
+    ext: 'txt', // extension: 'txt',
 
     ui: {
         theme: 'aqua',
