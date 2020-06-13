@@ -1,4 +1,7 @@
 const { Action } = require('../interfaces/index')
+const { HTMLVariables } = require('../enums/index')
+
+const DisableMouseEvent = HTMLVariables.DisableMouseEvent
 
 class LeftMouseup extends Action {
     constructor() {
@@ -15,7 +18,7 @@ class LeftMouseup extends Action {
         const rect = aqua.korwa.getLineWidthRect()
 
         aqua.cursorMgr.traverse(cursor => {
-            if (event.target.getAttribute('aqua-is-line-number')) return
+            if (event.target.getAttribute(DisableMouseEvent)) return
 
             cursor.$y = event.clientY - rect.top
             cursor.$x = event.clientX - rect.left

@@ -6,8 +6,6 @@ const { Algorithm } = require('../utils/index')
 
 class Locator {
     constructor(aqua) {
-        this.aqua = aqua
-
         this.lineMgr = aqua.lineMgr
         this.doc = aqua.docMgr
         this.korwa = aqua.korwa
@@ -65,6 +63,7 @@ class Locator {
         } else if (insideY > maxInsideY) {
             insideY = maxInsideY
         }
+
         const rect = lineRects[insideY]
         const measureRect = this.korwa.getLineWidthRect()
         const $xMax = rect.right - measureRect.left
@@ -72,6 +71,9 @@ class Locator {
 
         let x = -1
 
+        // lineRects[insideY].rect.right 并不一定等于 lastCharRect.right (可能会大于 0.00001 左右)
+        // 所以如果 $x 大于 该行最大长度, 直接设为最大长度可能是无效的
+        // 在下面的二分查找中会继续处理该情况
         if ($x >= $xMax) {
             $x = $xMax
         } else if ($x < $xMin) {
@@ -80,6 +82,12 @@ class Locator {
 
         if (maxInsideY === 0) {
             Algorithm.binarySearch(0, extendedLine.length, (center, lastCenter) => {
+                if (center === lastCenter) {
+                    x = center + 1
+
+                    return 0
+                }
+
                 const charRect = extendedLine.getElementRect(center)
 
                 const left = charRect.left - measureRect.left
@@ -98,7 +106,13 @@ class Locator {
                 return 0
             })
         } else {
-            Algorithm.binarySearch(0, extendedLine.length, center => {
+            Algorithm.binarySearch(0, extendedLine.length, (center, lastCenter) => {
+                if (center === lastCenter) {
+                    x = center + 1
+
+                    return 0
+                }
+
                 const charRect = extendedLine.getElementRect(center)
                 const top = charRect.bottom - measureRect.top
                 const charRectInsideY = extendedLine.getInsideY(top)
@@ -162,6 +176,12 @@ class Locator {
 
         if (maxInsideY === 0) {
             Algorithm.binarySearch(0, extendedLine.length, (center, lastCenter) => {
+                if (center === lastCenter) {
+                    x = center + 1
+
+                    return 0
+                }
+
                 const charRect = extendedLine.getElementRect(center)
 
                 const left = charRect.left - measureRect.left
@@ -180,7 +200,13 @@ class Locator {
                 return 0
             })
         } else {
-            Algorithm.binarySearch(0, extendedLine.length, center => {
+            Algorithm.binarySearch(0, extendedLine.length, (center, lastCenter) => {
+                if (center === lastCenter) {
+                    x = center + 1
+
+                    return 0
+                }
+
                 const charRect = extendedLine.getElementRect(center)
                 const top = charRect.bottom - measureRect.top
                 const charRectInsideY = extendedLine.getInsideY(top)

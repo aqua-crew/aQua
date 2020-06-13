@@ -48,13 +48,7 @@ class LineMgr {
 
     // TODO
     $getLine(lineNum, viewport = this.aqua.viewport){
-        let $line = viewport.$getLine(lineNum)
-
-        if (!$line) {
-            $line = this.aqua.korwa.$getLine(lineNum)
-        }
-
-        return $line
+        return this.aqua.korwa.$getLine(lineNum)
     }
 
     // getLine(lineNum, viewport = this.aqua.viewport) {

@@ -13,7 +13,7 @@ class Line {
         return this.template(content)
     }
 
-    template() {}
+    template(content = null) {}
 }
 
 module.exports = Line

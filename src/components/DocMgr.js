@@ -9,7 +9,6 @@ class DocMgr {
     }
 
     init() {
-        this.docWatcher.off('resize')
         this.docWatcher.on('resize', lines => {
             if (!lines) {
                 return

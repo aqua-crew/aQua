@@ -58,6 +58,7 @@ class Aqua {
         this.loadViewportEvents()
         this.loadInputerEvents()
 
+        /* Dev test */
         window.state = this.state
         window.aqua = this
 
@@ -76,8 +77,8 @@ class Aqua {
 
     init() {
         this.lineMgr.init()
-        this.docMgr.init()
         this.korwa.init()
+        this.docMgr.init()
 
         this.viewportMgr.init({
             $padding: this.uiMgr.get('lineCntr'),
@@ -135,12 +136,12 @@ class Aqua {
 
 
 
-        setTimeout(() => {
-            this.docMgr.write(c, {
-                y: 11,
-                x: 200,
-            })
-        }, 1000)
+        // setTimeout(() => {
+        //     this.docMgr.write(c, {
+        //         y: 11,
+        //         x: 200,
+        //     })
+        // }, 1000)
 
         let end = performance.now()
         const write = end - start
@@ -262,14 +263,15 @@ class Aqua {
                         inputerCntr
                             inputerLocator
                                 inputer
-                        beacon
                         scroller
                             components
                                 fullWidthCntr
                                     selectedLineCntr
                                 lineWidthCntr
-                                    measureCntr
-                                        modsMeasure
+                                    measurerCntr
+                                        ramMeasurer
+                                        lineMeasurer
+                                        remMeasurer
                                     cursorCntr
                                     selectionCntr
                                     lineCntr

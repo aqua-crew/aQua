@@ -18,8 +18,8 @@ class Renderer {
         this.renderers = Object.create(null)
 
         Object.keys(Renderers).forEach(name => {
-            const render = new Renderers[name](this.aqua)
-            this.renderers[render.applyName] = render
+            const renderer = new Renderers[name](this.aqua)
+            this.renderers[renderer.applyName] = renderer
         })
     }
 
@@ -27,15 +27,13 @@ class Renderer {
         const viewport = this.aqua.viewport
         const docWatcher = this.aqua.docWatcher
         const khala = this.aqua.khala
+        const uiMgr = this.aqua.uiMgr
 
         let lastChange = 0
 
-        // this.linePool.init(40)
-
         let timeoutId = null
-        docWatcher.off('change')
+
         docWatcher.on('change', data => {
-            // console.warn('Changed', data)
             const lines = data.effectLines
 
             LineHelper.setHeight(lines, this.korwa.measureLinesHeight(lines))
@@ -51,14 +49,28 @@ class Renderer {
             }
 
             lastChange = new Date().getTime()
-            // this.aqua.uiMgr.get('beacon').style.height = count + 'px'
         })
 
-        khala.off('scroll')
         khala.on('scroll', (y, lastY, force) => {
             viewport.update(y)
 
             this.renderViewport(viewport, force)
+        })
+
+        const $components = uiMgr.get('components')
+        const $lineWidthCntr = uiMgr.get('lineWidthCntr')
+
+        khala.on('ramWidthResize', ({ ramWidth, lineNumWidth } = {}) => {
+            rAF(() => {
+                console.error('yes')
+                $components.style.setProperty('--line-width', lineNumWidth + 'px')
+                $components.style.setProperty('--ram-width', ramWidth + 'px')
+
+                const lines = this.doc.getLines(0, this.doc.size)
+                LineHelper.setHeight(lines, this.korwa.measureLinesHeight(lines))
+                docWatcher.emit('resize', lines)
+                this.renderViewport(viewport, true)
+            })
         })
     }
 
@@ -93,7 +105,11 @@ class Renderer {
     }
 
     render(applyName, ...payload) {
-        this.renderers[applyName].render(...payload)
+        this.getRenderer(applyName).render(...payload)
+    }
+
+    getRenderer(applyName) {
+        return this.renderers[applyName]
     }
 }
 

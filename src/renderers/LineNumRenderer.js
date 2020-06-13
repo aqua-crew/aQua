@@ -1,7 +1,9 @@
 const { rAF } = require('../utils/index')
 
+const START_FROM = 1
+
 class LineNumRenderer {
-    constructor() {
+    constructor(aqua) {
         this.applyName = 'lineNum'
     }
 
@@ -10,13 +12,15 @@ class LineNumRenderer {
         const start = viewport.renderArea.start
 
         for (let i = 0; i < $lines.length; i++) {
-            this.updateLineNum($lines[i], start + i + 1)
+            const $lineNum = $lines[i].firstChild.firstChild
+
+            this.updateLineNum($lineNum, start + i + START_FROM)
         }
     }
 
-    updateLineNum($line, lineNum) {
+    updateLineNum($lineNum, lineNum) {
         rAF(() => {
-            $line.firstChild.textContent = lineNum
+            $lineNum.textContent = lineNum
         })
     }
 }

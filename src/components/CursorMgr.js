@@ -75,12 +75,6 @@ class CursorMgr {
 
             filter(cursor) && cb(cursor)
 
-            // cursor.updateCoord({
-            //     update,
-            //     force,
-            // })
-            // cursor.updateSelection()
-
             const after = cursor.coord.clone()
 
             accCoord.y = after.y - before.y
@@ -94,7 +88,6 @@ class CursorMgr {
         this.aqua.renderer.render('selectedLine', viewport)
 
         // this.detect() /* 检测光标与选区的冲突 */
-        // this.updateUI() /* 渲染光标视图 */
 
         return this
     }
@@ -152,9 +145,9 @@ class CursorMgr {
 
     }
 
-    transform(cursor) {
+    // transform(cursor) {
 
-    }
+    // }
 }
 
 module.exports = CursorMgr

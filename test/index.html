@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <title>Aqua Test</title>
     <style>
-        .aqua-beacon {
-            position: absolute;
-            height: 0;
-        }
         body {
             margin: 0;
             background-color: rgba(35, 35, 35, .7);
@@ -167,6 +163,10 @@
             position: relative;
             cursor: text;
         }
+        .aqua-variables {
+            --line-width: 0px;
+            --ram-width: 0px;
+        }
             .full-width-container {
                 position: absolute;
                 left: 0;
@@ -174,16 +174,25 @@
             }
             .line-width-container {
                 position: relative;
-                margin-left: 50px; /* $prefix-length */
+                margin-left: var(--ram-width);
                 height: 0;
             }
-        .measure-container {
+        .measurer-container {
             position: absolute;
             visibility: hidden;
             opacity: 0;
             right: 0;
             left: 0;
         }
+            .rem-measurer {
+                position: absolute;
+            }
+            .line-measurer {
+                position: absolute;
+            }
+            .ram-measurer {
+                position: absolute;
+            }
 
         /* Line about */
         .line {
@@ -193,14 +202,16 @@
         }
             .prefix {
                 position: absolute;
-                left: -50px; /* $prefix-length */
-                width: 30px;
-                padding: 0 8px 0 2px;
+                transform: translateX(-100%);
+                padding: 0 20px 0 20px;
                 text-align: right;
-                color: rgba(118, 218, 255, .5);
                 cursor: default;
                 user-select: none;
             }
+                .line-num {
+                    color: rgba(118, 218, 255, .5);
+                    width: var(--line-width);
+                }
             .suffix {
                 margin: 0;
                 overflow-wrap: break-word;

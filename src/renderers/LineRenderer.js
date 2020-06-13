@@ -9,6 +9,7 @@ class LineRenderer {
         this.processor = aqua.processorMgr
         this.lineMgr = aqua.lineMgr
         this.doc = aqua.docMgr
+        this.korwa = aqua.korwa
 
         this.$lineCntr = aqua.uiMgr.get('lineCntr')
 

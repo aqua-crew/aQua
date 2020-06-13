@@ -1,11 +1,6 @@
 const { DOM } = require('../utils/index')
 
 module.exports = {
-    /* Beacon Test Only */
-    beacon: function(payload) {
-        return DOM.e('div', {'class': 'aqua-beacon'})
-    },
-
     /* Host */
     aqua: function(payload) {
         return DOM.e('div', {'class': 'aqua theme-aqua'})
@@ -27,7 +22,7 @@ module.exports = {
 
     /* Components Container */
     components: function(payload) {
-        return DOM.e('div', {'class': 'aqua-components'})
+        return DOM.e('div', {'class': 'aqua-components aqua-variables'})
     },
 
     fullWidthCntr: function(payload) {
@@ -38,17 +33,21 @@ module.exports = {
         return DOM.e('div', {'class': 'line-width-container'})
     },
 
-    /* Measures */
-    measureCntr: function(payload) {
-        return DOM.e('div', {'class': 'measure-container'})
+    /* Measurers */
+    measurerCntr: function(payload) {
+        return DOM.e('div', {'class': 'measurer-container'})
     },
 
-    lineNumMeasure: function(payload) {
-        return DOM.e('div', {'class': 'line-num-measure'})
+    ramMeasurer: function(payload) {
+        return DOM.e('div', {'class': 'ram-measurer'})
     },
 
-    modsMeasure: function(payload) {
-        return DOM.e('div', {'class': 'mods-measure'})
+    lineMeasurer: function(payload) {
+        return DOM.e('div', {'class': 'line-measurer'})
+    },
+
+    remMeasurer: function(payload) {
+        return DOM.e('div', {'class': 'rem-measurer'})
     },
 
     /* Container in Components Container */

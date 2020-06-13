@@ -14,8 +14,6 @@ class LineMeasurer {
         extend(this.measureLinesHeight.bind(this))
         extend(this.measure.bind(this))
         extend(this.$getLine.bind(this))
-
-        extend('lineNumCntrWidth', 50)
     }
 
     init() {
@@ -25,21 +23,23 @@ class LineMeasurer {
 
     initMeasurers() {
         const $f = DOM.f()
-        const $modsMeasure = this.aqua.uiMgr.get('modsMeasure')
+        const $lineMeasurer = this.aqua.uiMgr.get('lineMeasurer')
         const mods = this.aqua.lineMgr.mods
 
         for (let name in mods) {
             const mod = mods[name]
             const $measure = mod.create()
+
             this.$measures[mod.name] = $measure
+
             DOM.appendChild($f, $measure)
         }
 
-        DOM.appendChild($modsMeasure, $f)
+        DOM.appendChild($lineMeasurer, $f)
     }
 
-    getSingleLineHeight(mod = this.aqua.state.mod.line) {
-        return this.lineHeight[mod.name]
+    getSingleLineHeight(modName = this.aqua.state.mod.line.name) {
+        return this.lineHeight[modName]
     }
 
     measureHeight(lineNumOrLineOrData, modName = 'Text') {
@@ -73,7 +73,20 @@ class LineMeasurer {
     }
 
     $getLine(lineNumOrLineOrData, modName = 'Text') {
-        const lineOrData = typeof lineNumOrLineOrData === 'number' ? this.aqua.docMgr.getLine(lineNumOrLineOrData) : lineNumOrLineOrData
+        let lineOrData = lineNumOrLineOrData
+        let $line = null
+
+        if (typeof lineNumOrLineOrData === 'number') {
+            const lineNum = lineNumOrLineOrData
+
+            $line = this.aqua.viewport.$getLine(lineNum)
+
+            if ($line) {
+                return $line
+            }
+
+            lineOrData = this.aqua.docMgr.getLine(lineNum)
+        }
 
         const $measure = this.$measures[modName]
 
