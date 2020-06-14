@@ -13,10 +13,10 @@ class PageUp extends Action {
     exec(aqua, event) {
         aqua.do(cursor => {
             cursor.$y = cursor.$y - aqua.viewport.height
+            cursor.$x = cursor.$x
         }, {
             acc: false,
         })
-        console.error(this.name)
     }
 }
 

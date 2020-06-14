@@ -64,11 +64,16 @@ class Anchor {
         return this.coord.maxInsideY
     }
 
-    updateLayout() {
+    updateLayout(useAbsoluteCoord = false) {
         const layout = this.aqua.locator.getLayoutByCoord(this.y, this.x, this.insideY !== this.maxInsideY ? this.insideY : null)
 
         this.layout.y = layout.y
         this.layout.x = layout.x
+
+        // if (useAbsoluteCoord) {
+        //     const line = this.aqua.docMgr.getLineWithHeight(this.y)
+        //     const extendLine = this.aqua.lineMgr.extendLine(this.y)
+        // }
 
         return layout
     }

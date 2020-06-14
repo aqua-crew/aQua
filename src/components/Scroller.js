@@ -9,14 +9,12 @@ class Scroller {
         this.speed = -1
         this.min = -1
         this.max = -1
-        this.minPad = -1
-        this.maxPad = -1
 
         // this.overflowType = 'buffer' // 'buffer', ['timeout', 'timeout'], null
         // this.overflowBuffer = 2500
         // this.overflowTimeout = 0.5
         // this.prevent = true
-        this.lastScroll = 0
+        this.lastScrollTime = 0
     }
 
     init({
@@ -37,8 +35,7 @@ class Scroller {
         const korwa = this.aqua.korwa
 
         this.aqua.docWatcher.on('resize', () => {
-            // this.max = docMgr.height - korwa.getSingleLineHeight(docMgr.getLastLine().mod)
-            this.max = docMgr.height - 25
+            this.max = docMgr.height - korwa.getSingleLineHeight()
 
             if (this.y > this.max) {
                 this.scrollTo(this.max)
@@ -63,8 +60,8 @@ class Scroller {
 
         clearTimeout(this.timeoutId)
 
-        if (new Date().getTime() - this.lastScroll >= 17) {
-            this.lastScroll = new Date().getTime()
+        if (new Date().getTime() - this.lastScrollTime >= 17) {
+            this.lastScrollTime = new Date().getTime()
             this.aqua.khala.emit('scroll', y, this.y, force)
 
             rAF(() => {
@@ -73,7 +70,7 @@ class Scroller {
 
         } else {
             this.timeoutId = setTimeout(() => {
-                this.lastScroll = new Date().getTime()
+                this.lastScrollTime = new Date().getTime()
                 this.aqua.khala.emit('scroll', y, this.y, force)
 
                 rAF(() => {

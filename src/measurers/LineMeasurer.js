@@ -1,7 +1,7 @@
 const { DOM } = require('../utils/index')
 
 class LineMeasurer {
-    constructor(aqua, extend, Korwa) {
+    constructor(aqua, extend) {
         this.aqua = aqua
 
         this.lineHeight = Object.create(null)

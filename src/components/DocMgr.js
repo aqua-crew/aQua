@@ -10,62 +10,7 @@ class DocMgr {
 
     init() {
         this.docWatcher.on('resize', lines => {
-            if (!lines) {
-                return
-            }
-
-            const effectChunks = []
-            const heightsCollection = []
-
-            let lastParent = lines[0].parent
-            let heightAcc = 0
-
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i]
-                const heightDiff = line.flushHeightBuffer()
-                const curParent = line.parent
-
-                if (curParent !== lastParent) {
-                    effectChunks.push(lastParent)
-                    heightsCollection.push(heightAcc)
-
-                    heightAcc = 0
-                }
-
-                heightAcc = heightAcc + heightDiff
-                lastParent = curParent
-            }
-
-            effectChunks.push(lastParent)
-            heightsCollection.push(heightAcc)
-
-            ACCPointer = 0
-            heightAcc = 0
-            let heightAccPointer = 0
-            this.doc.bubble(
-                effectChunks,
-
-                (chunk) => {
-                    const height = heightsCollection[ACCPointer]
-
-                    chunk.height = chunk.height + height
-
-                    heightAcc = heightAcc + height
-                    ACCPointer = ACCPointer + 1
-                },
-
-                (parent) => {
-                    heightsCollection[heightAccPointer] = heightAcc
-                    heightAccPointer = heightAccPointer + 1
-                },
-
-                () => {
-                    heightsCollection.length = heightAccPointer
-                    ACCPointer = 0
-                    heightAcc = 0
-                    heightAccPointer = 0
-                }
-            )
+            this.resize(lines)
         })
     }
 
@@ -77,18 +22,77 @@ class DocMgr {
         return this.doc.height
     }
 
-    get pseudoFirstCoord() {
+    get pseudoStartCoord() {
         return {
             y: 0,
             x: 0,
         }
     }
 
-    get pseudoLastCoord() {
+    get pseudoEndCoord() {
         return {
             y: this.size - 1,
             x: this.getLastLine().length,
         }
+    }
+
+    resize(lines) {
+        if (!lines) {
+            return
+        }
+
+        const effectChunks = []
+        const heightsCollection = []
+
+        let lastParent = lines[0].parent
+        let heightAcc = 0
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i]
+            const heightDiff = line.flushHeightBuffer()
+            const curParent = line.parent
+
+            if (curParent !== lastParent) {
+                effectChunks.push(lastParent)
+                heightsCollection.push(heightAcc)
+
+                heightAcc = 0
+            }
+
+            heightAcc = heightAcc + heightDiff
+            lastParent = curParent
+        }
+
+        effectChunks.push(lastParent)
+        heightsCollection.push(heightAcc)
+
+        heightAcc = 0
+        let ACCPointer = 0
+        let heightAccPointer = 0
+        this.doc.bubble(
+            effectChunks,
+
+            (chunk) => {
+                const height = heightsCollection[ACCPointer]
+
+                chunk.height = chunk.height + height
+
+                heightAcc = heightAcc + height
+                ACCPointer = ACCPointer + 1
+            },
+
+            (parent) => {
+                heightsCollection[heightAccPointer] = heightAcc
+                heightAccPointer = heightAccPointer + 1
+            },
+
+            () => {
+                heightsCollection.length = heightAccPointer
+                ACCPointer = 0
+                heightAcc = 0
+                heightAccPointer = 0
+            }
+        )
     }
 
     /* APIs */

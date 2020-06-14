@@ -30,7 +30,6 @@ class LineMgr {
      * @return {Array<Line>}
      */
     toLines(contents, start = 0, end = contents.length) {
-        console.error('yes??')
         const lines = []
 
         for (let i = start; i < end; i++) {
@@ -51,57 +50,10 @@ class LineMgr {
         return this.aqua.korwa.$getLine(lineNum)
     }
 
-    // getLine(lineNum, viewport = this.aqua.viewport) {
-    //     const $line = viewport.get$Line(lineNum)
-
-    //     if (!$line) {
-
-    //     }
-
-    //     return $line
-    // }
-
-    // getMeasuredLine(lineNum) {
-    //     return new MeasuredLine(this.getLine(lineNum), this.aqua.korwa)
-    // }
-
-    // getMeasuredLineRect(lineNum) {
-    //     const rect = this.getLine(lineNum).getBoundingClientRect()
-    //     const box = this.getMeasuredBase()
-
-    //     return {
-    //         left: rect.left - box.left,
-    //         right: rect.right - box.left,
-    //         top: rect.top - box.top,
-    //         bottom: rect.bottom - box.top,
-    //     }
-    // }
-
     // getCurrentBlock(lineNum, x) {
     //     const measuredLine = this.getMeasuredLine(lineNum)
 
     //     return measuredLine.getCurrentBlock(x)
-    // }
-
-    // /**
-    //  * 获得文档大小
-    //  * @return {Number}
-    //  */
-    // getSize() {
-    //     console.error('yes')
-    //     const doc = this.aqua.contentMgr.doc
-    //     return doc.size
-    // }
-
-    // *
-    //  * 获得单行长度
-    //  * @param  {Number} lineNum [行号]
-    //  * @return {Number}
-    //
-    // getLength(lineNum) {
-    //     const measuredLine = this.getMeasuredLine(lineNum)
-
-    //     return measuredLine.getLength()
     // }
 
     create($content) {

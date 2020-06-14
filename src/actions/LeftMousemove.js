@@ -1,8 +1,6 @@
 const { Action } = require('../interfaces/index')
 const { HTMLVariables } = require('../enums/index')
 
-const DisableMouseEvent = HTMLVariables.DisableMouseEvent
-
 class LeftMousemove extends Action {
     constructor() {
         super()
@@ -20,14 +18,14 @@ class LeftMousemove extends Action {
         const rect = aqua.korwa.getLineWidthRect()
 
         aqua.cursorMgr.traverse(cursor => {
-            if (event.target.getAttribute(DisableMouseEvent)) return
+            if (event.target.getAttribute(HTMLVariables.DisableMouseEvent)) return
 
             cursor.$y = event.clientY - rect.top
             cursor.$x = event.clientX - rect.left
 
             cursor.selection.terminal = cursor.coord
         }, {
-            filter: cursor => cursor === aqua.cursorMgr.main
+            filter: cursor => aqua.cursorMgr.isPrimary(cursor)
         })
     }
 }

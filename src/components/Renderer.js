@@ -1,5 +1,6 @@
 const { LineHelper } = require('../helpers/index')
 const { DOM, rAF } = require('../utils/index')
+const { ArgOpt, CSSVariables } = require('../enums/index')
 
 const Renderers = require('../renderers/index')
 // const { CursorRenderer, LineNumRenderer, LineRenderer, SelectionRenderer } = require('../renderers/index')
@@ -18,8 +19,7 @@ class Renderer {
         this.renderers = Object.create(null)
 
         Object.keys(Renderers).forEach(name => {
-            const renderer = new Renderers[name](this.aqua)
-            this.renderers[renderer.applyName] = renderer
+            this.setRenderer(Renderers[name])
         })
     }
 
@@ -41,10 +41,10 @@ class Renderer {
 
             clearTimeout(timeoutId)
             if (new Date().getTime() - lastChange > 17) {
-                this.renderViewport(viewport, true)
+                this.renderViewport(viewport, ArgOpt.SkipVisionCheck)
             } else {
                 timeoutId = setTimeout(() => {
-                    this.renderViewport(viewport, true)
+                    this.renderViewport(viewport, ArgOpt.SkipVisionCheck)
                 }, 17)
             }
 
@@ -62,14 +62,15 @@ class Renderer {
 
         khala.on('ramWidthResize', ({ ramWidth, lineNumWidth } = {}) => {
             rAF(() => {
-                console.error('yes')
-                $components.style.setProperty('--line-width', lineNumWidth + 'px')
-                $components.style.setProperty('--ram-width', ramWidth + 'px')
+                $components.style.setProperty(CSSVariables.LINE_WIDTH, lineNumWidth + 'px')
+                $components.style.setProperty(CSSVariables.RAM_WIDTH, ramWidth + 'px')
 
                 const lines = this.doc.getLines(0, this.doc.size)
+
                 LineHelper.setHeight(lines, this.korwa.measureLinesHeight(lines))
                 docWatcher.emit('resize', lines)
-                this.renderViewport(viewport, true)
+
+                this.renderViewport(viewport, ArgOpt.SkipVisionCheck)
             })
         })
     }
@@ -110,6 +111,11 @@ class Renderer {
 
     getRenderer(applyName) {
         return this.renderers[applyName]
+    }
+
+    setRenderer(Renderer) {
+        const renderer = new Renderer(this.aqua)
+        this.renderers[renderer.applyName] = renderer
     }
 }
 

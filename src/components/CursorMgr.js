@@ -2,7 +2,7 @@ class CursorMgr {
     constructor(aqua) {
         this.aqua = aqua
 
-        this.main = null
+        this.primary = null
         this.mods = Object.create(null)
         this.cursors = []
     }
@@ -19,24 +19,16 @@ class CursorMgr {
         return this.cursors.length
     }
 
-    /**
-     * Line 与 Mode 存的是实例, 因为他们是一个 Handler. Cursor 存的是构造函数, 因为需要返回实例
-     * @param  {Cursor} Cursor [Cursor 的构造函数]
-     * @return {CursorMgr}
-     */
-    load(Cursor) {
-        const name = Cursor.name
-        this.mods[name] = Cursor
-
-        if (!this.aqua.state.mod.cursor) {
-            this.aqua.state.mod.cursor = Cursor
-        }
-
-        return this
+    setPrimary(cursor) {
+        this.primary = cursor
     }
 
-    getMain(cb) {
-        cb(this.main)
+    isPrimary(cursor) {
+        return cursor === this.primary
+    }
+
+    getPrimary(cb) {
+        cb(this.primary)
     }
 
     pureTraverse(cb, cursors = this.cursors) {
@@ -50,7 +42,6 @@ class CursorMgr {
         cursors = this.cursors,
         filter = cursor => true,
         acc = true,
-        update = true,
         force = false,
     } = {}) {
         const accCoord = {
@@ -100,17 +91,13 @@ class CursorMgr {
             cursor.coord.assign(coord)
         }
 
-        this.setMain(cursor)
+        this.setPrimary(cursor)
         this.cursors.push(cursor)
 
         return cursor
     }
 
-    setMain(cursor) {
-        this.main = cursor
-    }
-
-    removeAll(exceptions = this.main) {
+    removeAll(exceptions = this.primary) {
         if (!Array.isArray(exceptions)) {
             exceptions = [exceptions]
         }
@@ -143,6 +130,22 @@ class CursorMgr {
 
     detect() {
 
+    }
+
+    /**
+     * Line 与 Mode 存的是实例, 因为他们是一个 Handler. Cursor 存的是构造函数, 因为需要返回实例
+     * @param  {Cursor} Cursor [Cursor 的构造函数]
+     * @return {CursorMgr}
+     */
+    load(Cursor) {
+        const name = Cursor.name
+        this.mods[name] = Cursor
+
+        if (!this.aqua.state.mod.cursor) {
+            this.aqua.state.mod.cursor = Cursor
+        }
+
+        return this
     }
 
     // transform(cursor) {
