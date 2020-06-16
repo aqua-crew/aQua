@@ -30,6 +30,8 @@ class Locator {
         return (rect.bottom - rect.top) / 2 - this.scroller.y
     }
 
+
+
     getYByLayoutY($y) {
         const maxHeight = this.doc.height
 
@@ -44,7 +46,8 @@ class Locator {
         const line = this.doc.getLineByHeight($y)
         const y = line.staticLineNum
         const extendedLine = this.lineMgr.extendLine(y)
-        const insideY = extendedLine.getInsideY($y)
+
+        const insideY = extendedLine.getInsideY($y - line.top)
         const lineRects = extendedLine.getClientRects()
 
         return {
@@ -115,8 +118,7 @@ class Locator {
                 }
 
                 const charRect = extendedLine.getElementRect(center)
-                const top = charRect.bottom - measureRect.top
-                const charRectInsideY = extendedLine.getInsideY(top)
+                const charRectInsideY = extendedLine.getInsideY(extendedLine.transformToInsideLayoutY(charRect.bottom))
 
                 if (insideY > charRectInsideY) {
                     return 1
@@ -161,7 +163,7 @@ class Locator {
         const lineNum = line.staticLineNum
         const extendedLine = this.lineMgr.extendLine(y)
         const lineRects = extendedLine.getClientRects()
-        const insideY = extendedLine.getInsideY($y)
+        const insideY = extendedLine.getInsideY($y - line.top)
         const rect = lineRects[insideY]
         const measureRect = this.korwa.getLineWidthRect()
         const $xMax = rect.right - measureRect.left
@@ -209,8 +211,7 @@ class Locator {
                 }
 
                 const charRect = extendedLine.getElementRect(center)
-                const top = charRect.bottom - measureRect.top
-                const charRectInsideY = extendedLine.getInsideY(top)
+                const charRectInsideY = extendedLine.getInsideY(extendedLine.transformToInsideLayoutY(charRect.bottom))
 
                 if (insideY > charRectInsideY) {
                     return 1
@@ -254,13 +255,15 @@ class Locator {
             y = yMax - 1
         }
 
-        const line = this.doc.getLine(y)
+        // const line = this.doc.getLine(y)
+        const line = this.doc.getLineWithHeight(y)
+
         const extendedLine = this.lineMgr.extendLine(y)
         const xMax = line.length
 
         if (xMax === 0) {
             return {
-                y: this.transformToCursorPhysicalY(extendedLine.transformToLayoutY(0)),
+                y: this.transformToCursorPhysicalY(extendedLine.transformToLayoutY(0) + line.top),
                 x: 0,
             }
         }
@@ -279,7 +282,7 @@ class Locator {
         let insideY = -1
 
         charRect = extendedLine.getElementRect(xAtLast ? x - 1 : x)
-        insideY = extendedLine.getInsideY(charRect.bottom - measureRect.top)
+        insideY = extendedLine.getInsideY(extendedLine.transformToInsideLayoutY(charRect.bottom))
 
         let $x = -1
 
@@ -302,18 +305,16 @@ class Locator {
         }
 
         return {
-            y: this.transformToCursorPhysicalY(extendedLine.transformToLayoutY(insideY)),
+            y: this.transformToCursorPhysicalY(extendedLine.transformToLayoutY(insideY) + line.top),
             x: charRect[charRectDirection] - measureRect.left,
         }
     }
 
     getInsideYByCoord(y, x) {
-        const measureRect = this.korwa.getLineWidthRect()
         const extendedLine = this.lineMgr.extendLine(y)
         const charRect = extendedLine.getElementRect(Math.min(x, extendedLine.length - 1))
-        const $y = charRect.bottom - measureRect.top
 
-        return extendedLine.getInsideY($y)
+        return extendedLine.getInsideY(extendedLine.transformToInsideLayoutY(charRect.bottom))
     }
 
     getMaxInsideYByY(y) {
@@ -322,6 +323,8 @@ class Locator {
 
         return lineRects.length - 1
     }
+
+
 
     transformToCursorPhysicalY(y) {
         return y - CURSOR_HEIGHT + (LINE_HEIGHT - FONT_SIZE) / 4

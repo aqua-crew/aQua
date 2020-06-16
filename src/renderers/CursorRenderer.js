@@ -15,6 +15,12 @@ class CursorRenderer {
         const renderArea = viewport.getRenderArea()
 
         this.cursors.pureTraverse(cursor => {
+            if (this.cursors.isPrimary(cursor)) {
+                this.renderCursor(cursor)
+
+                return
+            }
+
             if (cursor.y < renderArea.start || cursor.y >= renderArea.end) {
                 return
             }

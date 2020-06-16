@@ -61,11 +61,14 @@ class Renderer {
         const $lineWidthCntr = uiMgr.get('lineWidthCntr')
 
         khala.on('ramWidthResize', ({ ramWidth, lineNumWidth } = {}) => {
+            console.error('触发了 ramWidthResize')
             rAF(() => {
                 $components.style.setProperty(CSSVariables.LINE_WIDTH, lineNumWidth + 'px')
                 $components.style.setProperty(CSSVariables.RAM_WIDTH, ramWidth + 'px')
 
                 const lines = this.doc.getLines(0, this.doc.size)
+
+                console.error('执行了 ramWidthResize')
 
                 LineHelper.setHeight(lines, this.korwa.measureLinesHeight(lines))
                 docWatcher.emit('resize', lines)
@@ -81,8 +84,12 @@ class Renderer {
     }
 
     renderViewport(viewport = this.aqua.viewport, force = false) {
+        console.group('')
+        console.info('viewport.ceiling', viewport.ceiling, this.doc.getLineByHeight(viewport.ceiling).data)
         const start = this.doc.getLineByHeight(viewport.ceiling).staticLineNum
+        console.error('viewport.floor', viewport.floor)
         const end = this.doc.getLineByHeight(viewport.floor, true).staticLineNum + 1
+        console.groupEnd('')
 
         const visibleArea = viewport.updateVisibleArea(start, end)
 

@@ -40,6 +40,7 @@ class DocMgr {
         if (!lines) {
             return
         }
+        console.error('触发了 resize', lines)
 
         const effectChunks = []
         const heightsCollection = []
@@ -213,7 +214,6 @@ class DocMgr {
             lastLine.release()
             this.doc.remove(endLineNum, 1)
 
-            // effectLines = [startLine, lastLine]
             effectLines = [startLine]
             effectCount = 1
         }
@@ -229,7 +229,6 @@ class DocMgr {
             Line.setStatus(lines.slice(1), LineStatus.DELETED)
             this.doc.remove(startLineNum + 1, endLineNum - startLineNum)
 
-            // effectLines = lines
             effectLines = [startLine]
             effectCount = lines.length - 1
         }
@@ -260,9 +259,10 @@ class DocMgr {
     }
 
     getLineByHeight(height, isContainBottomBorder = false) {
-        const { chunk, offset, size } = this.doc.getByHeight(height, isContainBottomBorder)
+        const { chunk, offset, size, height: top } = this.doc.getByHeight(height, isContainBottomBorder)
         const line = chunk.get(offset)
 
+        line.top = height - top
         line.staticLineNum = size
 
         return line

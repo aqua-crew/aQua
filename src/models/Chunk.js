@@ -11,6 +11,7 @@ class Chunk {
         volume = 128,
     } = {}) {
         this._size = 0
+
         this.parent = parent
         this.children = children
         this.size = size

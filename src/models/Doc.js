@@ -67,8 +67,9 @@ class Doc {
 
         if (chunk.level < 1) {
             let i = 0
+            let child = null
             for (; i < children.length; i++) {
-                const child = children[i]
+                child = children[i]
 
                 if (height > child.height) {
                    height = height - child.height
@@ -84,10 +85,10 @@ class Doc {
                    continue
                 }
 
-                return { chunk, offset: i, size }
+                return { chunk, offset: i, size, height }
             }
 
-            return { chunk, offset: i - 1, size: size - 1 }
+            return { chunk, offset: i - 1, size: size - 1, height: child.height }
         } else {
             for (let i = 0; i < children.length; i++) {
                 const child = children[i]
@@ -443,7 +444,9 @@ class Doc {
         })
     }
 
-    onOverflow(chunk) {
+    onOverflow(chunk, force = false) {
+        console.error('触发了 onOverflow')
+
         const volume = chunk.level > 0 ? chunk.chunkVolume : chunk.volume
         const halfVolume = parseInt(volume / 2)
 

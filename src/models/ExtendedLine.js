@@ -76,14 +76,21 @@ class ExtendedLine {
         }
     }
 
+    // 这个 $y 是相对该行的 line-box 的偏移, 而非相对 scroller 的偏移
     getInsideY($y) {
         const lineRects = this.getClientRects()
         let insideY = lineRects.length - 1
 
-        for (; insideY >= 0; insideY--) {
-            const bottom = this.transformToRealBottom(lineRects[insideY].bottom) - this.korwa.getScrollerRect().top // (lineHeight - fontSize) / 2
+        if (insideY === 0) {
+            return insideY
+        }
 
-            if ($y > bottom) {
+        const top = this.getClientRect().top
+
+        for (; insideY >= 0; insideY--) {
+            const bottom = this.transformToRealBottom(lineRects[insideY].bottom) - top
+
+            if ($y > bottom - 2) { // <---------------------
                 break
             }
         }
@@ -92,9 +99,19 @@ class ExtendedLine {
     }
 
     transformToLayoutY(insideY) {
+        // const top = this.getClientRect().top
+        // const rects = this.getClientRects()
+
+        // // return rects[insideY].bottom - this.korwa.getScrollerRect().top
+        // return rects[insideY].bottom - top
+
         const rects = this.getClientRects()
 
-        return rects[insideY].bottom - this.korwa.getScrollerRect().top
+        return this.transformToInsideLayoutY(rects[insideY].bottom)
+    }
+
+    transformToInsideLayoutY($y) {
+        return $y - this.getClientRect().top
     }
 
     getClientRect() {

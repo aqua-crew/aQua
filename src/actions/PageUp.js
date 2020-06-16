@@ -11,8 +11,10 @@ class PageUp extends Action {
     }
 
     exec(aqua, event) {
+        const lineHeight = aqua.korwa.getSingleLineHeight()
+
         aqua.do(cursor => {
-            cursor.$y = cursor.$y - aqua.viewport.height
+            cursor.$y = cursor.$y - aqua.viewport.height + lineHeight
             cursor.$x = cursor.$x
         }, {
             acc: false,
