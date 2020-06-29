@@ -36,14 +36,13 @@ class DocMgr {
         }
     }
 
-    resize(lines) {
+    resize(lines, force = false) {
         if (!lines) {
             return
         }
-        console.error('触发了 resize', lines)
 
         const effectChunks = []
-        const heightsCollection = []
+        let heightsCollection = []
 
         let lastParent = lines[0].parent
         let heightAcc = 0
@@ -58,10 +57,11 @@ class DocMgr {
                 heightsCollection.push(heightAcc)
 
                 heightAcc = 0
+
+                lastParent = curParent
             }
 
             heightAcc = heightAcc + heightDiff
-            lastParent = curParent
         }
 
         effectChunks.push(lastParent)
@@ -69,7 +69,8 @@ class DocMgr {
 
         heightAcc = 0
         let ACCPointer = 0
-        let heightAccPointer = 0
+        let heights = []
+
         this.doc.bubble(
             effectChunks,
 
@@ -82,16 +83,16 @@ class DocMgr {
                 ACCPointer = ACCPointer + 1
             },
 
-            (parent) => {
-                heightsCollection[heightAccPointer] = heightAcc
-                heightAccPointer = heightAccPointer + 1
+            () => {
+                heights.push(heightAcc)
+                heightAcc = 0
             },
 
             () => {
-                heightsCollection.length = heightAccPointer
+                heightsCollection = heights
+                heights = []
                 ACCPointer = 0
                 heightAcc = 0
-                heightAccPointer = 0
             }
         )
     }
@@ -143,6 +144,8 @@ class DocMgr {
             effectLines,
             source: 'write',
         })
+
+        return
     }
 
     /**

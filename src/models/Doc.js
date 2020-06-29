@@ -180,8 +180,8 @@ class Doc {
             const parent = obj.parent
 
             if (lastParent !== parent) {
-                breakCb(parent)
-                effectObjs.push(parent)
+                breakCb(lastParent)
+                effectObjs.push(lastParent)
             }
 
             cb(obj)
@@ -192,7 +192,7 @@ class Doc {
         breakCb(lastParent)
         effectObjs.push(lastParent)
 
-        after()
+        after(effectObjs)
 
         return this.bubble(effectObjs, cb, breakCb, after)
     }
@@ -365,7 +365,8 @@ class Doc {
         return copys
     }
 
-    /* Private */
+    /* Rare */
+
     onInsert(chunk, objs, payload) {
         let effectSize = 0
         let effectHeight = 0
@@ -445,8 +446,6 @@ class Doc {
     }
 
     onOverflow(chunk, force = false) {
-        console.error('触发了 onOverflow')
-
         const volume = chunk.level > 0 ? chunk.chunkVolume : chunk.volume
         const halfVolume = parseInt(volume / 2)
 
@@ -458,9 +457,7 @@ class Doc {
         const copys = this.toChunks(chunk, splitChildren)
 
         if (this.isRoot(chunk)) {
-            const newRoot = chunk.clone({
-                volume,
-            })
+            const newRoot = chunk.clone()
 
             this.setRoot(newRoot)
 

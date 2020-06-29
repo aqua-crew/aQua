@@ -1,4 +1,5 @@
 const { Coord, Selection } = require('../models/index')
+const { ArgOpt } = require('../enums/index')
 
 class Anchor {
     constructor(aqua) {
@@ -9,6 +10,8 @@ class Anchor {
         this.selection = new Selection
 
         this.filter = null
+
+        this.state = Object.create(null)
     }
 
     set y(y) {
@@ -71,6 +74,16 @@ class Anchor {
         this.layout.x = layout.x
 
         return layout
+    }
+
+    merge(cursor) {
+        this.selection.merge(cursor.selection)
+
+        if (this.selection.direction === ArgOpt.SelectionDirectionIsBottomRight) {
+            this.coord.assign(this.selection.end)
+        } else if (this.selection.direction === ArgOpt.SelectionDirectionIsTopLeft) {
+            this.coord.assign(this.selection.start)
+        }
     }
 }
 

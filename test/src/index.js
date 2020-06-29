@@ -51,7 +51,7 @@ A:originにログインした後、左側にある項目の『ゲームライブ
 ※その他便利なコマンド紹介👇👇
 -fullscreen (APEX起動時にフルスクリーンで起動)
 -novid(起動時のムービーをカット)
- +exec autoexec
++exec autoexec
 -preload(起動時に色々読み込む。起動時は少しだけ重く感じますが、パフォーマンスを向上させる)
 +m_rawinput 1(マウスの入力をOSを介さずにゲームに反映)
 -forcenovsync (垂直同期をオフ)
@@ -149,7 +149,8 @@ const aqua = new Aqua({
     },
 })
 
-// aqua.write(' +exec autoexec') // BUG <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// aqua.write(' +exec autoexec') // BUG <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 开头的这个空格是精髓
+
 aqua.write('1')
 aqua.docMgr.write(content.split('\n'), {
     y: 1000,
@@ -181,16 +182,7 @@ window.test = () => {
 }
 
 aqua.docMgr.write(content.split('\n'))
-// aqua.docMgr.write(content.split('\n'))
-
-// aqua.docMgr.write(content.split('\n'))
-// aqua.docMgr.write(content.split('\n'))
-// aqua.docMgr.write(content.split('\n'))
-// aqua.docMgr.write(content.split('\n'))
-// aqua.docMgr.write(content.split('\n'))
-// aqua.docMgr.write(content.split('\n'))
-// aqua.docMgr.write(content.split('\n'))
-// aqua.docMgr.write(content.split('\n'))
-// aqua.docMgr.write(content.split('\n'))
-// aqua.docMgr.write(content.split('\n'))
-// aqua.docMgr.write(content.split('\n'))
+aqua.docMgr.write(content.split('\n'))
+aqua.docMgr.write(content.split('\n'))
+aqua.docMgr.write(content.split('\n'))
+aqua.docMgr.write(content.split('\n'))

@@ -104,6 +104,10 @@
             right: 0px;
             height: 25px;
             background-color: rgba(255, 255, 255, .15);
+
+            transition-property: background-color;
+            transition-duration: 0.2s;
+            transition-timing-function: ease-out;
         }
         .selected-line-container .selected-line {
             position: absolute;
@@ -146,7 +150,9 @@
             height: 22px;
             background-color: rgba(118, 218, 255, .85);
 
-            transition: transform 0.2s ease-out;
+            transition-property: transform, background-color;
+            transition-duration: 0.2s;
+            transition-timing-function: ease-out;
         }
 
         .aqua-viewport {
@@ -164,8 +170,6 @@
             cursor: text;
         }
         .aqua-variables {
-/*            --line-width: 28px;
-            --ram-width: 68px;*/
             --line-width: 0;
             --ram-width: 0;
         }

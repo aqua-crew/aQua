@@ -10,6 +10,7 @@ class CtrlLeftMouseUp extends Action {
     }
 
     exec(aqua, event, state) {
+        state.isCreateCursor = true
         aqua.actionMgr.exec('LeftMouseup', event, state)
     }
 }

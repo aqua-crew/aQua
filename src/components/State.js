@@ -1,6 +1,7 @@
 class State {
     constructor() {
-        active: false,
+        this.active = false,
+        this.mousedown = false,
 
         this.mod = {
             line: null,

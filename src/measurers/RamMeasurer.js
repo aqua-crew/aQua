@@ -60,7 +60,7 @@ class RamMeasurer {
             if (this.lastDocSizeDigit === sizeDigit) {
                 return
             }
-            console.info('行号数量改变了', this.lastDocSizeDigit, sizeDigit)
+
             this.lastDocSizeDigit = sizeDigit
 
             this.traverse($measure => {
@@ -80,8 +80,6 @@ class RamMeasurer {
 
                 this.ramWidth = target.clientWidth
                 this.lineNumWidth = target.firstChild.clientWidth
-
-                console.info('行号宽度改变了', this.lineNumWidth)
 
                 this.aqua.khala.emit('ramWidthResize', {
                     ramWidth: this.ramWidth,

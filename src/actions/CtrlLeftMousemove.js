@@ -11,6 +11,7 @@ class CtrlLeftMousemove extends Action {
     }
 
     exec(aqua, event, state) {
+        state.isCreateCursor = true
         aqua.actionMgr.exec('LeftMousemove', event, state)
     }
 }

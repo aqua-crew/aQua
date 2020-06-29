@@ -57,6 +57,7 @@ class Aqua {
         this.loadActions(Actions)
         this.loadViewportEvents()
         this.loadInputerEvents()
+        this.loadDocumentEvents()
 
         /* Dev test */
         window.state = this.state
@@ -374,14 +375,22 @@ class Aqua {
 
         this.kizuna.on($inputer, 'focus', event => {
             this.state.focus = true
+            console.error('focus')
         })
 
         this.kizuna.on($inputer, 'blur', event => {
             this.state.focus = false
+            console.error('blur')
         })
 
         this.kizuna.on($inputer, 'input', event => {
             event.preventDefault()
+
+            const data = event.data
+
+            this.do(cursor => {
+                this.write(data, cursor.coord)
+            })
             console.error('event', event)
         })
 
@@ -436,6 +445,24 @@ class Aqua {
             }
 
             event.preventDefault()
+        })
+    }
+
+    loadDocumentEvents() {
+        this.kizuna.on(document, 'mousedown', event => {
+            this.state.mousedown = true
+        })
+
+        this.kizuna.on(document, 'mouseup', event => {
+            this.state.mousedown = false
+        })
+
+        this.kizuna.on(document, 'visibilitychange', event => {
+            if (document.hidden && this.state.mousedown) {
+                this.state.mousedown = false
+            }
+
+            document.title = document.hidden ? 'Minato' : 'Aqua'
         })
     }
 }

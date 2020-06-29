@@ -1,4 +1,5 @@
 const Coord = require('./Coord')
+const { ArgOpt } = require('../enums/index')
 
 class Selection {
     constructor() {
@@ -7,15 +8,7 @@ class Selection {
         this.start = new Coord
         this.end = new Coord
 
-        this.collapsed = true
-    }
-
-    reset() {
-        this._base = new Coord
-
-        this.start = new Coord
-        this.end = new Coord
-
+        this.direction = ArgOpt.SelectionDirectionIsNone
         this.collapsed = true
     }
 
@@ -23,8 +16,36 @@ class Selection {
         this._base.assign(coord)
     }
 
+    get base() {
+        return this._base
+    }
+
     set terminal(coord) {
         this.reorder(this._base, coord)
+    }
+
+    isCollapsed() {
+        return this.collapsed
+    }
+
+    isContainCoord(coord) {
+        if (coord.y < this.start.y) {
+            return false
+        }
+
+        if (coord.y > this.end.y) {
+            return false
+        }
+
+        if (coord.x < this.start.x) {
+            return false
+        }
+
+        if (coord.x > this.end.x) {
+            return false
+        }
+
+        return true
     }
 
     reorder(base, terminal) {
@@ -36,12 +57,16 @@ class Selection {
             this.setStart(base)
             this.setEnd(terminal)
 
+            this.direction = ArgOpt.SelectionDirectionIsBottomRight
+
             return
         }
 
         if (diffY < 0) {
             this.setStart(terminal)
             this.setEnd(base)
+
+            this.direction = ArgOpt.SelectionDirectionIsTopLeft
 
             return
         }
@@ -52,6 +77,8 @@ class Selection {
             this.setStart(base)
             this.setEnd(terminal)
 
+            this.direction = ArgOpt.SelectionDirectionIsBottomRight
+
             return
         }
 
@@ -59,30 +86,13 @@ class Selection {
             this.setStart(terminal)
             this.setEnd(base)
 
+            this.direction = ArgOpt.SelectionDirectionIsTopLeft
+
             return
         }
 
+        this.direction = ArgOpt.SelectionDirectionIsNone
         this.collapsed = true
-    }
-
-    setStart(coord) {
-        this.start.assign(coord)
-    }
-
-    setEnd(coord) {
-        this.end.assign(coord)
-    }
-
-    getStart() {
-        return this.start
-    }
-
-    getEnd() {
-        return this.end
-    }
-
-    isCollapsed() {
-        return this.collapsed
     }
 
     containMinLines(base = this.start, terminal = this.end) {
@@ -114,6 +124,81 @@ class Selection {
 
         if (diffY === -1) {
             return Math.min(base.insideY + terminal.maxInsideY - terminal.insideY + 2, 3)
+        }
+    }
+
+    reset() {
+        this._base = new Coord
+
+        this.start = new Coord
+        this.end = new Coord
+
+        this.collapsed = true
+    }
+
+    setStart(coord) {
+        this.start.assign(coord)
+    }
+
+    setEnd(coord) {
+        this.end.assign(coord)
+    }
+
+    getStart() {
+        return this.start
+    }
+
+    getEnd() {
+        return this.end
+    }
+
+    clone() {
+        const selection = new Selection
+
+        selection._base = this._base.clone()
+        selection.start = this.start.clone()
+        selection.end = this.end.clone()
+        selection.collapsed = this.collapsed
+
+        return selection
+    }
+
+    extract() {
+        return {
+            start: this.start.extract(),
+            end: this.end.extract(),
+            collapsed: this.collapsed,
+        }
+    }
+
+    /**
+     * 请保证 selection 与当前 selection 重合再调用此方法
+     * @param  {Selection} selection
+     */
+    merge(selection) {
+        if (selection.collapsed) {
+            return
+        }
+
+        this.collapsed = selection.collapsed
+        const direction = selection.direction
+
+        if (direction === ArgOpt.SelectionDirectionIsBottomRight) {
+            if (selection.base.less(this.base)) {
+                this.base = selection.base
+            }
+        } else if (direction === ArgOpt.SelectionDirectionIsTopLeft) {
+            if (selection.base.greater(this.base)) {
+                this.base = selection.base
+            }
+        }
+
+        if (selection.start.less(this.start)) {
+            this.start.assign(selection.start)
+        }
+
+        if (selection.end.greater(this.end)) {
+            this.end.assign(selection.end)
         }
     }
 }

@@ -11,15 +11,17 @@ class LeftMousedown extends Action {
     }
 
     exec(aqua, event, state) {
-        state.mousedown = true
+        aqua.state.mousedown = true
 
-        if (!state.stay && aqua.cursorMgr.size > 1) {
-            aqua.cursorMgr.removeAll()
+        const cursors = aqua.cursorMgr
+
+        if (cursors.size > 1) {
+            cursors.removeAll()
         }
 
         const rect = aqua.korwa.getLineWidthRect()
 
-        aqua.cursorMgr.traverse(cursor => {
+        cursors.traverse(cursor => {
             if (event.target.getAttribute(HTMLVariables.DisableMouseEvent)) return
 
             cursor.$y = event.clientY - rect.top
@@ -27,8 +29,10 @@ class LeftMousedown extends Action {
 
             cursor.selection.base = cursor.coord
             cursor.selection.terminal = cursor.coord
-        }, {
-            filter: cursor => aqua.cursorMgr.isPrimary(cursor)
+    }, {
+            filter: cursor => cursors.isPrimary(cursor),
+            acc: false,
+            detect: false,
         })
     }
 }

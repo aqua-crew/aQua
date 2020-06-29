@@ -40,8 +40,6 @@ class Coord {
 
         coord.y = this.y
         coord.x = this.x
-        // coord.insideY = this.insideY
-        // coord.maxInsideY = this.maxInsideY
 
         return coord
     }
@@ -78,7 +76,7 @@ class Coord {
         }
 
         if (diffY > 0) {
-            return true
+            return false
         }
 
         const diffX = this.x - coord.x

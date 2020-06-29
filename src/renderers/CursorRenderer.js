@@ -25,22 +25,33 @@ class CursorRenderer {
                 return
             }
 
-            this.renderCursor(cursor)
+            console.error(cursor.state)
+            this.renderCursor(cursor, cursor.state)
         })
 
         this.pool.clearUnuse()
     }
 
-    renderCursor(cursor) {
+    renderCursor(cursor, state = {}) {
         const $cursor = this.pool.get()
         const layout = cursor.updateLayout()
 
-        this.updateCursor($cursor, layout)
+        let cssText = ''
+
+        if (state.overlayMark) {
+            cssText = 'background-color: rgba(255, 133, 173, .5);'
+
+            setTimeout(() => {
+                state.overlayMark = false
+            })
+        }
+
+        this.updateCursor($cursor, layout, cssText)
     }
 
-    updateCursor($cursor, layout) {
+    updateCursor($cursor, layout, cssText = '') {
         rAF(() => {
-            $cursor.style.cssText = `transform: translate(${layout.x}px, ${layout.y}px)`
+            $cursor.style.cssText = cssText + `transform: translate(${layout.x}px, ${layout.y}px);`
         })
     }
 }
