@@ -8,6 +8,7 @@ class SelectionRenderer {
         this.korwa = aqua.korwa
         this.locator = aqua.locator
         this.cursors = aqua.cursorMgr
+        this.marker = aqua.marker
         this.pool = new DisposablePool(aqua.uiMgr.get('selectionCntr'), 'selection')
     }
 
@@ -44,14 +45,8 @@ class SelectionRenderer {
 
         let cssText = ''
 
-        if (state.overlayMark) {
-            cssText = 'background-color: rgba(255, 133, 173, .5);'
-
-            setTimeout(() => {
-                // delete state.overlayMark
-                // https://stackoverflow.com/questions/43594092/slow-delete-of-object-properties-in-js-in-v8/44008788
-                state.overlayMark = false
-            })
+        if (this.marker.isMarked(state, 'OverlayMark')) {
+            cssText = this.marker.use(state, 'OverlayMark')
         }
 
         this.updateSelection($selections, selection.getStart(), selection.getEnd(), cssText)

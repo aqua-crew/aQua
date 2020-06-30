@@ -15,7 +15,6 @@ class LeftMousemove extends Action {
             return
         }
 
-        const after = state.isCreateCursor ? () => { aqua.cursorMgr.detectCursorSelectionOverlay().map(cursor => cursor.state.overlayMark = true) } : null
         const rect = aqua.korwa.getLineWidthRect()
 
         aqua.cursorMgr.traverse(cursor => {
@@ -29,8 +28,16 @@ class LeftMousemove extends Action {
             filter: cursor => aqua.cursorMgr.isPrimary(cursor),
             acc: false,
             detect: false,
-            after,
+            after: state.isCreateCursor ? () => { this.detectAndMark(aqua) } : null,
         })
+    }
+
+    detectAndMark(aqua) {
+        const cursors = aqua.cursorMgr.detectCursorSelectionOverlay()
+
+        for (let i = 0; i < cursors.length; i++) {
+            aqua.marker.mark(cursors[i].state, 'OverlayMark')
+        }
     }
 }
 

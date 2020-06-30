@@ -6,6 +6,7 @@ const Khala = require('./Khala')
 const Range = require('./Range')
 const SizeObserver = require('./SizeObserver')
 const Kizuna = require('./Kizuna')
+const Marker = require('./Marker')
 const rAF = require('./rAF')
 const Noop = require('./Noop')
 const Iterator = require('./Iterator')
@@ -22,6 +23,7 @@ module.exports = {
     Range,
     SizeObserver,
     Kizuna,
+    Marker,
     rAF,
     Noop,
     Iterator,

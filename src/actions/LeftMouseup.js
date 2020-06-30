@@ -13,22 +13,6 @@ class LeftMouseup extends Action {
     exec(aqua, event, state) {
         aqua.state.mousedown = false
 
-        const after = state.isCreateCursor ? () => {
-            const overlayCursors = aqua.cursorMgr.detectCursorSelectionOverlay()
-
-            if (overlayCursors.length === 0) {
-                return
-            }
-
-            const lastCursor = overlayCursors[overlayCursors.length - 1]
-
-            aqua.cursorMgr.remove(overlayCursors)
-
-            aqua.cursorMgr.getPrimary(cursor => {
-                cursor.merge(lastCursor)
-            })
-        } : null
-
         const rect = aqua.korwa.getLineWidthRect()
 
         aqua.cursorMgr.traverse(cursor => {
@@ -42,7 +26,23 @@ class LeftMouseup extends Action {
             filter: cursor => aqua.cursorMgr.isPrimary(cursor),
             acc: false,
             detect: false,
-            after,
+            after: state.isCreateCursor ? () => { this.detectAndRemove(aqua) } : null,
+        })
+    }
+
+    detectAndRemove(aqua) {
+        const overlayCursors = aqua.cursorMgr.detectCursorSelectionOverlay()
+
+        if (overlayCursors.length === 0) {
+            return
+        }
+
+        const lastCursor = overlayCursors[overlayCursors.length - 1]
+
+        aqua.cursorMgr.remove(overlayCursors)
+
+        aqua.cursorMgr.getPrimary(cursor => {
+            cursor.merge(lastCursor)
         })
     }
 }

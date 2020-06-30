@@ -1,4 +1,4 @@
-const { Khala, Kizuna, Noop, Iterator, DataTransferItemHandler } = require('./utils/index')
+const { DataTransferItemHandler, Iterator, Khala, Kizuna, Marker, Noop } = require('./utils/index')
 const { DefaultOptions } = require('./options/index')
 const { History, Locator, State, Korwa, LineMgr, ContentMgr, CursorMgr, ActionMgr, OptionMgr, UIMgr, ProcessorMgr, Renderer, DocMgr, PluginMgr, Scroller, ViewportMgr } = require('./components/index')
 const { Coord, Content } = require('./models/index')
@@ -8,7 +8,7 @@ const Actions = require('./actions/index')
 const Options = require('./options/index')
 const UI = require('./ui/index')
 const Processors = require('./processors/index')
-
+const Marks = require('./marks/index')
 const { StringAsset, ImageAsset } = require('./assets/index')
 
 const aqua = require('./aquaqua.jpg')
@@ -20,6 +20,7 @@ class Aqua {
         this.docWatcher = new Khala
         this.kizuna = new Kizuna
         this.state = new State
+        this.marker = new Marker
 
         /* Temp */
         // console.error(options.lifetimes)
@@ -45,6 +46,7 @@ class Aqua {
         window.doc = this.docMgr.doc
         this.loadOptions(Options)
         this.loadOptions(options)
+        this.loadMarks(Marks)
         this.installPlugins()
         this.lifetimes.emit('setup', this)
         this.loadUI(UI)
@@ -99,6 +101,7 @@ class Aqua {
 
         this.docMgr.write('')
         this.cursorMgr.init()
+
         // const resizeObserver = new ResizeObserver(entreis => {
         //     const contentRect = entreis[0].contentRect
         //     console.error(contentRect.height)
@@ -243,6 +246,12 @@ class Aqua {
 
     loadOptions(options) {
         this.optionMgr.load(options)
+    }
+
+    loadMarks(Marks) {
+        Iterator.iterate(Marks, (mark, name) => {
+            this.marker.load(name, mark)
+        })
     }
 
     installPlugins() {

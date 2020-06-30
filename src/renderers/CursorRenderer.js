@@ -6,6 +6,7 @@ class CursorRenderer {
         this.applyName = 'cursor'
 
         this.cursors = aqua.cursorMgr
+        this.marker = aqua.marker
         this.pool = new DisposablePool(aqua.uiMgr.get('cursorCntr'), 'cursor')
     }
 
@@ -25,7 +26,6 @@ class CursorRenderer {
                 return
             }
 
-            console.error(cursor.state)
             this.renderCursor(cursor, cursor.state)
         })
 
@@ -38,12 +38,8 @@ class CursorRenderer {
 
         let cssText = ''
 
-        if (state.overlayMark) {
-            cssText = 'background-color: rgba(255, 133, 173, .5);'
-
-            setTimeout(() => {
-                state.overlayMark = false
-            })
+        if (this.marker.isMarked(state, 'OverlayMark')) {
+            cssText = this.marker.use(state, 'OverlayMark')
         }
 
         this.updateCursor($cursor, layout, cssText)
