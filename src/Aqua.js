@@ -23,7 +23,6 @@ class Aqua {
         this.marker = new Marker
 
         /* Temp */
-        // console.error(options.lifetimes)
         for (let name in options.lifetimes) {
             this.lifetimes.on(name, options.lifetimes[name])
         }
@@ -91,7 +90,6 @@ class Aqua {
         })
 
         this.scroller.init({
-            $el: this.uiMgr.get('scroller'),
             y: 0,
             speed: 250,
             min: 0,
@@ -109,10 +107,6 @@ class Aqua {
         //     this.viewport.height = contentRect.height
         //     this.renderer.render(this.viewport)
         // })
-
-        // resizeObserver.observe(this.uiMgr.get('viewport'))
-        // resizeObserver.observe(this.uiMgr.get('beacon'))
-        // resizeObserver.observe(this.uiMgr.get('scroller'))
 
         let ACC = 0
         function genCoord() {
@@ -285,6 +279,10 @@ class Aqua {
                                     cursorCntr
                                     selectionCntr
                                     lineCntr
+                        fixed
+                            sideBarCntr
+                                minimap
+                                scrollBar
                 fgCntr
         `
 
@@ -398,9 +396,9 @@ class Aqua {
             const data = event.data
 
             this.do(cursor => {
+                console.error('event', event)
                 this.write(data, cursor.coord)
             })
-            console.error('event', event)
         })
 
         this.kizuna.on($inputer, 'keydown', event => {

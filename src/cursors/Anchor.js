@@ -3,7 +3,8 @@ const { ArgOpt } = require('../enums/index')
 
 class Anchor {
     constructor(aqua) {
-        this.aqua = aqua
+        this.docMgr = aqua.docMgr
+        this.locator = aqua.locator
 
         this.coord = new Coord
         this.layout = new Coord
@@ -15,8 +16,8 @@ class Anchor {
     }
 
     set y(y) {
-        this.coord.y = y
-        this.coord.maxInsideY = this.aqua.locator.getMaxInsideYByY(y)
+        this.coord.y = this.docMgr.correctLineNum(y)
+        this.coord.maxInsideY = this.locator.getMaxInsideYByY(y)
     }
 
     get y() {
@@ -24,8 +25,8 @@ class Anchor {
     }
 
     set x(x) {
-        this.coord.x = Math.min(x, this.aqua.docMgr.getLine(this.coord.y).length)
-        this.coord.insideY = this.aqua.locator.getInsideYByCoord(this.coord.y, this.coord.x)
+        this.coord.x = Math.min(x, this.docMgr.getLine(this.coord.y).length)
+        this.coord.insideY = this.locator.getInsideYByCoord(this.coord.y, this.coord.x)
     }
 
     get x() {
@@ -33,7 +34,7 @@ class Anchor {
     }
 
     set $y($y) {
-        const { y, insideY, maxInsideY } = this.aqua.locator.getYByLayoutY($y)
+        const { y, insideY, maxInsideY } = this.locator.getYByLayoutY($y)
 
         this.coord.y = y
         this.coord.insideY = insideY
@@ -45,7 +46,7 @@ class Anchor {
     }
 
     set $x($x) {
-        const x = this.aqua.locator.getXByLayoutX(this.coord.y, this.coord.insideY, $x)
+        const x = this.locator.getXByLayoutX(this.coord.y, this.coord.insideY, $x)
 
         this.coord.x = x
     }
@@ -68,7 +69,7 @@ class Anchor {
     }
 
     updateLayout() {
-        const layout = this.aqua.locator.getLayoutByCoord(this.y, this.x, this.insideY !== this.maxInsideY ? this.insideY : null)
+        const layout = this.locator.getLayoutByCoord(this.y, this.x, this.insideY !== this.maxInsideY ? this.insideY : null)
 
         this.layout.y = layout.y
         this.layout.x = layout.x

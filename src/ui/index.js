@@ -2,90 +2,109 @@ const { DOM } = require('../utils/index')
 
 module.exports = {
     /* Host */
-    aqua: function(payload) {
+    aqua: function() {
         return DOM.e('div', {'class': 'aqua theme-aqua'})
     },
 
     /* Editor */
-    editor: function(payload) {
+    editor: function() {
         return DOM.e('div', {'class': 'aqua-editor'})
     },
 
     /* Viewport */
-    viewport: function(payload) {
+    viewport: function() {
         return DOM.e('div', {'class': 'aqua-viewport'})
     },
 
-    scroller: function(payload) {
+    scroller: function() {
         return DOM.e('div', {'class': 'aqua-scroller'})
     },
 
     /* Components Container */
-    components: function(payload) {
+    components: function() {
         return DOM.e('div', {'class': 'aqua-components aqua-variables'})
     },
 
-    fullWidthCntr: function(payload) {
+    fullWidthCntr: function() {
         return DOM.e('div', {'class': 'full-width-container'})
     },
 
-    lineWidthCntr: function(payload) {
+    lineWidthCntr: function() {
         return DOM.e('div', {'class': 'line-width-container'})
     },
 
+    /* Fixed */
+    fixed: function() {
+        return DOM.e('div', {'class': 'aqua-fixed'})
+    },
+
+    sideBarCntr: function() {
+        return DOM.e('div', {'class': 'side-bar-container'})
+    },
+
+    minimap: function() {
+        return DOM.e('div', {'class': 'aqua-minimap'})
+    },
+
+    scrollBar: function() {
+        return DOM.e('div', {'class': 'aqua-scroll-bar'}, [
+            DOM.e('div', {'class': 'aqua-slider'}),
+        ])
+    },
+
     /* Measurers */
-    measurerCntr: function(payload) {
+    measurerCntr: function() {
         return DOM.e('div', {'class': 'measurer-container'})
     },
 
-    ramMeasurer: function(payload) {
+    ramMeasurer: function() {
         return DOM.e('div', {'class': 'ram-measurer'})
     },
 
-    lineMeasurer: function(payload) {
+    lineMeasurer: function() {
         return DOM.e('div', {'class': 'line-measurer'})
     },
 
-    remMeasurer: function(payload) {
+    remMeasurer: function() {
         return DOM.e('div', {'class': 'rem-measurer'})
     },
 
     /* Container in Components Container */
-    inputerCntr: function(payload) {
+    inputerCntr: function() {
         return DOM.e('div', {'class': 'inputer-container'})
     },
 
-    cursorCntr: function(payload) {
+    cursorCntr: function() {
         return DOM.e('div', {'class': 'cursor-container'})
     },
 
-    selectedLineCntr: function(payload) {
+    selectedLineCntr: function() {
         return DOM.e('div', {'class': 'selected-line-container'})
     },
 
-    selectionCntr: function(payload) {
+    selectionCntr: function() {
         return DOM.e('div', {'class': 'selection-container'})
     },
 
-    lineCntr: function(payload) {
+    lineCntr: function() {
         return DOM.e('div', {'class': 'line-container'})
     },
 
     /* Bg & Fg Container */
-    bgCntr: function(payload) {
+    bgCntr: function() {
         return DOM.e('div', {'class': 'bg'})
     },
 
-    fgCntr: function(payload) {
+    fgCntr: function() {
         return DOM.e('div', {'class': 'fg'})
     },
 
     /* Vital Components Children */
-    inputerLocator: function(payload) {
+    inputerLocator: function() {
         return DOM.e('div', {'class': 'inputer-locator'})
     },
 
-    inputer: function(payload) {
+    inputer: function() {
         return (
             DOM.e('textarea', {'class': 'inputer',
                 'autocomplete': 'off',  // 关闭自动补全提示, 防止出戏 (笑

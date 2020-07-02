@@ -78,12 +78,17 @@ class Renderer {
     initGroups() {
         this.groups = Object.create(null)
 
-        this.setGroup('standard', (viewport) => {
+        this.setGroup('standard', viewport => {
             this.render('cursor', viewport)
             this.render('inputer', viewport)
             this.render('selection', viewport)
             this.render('selectedLine', viewport)
             this.render('lineNum', viewport)
+        })
+
+        this.setGroup('scroller', viewport => {
+            this.render('scroller', viewport)
+            this.render('scrollBar', viewport)
         })
     }
 
@@ -94,6 +99,9 @@ class Renderer {
     }
 
     renderViewport(viewport = this.aqua.viewport, force = false) {
+        this.renderGroup('scroller', viewport)
+        this.render('minimap', viewport)
+
         const start = this.doc.getLineByHeight(viewport.ceiling).staticLineNum
         const end = this.doc.getLineByHeight(viewport.floor, true).staticLineNum + 1
 

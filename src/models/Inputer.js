@@ -3,6 +3,7 @@ class Inputer {
         this.$inputer = $inputer
     }
 
+
 }
 
 module.exports = Inputer

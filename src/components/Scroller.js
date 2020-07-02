@@ -63,19 +63,10 @@ class Scroller {
         if (new Date().getTime() - this.lastScrollTime >= 17) {
             this.lastScrollTime = new Date().getTime()
             this.aqua.khala.emit('scroll', y, this.y, force)
-
-            rAF(() => {
-                this.$el.style.transform = `translateY(-${y}px)`
-            })
-
         } else {
             this.timeoutId = setTimeout(() => {
                 this.lastScrollTime = new Date().getTime()
                 this.aqua.khala.emit('scroll', y, this.y, force)
-
-                rAF(() => {
-                    this.$el.style.transform = `translateY(-${y}px)`
-                })
             }, 17)
         }
     }

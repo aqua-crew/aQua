@@ -98,7 +98,7 @@ class DocMgr {
     }
 
     /* APIs */
-    writeAsNewline(contents, coord = new Coord) {
+    writeAsNewLine(contents, coord = new Coord) {
         if (!Array.isArray(contents)) {
             contents = [contents]
         }
@@ -109,11 +109,12 @@ class DocMgr {
     }
 
     write(contents, coord = new Coord) {
-        const startLineNum = coord.y
-
+        console.error('Execute', contents, coord)
         if (!Array.isArray(contents)) {
             contents = [contents]
         }
+
+        const startLineNum = coord.y
 
         let effectLines = []
 
@@ -292,7 +293,7 @@ class DocMgr {
     }
 
     correctCoord(coord) {
-        const yMax = this.doc.size
+        const yMax = this.size
 
         const y = coord.y
 

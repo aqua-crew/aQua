@@ -19,7 +19,7 @@
         }
 
         .my-editor {
-            width: 1200px;
+            width: 1400px;
             height: 1200px;
             margin: 0 auto;
         }
@@ -157,79 +157,105 @@
 
         .aqua-viewport {
             position: relative;
+            display: flex;
             height: 100%;
 
             overflow-y: hidden;
         }
+        .aqua-fixed {
+            position: relative;
+            flex: 1 0 200px;
+        }
+            .side-bar-container {
+
+            }
+                .aqua-scroll-bar {
+                    position: absolute;
+                    right: 0;
+                    top: 0;
+                    bottom: 0;
+                    width: 10px;
+                    background-color: rgba(118, 218, 255, .05);
+                }
+                    .aqua-slider {
+                        position: absolute;
+                        left: 0;
+                        right: 0;
+                        background-color: rgba(118, 218, 255, .15);
+                        height: 40px;
+                        transition: transform .2s ease-out
+                    }
         .aqua-scroller {
             transform: translateY(0);
             transition: transform 0.15s ease-out;
         }
-        .aqua-components {
-            position: relative;
-            cursor: text;
-        }
-        .aqua-variables {
-            --line-width: 0;
-            --ram-width: 0;
-        }
-            .full-width-container {
-                position: absolute;
-                left: 0;
-                right: 0;
-            }
-            .line-width-container {
+            .aqua-components {
                 position: relative;
-                margin-left: var(--ram-width);
-                height: 0;
+                cursor: text;
             }
-        .measurer-container {
-            position: absolute;
-            visibility: hidden;
-            opacity: 0;
-            right: 0;
-            left: 0;
-        }
-            .rem-measurer {
-                position: absolute;
+            .aqua-variables {
+                --line-width: 0;
+                --ram-width: 0;
             }
-            .line-measurer {
-                position: absolute;
-            }
-            .ram-measurer {
-                position: absolute;
-            }
-
-        /* Line about */
-        .line {
-            position: relative;
-            line-height: 25px;
-            font-size: 12px;
-        }
-            .prefix {
-                position: absolute;
-                transform: translateX(-100%);
-                padding: 0 20px 0 20px;
-                text-align: right;
-                cursor: default;
-                user-select: none;
-            }
-                .line-num {
-                    color: rgba(118, 218, 255, .5);
-                    width: var(--line-width);
+                .full-width-container {
+                    position: absolute;
+                    left: 0;
+                    right: 0;
                 }
-            .suffix {
-                margin: 0;
-                overflow-wrap: break-word;
-                white-space: pre-wrap;
-                word-break: normal;
-                color: rgba(255, 255, 255, 1);
+                .line-width-container {
+                    position: relative;
+                    margin-left: var(--ram-width);
+                    height: 0;
+                }
+            .line-container {
             }
-            code {
+            .measurer-container {
+                position: absolute;
+                visibility: hidden;
+                opacity: 0;
+                right: 0;
+                left: 0;
+            }
+                .rem-measurer {
+                    position: absolute;
+                }
+                .line-measurer {
+                    position: absolute;
+                }
+                .ram-measurer {
+                    position: absolute;
+                }
+
+            /* Line about */
+            .line {
+                position: relative;
                 line-height: 25px;
-                margin-right: 0.1px; /* 修复 chrome 下的 getClientRects 不符合预期行为的问题, 以及撑开行高 */
-                font-family: inherit;
+                font-size: 12px;
             }
+                .prefix {
+                    position: absolute;
+                    transform: translateX(-100%);
+                    padding: 0 20px 0 20px;
+                    text-align: right;
+                    cursor: default;
+                    user-select: none;
+                }
+                    .line-num {
+                        color: rgba(118, 218, 255, .5);
+                        width: var(--line-width);
+                    }
+                .suffix {
+                    margin: 0;
+                    overflow-wrap: break-word;
+                    white-space: pre-wrap;
+                    word-break: normal;
+                    color: rgba(255, 255, 255, 1);
+                }
+                code {
+                    line-height: 25px;
+                    margin-right: 0.1px; /* 修复 chrome 下的 getClientRects 不符合预期行为的问题, 以及撑开行高 */
+                    font-family: inherit;
+                }
     </style>
 </head>
 <body>

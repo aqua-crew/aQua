@@ -16,6 +16,11 @@ module.exports = {
         foreground($ctnr, DOM) {},
     },
 
+    components: {
+        scrollBar: true,
+        minimap: true,
+    },
+
     scroller: {
 
     },
