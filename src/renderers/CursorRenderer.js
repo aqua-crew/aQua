@@ -15,6 +15,11 @@ class CursorRenderer {
 
         const renderArea = viewport.getRenderArea()
 
+        if (this.cursors.offsetMap.size > 0) {
+            console.warn('渲染时触发了 offsetMap', this.cursors.offsetMap.size)
+            this.cursors.flushOffset()
+        }
+
         this.cursors.pureTraverse(cursor => {
             if (this.cursors.isPrimary(cursor)) {
                 this.renderCursor(cursor)

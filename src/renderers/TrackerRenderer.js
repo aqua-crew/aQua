@@ -18,13 +18,13 @@ class TrackerRenderer {
             const $y = cursor.$y
 
             if ($y < viewport.ceiling) {
-                this.scroller.scrollTo($y, true)
+                this.scroller.scroll($y, true)
 
                 return
             }
 
             if ($y + this.korwa.getSingleLineHeight() > viewport.floor) {
-                this.scroller.scrollTo($y - viewport.height + this.korwa.getSingleLineHeight(), true)
+                this.scroller.scroll($y - viewport.height + this.korwa.getSingleLineHeight(), true)
 
                 return
             }

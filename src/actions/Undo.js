@@ -8,10 +8,37 @@ class Undo extends Action {
         this.cmd = null
         this.icons = null
         this.shortcuts = ['Ctrl + Z']
+        this.record = false
     }
 
     exec(aqua, event) {
-        console.error(this.name)
+        event.preventDefault()
+
+        aqua.chronicle.back(macro => {
+            if (!macro) {
+                return
+            }
+
+            this.executeMicros(aqua, macro.micros)
+        })
+    }
+
+    executeMicros(aqua, micros) {
+        for (let i = micros.length - 1; i >= 0; i--) {
+            const { source, start, end, contents } = micros[i].record
+
+            if (source === 'write') {
+                aqua.docMgr.delete(start, end)
+
+                continue
+            }
+
+            if (source === 'delete') {
+                aqua.docMgr.write(contents, start)
+
+                continue
+            }
+        }
     }
 }
 

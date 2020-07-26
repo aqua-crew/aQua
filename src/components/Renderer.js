@@ -1,5 +1,5 @@
 const { LineHelper } = require('../helpers/index')
-const { DOM, rAF } = require('../utils/index')
+const { DOM, rAF, Limiter, SimpleSet } = require('../utils/index')
 const { ArgOpt, CSSVariables } = require('../enums/index')
 
 const Renderers = require('../renderers/index')
@@ -13,6 +13,11 @@ class Renderer {
 
         this.doc = aqua.docMgr
         this.korwa = aqua.korwa
+
+        this.renderSet = new SimpleSet
+
+        this.renderViewport = Limiter.toNextTick(this.renderViewport.bind(this), 17)
+        this.startup = Limiter.toNextTick(this.startup.bind(this), 17)
     }
 
     initRenders(Renders) {
@@ -29,9 +34,8 @@ class Renderer {
         const khala = this.aqua.khala
         const uiMgr = this.aqua.uiMgr
 
-        let lastChange = 0
-
-        let timeoutId = null
+        // let lastChange = 0
+        // let timeoutId = null
 
         docWatcher.on('change', data => {
             const lines = data.effectLines
@@ -39,19 +43,10 @@ class Renderer {
             LineHelper.setHeight(lines, this.korwa.measureLinesHeight(lines))
             docWatcher.emit('resize', lines)
 
-            clearTimeout(timeoutId)
-            if (new Date().getTime() - lastChange > 17) {
-                this.renderViewport(viewport, ArgOpt.SkipVisionCheck)
-            } else {
-                timeoutId = setTimeout(() => {
-                    this.renderViewport(viewport, ArgOpt.SkipVisionCheck)
-                }, 17)
-            }
-
-            lastChange = new Date().getTime()
+            this.renderViewport(viewport, ArgOpt.SkipVisionCheck)
         })
 
-        khala.on('scroll', (y, lastY, force) => {
+        khala.on('scroll', (y, force) => {
             viewport.update(y)
 
             this.renderViewport(viewport, force)
@@ -100,7 +95,6 @@ class Renderer {
 
     renderViewport(viewport = this.aqua.viewport, force = false) {
         this.renderGroup('scroller', viewport)
-        this.render('minimap', viewport)
 
         const start = this.doc.getLineByHeight(viewport.ceiling).staticLineNum
         const end = this.doc.getLineByHeight(viewport.floor, true).staticLineNum + 1
@@ -116,10 +110,10 @@ class Renderer {
         const oldRenderArea = viewport.getRenderArea()
         const renderArea = viewport.updateRenderArea(renderStart, renderEnd)
 
-        viewport.pad(this.doc.getLineWithHeight(renderArea.start).top)
-
+        this.render('pad', viewport)
         this.render('line', viewport, renderArea, oldRenderArea)
         this.renderGroup('standard', viewport)
+        this.render('minimap', viewport)
     }
 
     setRenderer(Renderer) {
@@ -132,6 +126,12 @@ class Renderer {
     }
 
     render(applyName, ...payload) {
+        this.renderSet.add(applyName, payload)
+
+        this.startup()
+    }
+
+    renderImmediately(applyName, ...payload) {
         this.getRenderer(applyName).render(...payload)
     }
 
@@ -145,6 +145,14 @@ class Renderer {
 
     getGroup(name) {
         return this.groups[name]
+    }
+
+    startup() {
+        const [ renderers, traverse ] = this.renderSet.use()
+
+        traverse(renderers, renderer => {
+            this.renderImmediately(renderer.name, ...renderer.payload)
+        })
     }
 }
 

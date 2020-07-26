@@ -4,8 +4,6 @@ class Viewport {
         x = 0,
         height = 0,
         width = 0,
-        $padding = null,
-        padding = 0,
         lps = 0,
         lines = [],
         $lines = [],
@@ -15,8 +13,6 @@ class Viewport {
         this.x = x
         this.height = height
         this.width = width
-        this.$padding = $padding
-        this.padding = 0
         this.lps = lps // Lines Per Screen
         this.lines = lines
         this.$lines = $lines
@@ -41,11 +37,6 @@ class Viewport {
 
     get floor() {
         return this.y + this.height
-    }
-
-    pad(px) {
-        this.padding = px
-        this.$padding.style.transform = `translateY(${px}px)`
     }
 
     update(y) {

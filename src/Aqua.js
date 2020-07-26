@@ -1,20 +1,23 @@
-const { DataTransferItemHandler, Iterator, Khala, Kizuna, Marker, Noop } = require('./utils/index')
+const { DataTransferItemHandler, Iterator, Khala, Kizuna, Marker, Noop, Progress } = require('./utils/index')
 const { DefaultOptions } = require('./options/index')
-const { History, Locator, State, Korwa, LineMgr, ContentMgr, CursorMgr, ActionMgr, OptionMgr, UIMgr, ProcessorMgr, Renderer, DocMgr, PluginMgr, Scroller, ViewportMgr } = require('./components/index')
+const { ActionMgr, Chronicle, ContentMgr, CursorMgr, DocMgr, History, Inputer, Korwa, LineMgr, Locator, OptionMgr, PluginMgr, ProcessorMgr, Renderer, Scroller, State, UIMgr, ViewportMgr } = require('./components/index')
 const { Coord, Content } = require('./models/index')
 const Lines = require('./lines/index')
 const Cursors = require('./cursors/index')
 const Actions = require('./actions/index')
-const Options = require('./options/index')
 const UI = require('./ui/index')
 const Processors = require('./processors/index')
 const Marks = require('./marks/index')
 const { StringAsset, ImageAsset } = require('./assets/index')
+const plugins = require('./plugins/index')
 
-const aqua = require('./aquaqua.jpg')
+// const aqua = require('./aquaqua.jpg')
 
 class Aqua {
     constructor(options) {
+        this.optionMgr = new OptionMgr(this)
+
+        this.progress = new Progress
         this.khala = new Khala
         this.lifetimes = new Khala
         this.docWatcher = new Khala
@@ -22,16 +25,21 @@ class Aqua {
         this.state = new State
         this.marker = new Marker
 
-        /* Temp */
-        for (let name in options.lifetimes) {
-            this.lifetimes.on(name, options.lifetimes[name])
-        }
+        this.loadOptions(options)
 
+        this.uiMgr = new UIMgr(this)
+        this.loadUI(UI)
+        this.mountUI()
+        this.loadPlugins([...plugins, ...this.optionMgr.get('plugins')])
+
+        this.optionMgr.normalize()
+        this.lifetimes.emit('setup', this)
+        this.progress.set(0)
+
+        this.chronicle = new Chronicle(this)
         this.pluginMgr = new PluginMgr(this)
         this.scroller = new Scroller(this)
         this.processorMgr = new ProcessorMgr(this)
-        this.optionMgr = new OptionMgr(this)
-        this.uiMgr = new UIMgr(this)
         this.korwa = new Korwa(this)
         this.lineMgr = new LineMgr(this)
         this.cursorMgr = new CursorMgr(this)
@@ -41,17 +49,11 @@ class Aqua {
         this.locator = new Locator(this)
         this.viewportMgr = new ViewportMgr(this)
         this.renderer = new Renderer(this)
+        this.inputer = new Inputer(this)
 
-        window.doc = this.docMgr.doc
-        this.loadOptions(Options)
-        this.loadOptions(options)
+        this.progress.set(20)
+
         this.loadMarks(Marks)
-        this.installPlugins()
-        this.lifetimes.emit('setup', this)
-        this.loadUI(UI)
-        this.mountUI()
-        this.lifetimes.emit('mounted', this)
-
         this.loadProcessors(Processors)
         this.loadLines(Lines)
         this.loadCursors(Cursors)
@@ -60,18 +62,46 @@ class Aqua {
         this.loadInputerEvents()
         this.loadDocumentEvents()
 
-        /* Dev test */
-        window.state = this.state
-        window.aqua = this
+        this.lifetimes.emit('ready', this)
+        this.progress.set(60)
 
         this.init()
-        this.lifetimes.emit('ready', this)
-
         this.expose()
+
+        this.lifetimes.emit('complete', this)
+        this.progress.set(100)
+
+        this.releaseExtendPlugins()
+        this.progress = null
+
+        /* Dev test */
+        window.aqua = this
+    }
+
+    static use(ExtendPlugin, ...options) {
+        if (!this.extendPlugins) {
+            this.extendPlugins = []
+        }
+
+        if (this.extendPlugins.indexOf(ExtendPlugin) > -1) {
+            return
+        }
+
+        this.extendPlugins.push(ExtendPlugin)
+
+        ExtendPlugin.install ? ExtendPlugin.install(Aqua, ...options) : new ExtendPlugin(Aqua, ...options)
+    }
+
+    releaseExtendPlugins() {
+        Aqua.extendPlugins = null
     }
 
     expose() {
-        this.write = this.docMgr.write.bind(this.docMgr)
+        this.write = (...payload) => {
+            this.chronicle.start('Input')
+            this.docMgr.write(...payload)
+            this.chronicle.end('Input')
+        }
         this.read = this.docMgr.read.bind(this.docMgr)
         this.delete = this.docMgr.delete.bind(this.docMgr)
         this.do = this.cursorMgr.traverse.bind(this.cursorMgr)
@@ -83,7 +113,6 @@ class Aqua {
         this.docMgr.init()
 
         this.viewportMgr.init({
-            $padding: this.uiMgr.get('lineCntr'),
             y: 0,
             height: this.korwa.getViewportRect().height,
             lps: 10,
@@ -96,140 +125,9 @@ class Aqua {
         })
 
         this.renderer.init()
-
-        this.docMgr.write('')
         this.cursorMgr.init()
-
-        // const resizeObserver = new ResizeObserver(entreis => {
-        //     const contentRect = entreis[0].contentRect
-        //     console.error(contentRect.height)
-
-        //     this.viewport.height = contentRect.height
-        //     this.renderer.render(this.viewport)
-        // })
-
-        let ACC = 0
-        function genCoord() {
-            return new Coord({
-                y: ACC++,
-            })
-        }
-
-        let start = performance.now()
-        const contents = []
-        for (let i = 0; i < 1; i++) {
-            const coord = genCoord()
-            contents.push('#' + (coord.y + 1))
-        }
-
-        this.docMgr.write(contents)
-
-        // const c = new ImageAsset({
-        //     src: aqua,
-        // })
-
-        // c.setNext(new StringAsset('aqua aqua'))
-
-        const c = new StringAsset('aqua aqua')
-
-
-
-        // setTimeout(() => {
-        //     this.docMgr.write(c, {
-        //         y: 11,
-        //         x: 200,
-        //     })
-        // }, 1000)
-
-        let end = performance.now()
-        const write = end - start
-        console.info('Write Use time', write)
-
-        start = performance.now()
-
-        // console.error(this.docMgr.getLinesByHeight())
-
-
-        // setTimeout(() => {
-        //     start = performance.now()
-
-        //         console.error('---------------------')
-        //         for (let i = 0; i < 100; i++) {
-        //             const y = Math.random() < 1 ? this.docMgr.doc.root.size : parseInt(this.docMgr.doc.root.size * Math.random())
-        //             this.docMgr.write('Peko', {
-        //                 y,
-        //             })
-        //         }
-
-        //     console.error('Root', this.docMgr.doc.root)
-        //     end = performance.now()
-        //     console.info('Write Use time', end - start, 'ms')
-        // }, 800)
-
-        // end = performance.now()
-        // const read = end - start
-        // console.info('Read Use time', read)
-
-        // this.docMgr.write(new ImageAsset({
-        //     src: 'http://i0.hdslb.com/bfs/face/281753a6f2c08940ce82c36e870633991262a4cf.jpg',
-        //     alt: 'aqua',
-        // }))
-
-        // const start = performance.now()
-        // let i = 0;
-        // const sec = 1000
-        // for (; performance.now() - start < sec; i++) {
-        //     this.docMgr.write(new StringAsset('A'), {
-        //         y: i,
-        //         x: 0,
-        //     })
-        // }
-        // console.error(`Insert With CustomData ${i / sec * 1000} qps/second`)
-        // console.info('this.doc', this.docMgr.doc.root)
-// 1   1   1
-// 2   3
-// 3   4
-// 4   5
-// 5   6
-        // this.khala.on('docUpdated', info => {
-        //     const start = performance.now()
-
-        //     console.error('Read Content',
-        //         this.docMgr.read(
-        //             new Coord({
-        //                 y: 0,
-        //                 x: 0,
-        //             }),
-
-        //             new Coord({
-        //                 y: Infinity,
-        //                 x: Infinity,
-        //             })
-        //         )
-        //     )
-        //     if (info.type === 'write') {
-        //         let e = this.contentMgr.tokenize(new Content({
-        //             // value: this.optionMgr.get('content'),
-        //             value: 'Pekora  \n Ch. 兎田ぺこら',
-        //         }))
-        //         console.error('tokens', e)
-        //         e = this.contentMgr.toElements(e)
-        //         console.error('elements', e)
-        //         this.lineMgr.insert(e)
-        //     }
-
-        //     if (info.type === 'update') {
-
-        //     }
-
-        //     const end = performance.now()
-        //     console.warn('Use time: ', end - start)
-        // })
-
-        // this.khala.once('docUpdated', () => {
-        //     console.error('docUpdated', this.contentMgr.doc)
-            // this.cursorMgr.create()
-        // })
+        this.chronicle.init()
+        this.inputer.init()
     }
 
     loadProcessors(Processors) {
@@ -248,8 +146,10 @@ class Aqua {
         })
     }
 
-    installPlugins() {
-
+    loadPlugins(plugins) {
+        plugins.forEach(plugin => {
+            plugin.install(this)
+        })
     }
 
     loadUI(UI) {
@@ -345,8 +245,6 @@ class Aqua {
             this.scroller.handleScroll(event)
         })
 
-
-
         this.kizuna.on($viewport, 'dragover', event => {
             event.preventDefault()
         })
@@ -382,38 +280,29 @@ class Aqua {
 
         this.kizuna.on($inputer, 'focus', event => {
             this.state.focus = true
-            console.error('focus')
         })
 
         this.kizuna.on($inputer, 'blur', event => {
             this.state.focus = false
-            console.error('blur')
         })
 
         this.kizuna.on($inputer, 'input', event => {
-            event.preventDefault()
-
-            const data = event.data
-
-            this.do(cursor => {
-                console.error('event', event)
-                this.write(data, cursor.coord)
-            })
+            this.inputer.poll()
         })
 
         this.kizuna.on($inputer, 'keydown', event => {
-            // event.preventDefault()
             this.kizuna.filterKeydown(event)
         })
 
         this.kizuna.on($inputer, 'keyup', event => {
-            event.preventDefault()
+            // event.preventDefault()
             this.kizuna.filterKeyup(event)
         })
 
         this.kizuna.on($inputer, 'copy', event => {
-            console.error('copy event', event)
             event.preventDefault()
+
+            console.error('copy event', event)
         })
 
         this.kizuna.on($inputer, 'cut', event => {
@@ -422,36 +311,55 @@ class Aqua {
         })
 
         this.kizuna.on($inputer, 'paste', event => {
-            const items = event.clipboardData.items
-            console.error('Paste event.clipboardData', event.clipboardData)
+            this.inputer.poll()
 
-            if (!(event.clipboardData && items)) {
-                return
-            }
+            // const items = event.clipboardData.items
+            // console.error('Paste event.clipboardData', event.clipboardData)
 
-            for (let i = 0, len = items.length; i < len; i++) {
-                DataTransferItemHandler.handle(items[i], {
-                    text: text => {
-                        console.info('text', text)
-                    },
+            // if (!(event.clipboardData && items)) {
+            //     return
+            // }
 
-                    html: html => {
-                        const $test = document.getElementById('con')
-                        const regexp = new RegExp(/^(<!--StartFragment-->)([\s\S]*)(<!--EndFragment-->)/, 'gm')
+            // for (let i = 0, len = items.length; i < len; i++) {
+            //     DataTransferItemHandler.handle(items[i], {
+            //         text: text => {
+            //             console.info('text', text)
+            //         },
 
-                        const c = regexp.exec(html)[2]
-                        console.error(c)
-                        $test.innerHTML = c
-                        console.info('html', html)
-                    },
+            //         html: html => {
+            //             const $test = document.getElementById('con')
+            //             const regexp = new RegExp(/^(<!--StartFragment-->)([\s\S]*)(<!--EndFragment-->)/, 'gm')
 
-                    file: file => {
-                        console.info('file', file)
-                    }
-                })
-            }
+            //             const c = regexp.exec(html)[2]
+            //             console.error(c)
+            //             $test.innerHTML = c
+            //             console.info('html', html)
+            //         },
 
-            event.preventDefault()
+            //         file: file => {
+            //             console.info('file', file)
+            //         }
+            //     })
+            // }
+
+            // event.preventDefault()
+        })
+
+        this.khala.on('input', text => {
+            this.chronicle.start('Input')
+
+            this.cursorMgr.traverse(cursor => {
+                if (!cursor.selection.isCollapsed()) {
+                    this.actionMgr.execWithName('Backspace', 'backspace', cursor)
+                }
+
+                const { y, x } = this.docMgr.write(text, cursor)
+
+                cursor.y = cursor.y + y
+                cursor.x = cursor.x + x
+            })
+
+            this.chronicle.end('Input')
         })
     }
 

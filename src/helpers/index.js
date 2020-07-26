@@ -1,5 +1,7 @@
+const CoordHelper = require('./CoordHelper')
 const LineHelper = require('./LineHelper')
 
 module.exports = {
-    LineHelper: new LineHelper,
+    CoordHelper,
+    LineHelper,
 }

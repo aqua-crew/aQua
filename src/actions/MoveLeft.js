@@ -10,41 +10,49 @@ class MoveLeft extends Action {
         this.shortcuts = ['←']
     }
 
-    exec(aqua, event, state = {}) {
-        const fn = (cursor, clearSelection = true) => {
-            if (clearSelection) {
-                cursor.selection.reset()
-            }
+    exec(aqua, event) {
+        aqua.cursorMgr.traverse(cursor => {
+            this.moveLeft(aqua, cursor, true)
+        }, {
+            acc: false,
+        })
+    }
 
-            if (cursor.x <= 0) {
-                if (cursor.y === 0) {
-                    return
-                }
-
-                cursor.y = cursor.y - 1
-                cursor.x = Infinity
-
-                return
-            }
-
-            cursor.x = cursor.x - 1
+    moveLeft(aqua, cursor, clearSelection = false) {
+        if (clearSelection) {
+            cursor.resetSelection()
         }
 
-        if (state.cursor) {
-            fn(state.cursor, false)
+        const coord = this.getMoveLeftCoord(aqua, cursor.coord)
 
+        if (cursor.coord === coord) {
             return
         }
 
-        aqua.cursorMgr.traverse(fn, {
-            acc: false,
-        })
+        if (cursor.y !== coord.y) {
+            cursor.y = coord.y
+        }
+
+        cursor.x = coord.x
+    }
+
+    getMoveLeftCoord(aqua, coord, xMinus = 1) {
+        if (coord.x <= 0) {
+            if (coord.y === 0) {
+                return coord
+            }
+
+            return {
+                y: coord.y - 1,
+                x: Infinity,
+            }
+        }
+
+        return {
+            y: coord.y,
+            x: coord.x - 1,
+        }
     }
 }
 
 module.exports = MoveLeft
-
-// + GapBuffer / Rope
-// + Doc
-// + Selected
-// + Selection

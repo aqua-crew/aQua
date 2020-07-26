@@ -10,38 +10,51 @@ class MoveRight extends Action {
         this.shortcuts = ['→']
     }
 
-    exec(aqua, event, state = {}) {
-        const fn = (cursor, clearSelection = true) => {
-            if (clearSelection) {
-                cursor.selection.reset()
-            }
+    exec(aqua, event) {
+        aqua.cursorMgr.traverse(cursor => {
+            this.moveRight(aqua, cursor, true)
+        }, {
+            acc: false,
+        })
+    }
 
-            const max = aqua.docMgr.size - 1
-            const lineLen = aqua.docMgr.getLine(cursor.y).length
-
-            if (cursor.x >= lineLen) {
-                if (cursor.y === max) {
-                    return
-                }
-
-                cursor.y = cursor.y + 1
-                cursor.x = 0
-
-                return
-            }
-
-            cursor.x = cursor.x + 1
+    moveRight(aqua, cursor, clearSelection = false) {
+        if (clearSelection) {
+            cursor.resetSelection()
         }
 
-        if (state.cursor) {
-            fn(state.cursor, false)
+        const coord = this.getMoveRightCoord(aqua, cursor.coord)
 
+        if (cursor.coord === coord) {
             return
         }
 
-        aqua.cursorMgr.traverse(fn, {
-            acc: false,
-        })
+        if (cursor.y !== coord.y) {
+            cursor.y = coord.y
+        }
+
+        cursor.x = coord.x
+    }
+
+    getMoveRightCoord(aqua, coord, xPlus = 1) {
+        const max = aqua.docMgr.size - 1
+        const xMax = aqua.docMgr.getLine(coord.y).length
+
+        if (coord.x >= xMax) {
+            if (coord.y === max) {
+                return coord
+            }
+
+            return {
+                y: coord.y + 1,
+                x: 0,
+            }
+        }
+
+        return {
+            y: coord.y,
+            x: coord.x + 1,
+        }
     }
 }
 

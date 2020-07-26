@@ -29,9 +29,6 @@ class LineRenderer {
      * 2. 比较行号相同的部分, 返回需要渲染的 DOM 数组
      */
     diff(viewport, lines, oldLines, renderArea, oldRenderArea) {
-        // console.log('新渲染区域', lines)
-        // console.log('旧渲染区域', oldLines)
-
         let oldIndex = 0
         let oldIndexMax = 0
 
@@ -78,9 +75,10 @@ class LineRenderer {
             const line = lines[curIndex]
             const status = line.status
 
-            line.setStatus(LineStatus.DONE)
 
             if (line === oldLine) {
+                line.setStatus(LineStatus.DONE)
+
                 $list[curIndex] = $lines[oldIndex]
 
                 if (status === LineStatus.DONE) {
@@ -99,6 +97,7 @@ class LineRenderer {
                     if (oldStatus === LineStatus.DELETED) {
                         curIndex = curIndex - 1
                         hasDeleted = true
+                        // line.setStatus(status)
                     }
 
                     while (oldStatus === LineStatus.DELETED) {
@@ -115,6 +114,8 @@ class LineRenderer {
                         continue
                     }
                 }
+
+                line.setStatus(LineStatus.DONE)
 
                 const $line = this.pool.size > 0 ? this.pool.get() : this.lineMgr.create()
                 $list[curIndex] = $line

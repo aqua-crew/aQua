@@ -124,7 +124,6 @@ class ExtendedLine {
 
     genMap() {
         const $nodes = this.$code.childNodes // 由于空格之类的字符不生成包裹的父元素, 如果使用 children 那么这些空格由于不算作 ElementType, 会被忽略 导致报错
-        // const $nodes = this.$code.children
         const len = $nodes.length
         const map = [0]
 

@@ -1,7 +1,5 @@
-const Scroller = require('./Scroller/index')
-const Menu = require('./Menu/index')
+const AquaProgress = require('./AquaProgress/index')
 
-module.exports = {
-    Scroller,
-    Menu,
-}
+module.exports = [
+    new AquaProgress,
+]

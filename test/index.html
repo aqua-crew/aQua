@@ -62,7 +62,7 @@
                 padding: 0 .5px;
             }
 
-        .bg {
+        .aqua-bg {
             position: absolute;
             top: 0;
             right: 0;
@@ -81,7 +81,7 @@
                 width: 50%;
             }
 
-        .bg .aqua-chan {
+        .aqua-bg .aqua-chan {
             width: 100%;
         }
 
@@ -91,6 +91,49 @@
             height: 100%;
             font-family: Consolas;
         }
+
+        /* Loading */
+        .aqua-loading {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            opacity: 1;
+            background-color: rgba(42, 46, 58, 1);
+            text-align: center;
+            transition: opacity .25s ease-out;
+        }
+            .loading {
+                display: inline-block;
+                position: relative;
+                vertical-align: middle;
+                width: 80%;
+                height: 10px;
+                border-radius: 10px;
+                background-color: rgba(255, 255, 255, .1);
+                contain: strict;
+            }
+                .progress {
+                    --progress: -100%;
+                    visibility: visible;
+                    position: absolute;
+                    top: 0;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    transform: translateX(var(--progress));
+                    background-color: rgba(255, 255, 255, .35);
+                    border-radius: 10px;
+                    transition-property: transform, visibility;
+                    transition-duration: 0.25s;
+                    transition-timing-function: ease-out;
+                }
+            .strut {
+                display: inline-block;
+                vertical-align: middle;
+                height: 100%;
+            }
 
         /* Container */
         .selected-line-container, .selection-container {
@@ -120,7 +163,6 @@
             transition-duration: 0.2s;
             transition-timing-function: ease-out;
             background-color: rgba(255, 255, 255, .05);
-
         }
         .inputer-container, .cursor-container {
             position: absolute;
@@ -164,7 +206,7 @@
         }
         .aqua-fixed {
             position: relative;
-            flex: 1 0 200px;
+            flex: 0 0 200px;
         }
             .side-bar-container {
 
@@ -174,7 +216,7 @@
                     right: 0;
                     top: 0;
                     bottom: 0;
-                    width: 10px;
+                    width: 6px;
                     background-color: rgba(118, 218, 255, .05);
                 }
                     .aqua-slider {
@@ -182,12 +224,17 @@
                         left: 0;
                         right: 0;
                         background-color: rgba(118, 218, 255, .15);
-                        height: 40px;
-                        transition: transform .2s ease-out
+                        height: 0;
+
+                        transition-property: transform, height;
+                        transition-duration: 0.2s;
+                        transition-timing-function: ease-out;
                     }
         .aqua-scroller {
+            flex: 1 1 auto;
             transform: translateY(0);
             transition: transform 0.15s ease-out;
+            will-change: transform;
         }
             .aqua-components {
                 position: relative;
@@ -261,7 +308,7 @@
 <body>
     <div class="center">
         <div class="misc" style="height: 100px;"></div>
-        <div class="my-editor" style="visibility: hidden;">
+        <div class="my-editor" style="visibility: hidden; display: none;">
             <!-- 这里开始是 editor 的内容 start -->
             <div class="aqua theme-aqua">
                 <div class="aqua-header">

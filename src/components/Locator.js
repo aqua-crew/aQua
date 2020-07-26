@@ -58,6 +58,12 @@ class Locator {
     }
 
     getXByLayoutX(y, insideY, $x) {
+        const line = this.doc.getLine(y)
+
+        if (line.length === 0) {
+            return 0
+        }
+
         const extendedLine = this.lineMgr.extendLine(y)
         const lineRects = extendedLine.getClientRects()
         const maxInsideY = lineRects.length - 1
@@ -257,7 +263,6 @@ class Locator {
 
         // const line = this.doc.getLine(y)
         const line = this.doc.getLineWithHeight(y)
-
         const extendedLine = this.lineMgr.extendLine(y)
         const xMax = line.length
 
@@ -276,7 +281,6 @@ class Locator {
 
         const measureRect = this.korwa.getLineWidthRect()
         const xAtLast = x === xMax // 如果是最后一格, 取 charRect 按照最后一个字取, 只不过在返回的时候返回 rect 的右边部分
-
         let charRectDirection = ''
         let charRect = null
         let insideY = -1

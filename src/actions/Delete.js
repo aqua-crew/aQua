@@ -11,7 +11,27 @@ class Delete extends Action {
     }
 
     exec(aqua, event) {
+        aqua.cursorMgr.traverse(cursor => {
+            this.delete(aqua, cursor)
+        })
+
         console.error(this.name)
+    }
+
+    delete(aqua, cursor) {
+        const selection = cursor.selection
+
+        if (selection.isCollapsed()) {
+            const coord = aqua.actionMgr.execWithName('MoveRight', 'getMoveRightCoord', cursor)
+
+            aqua.docMgr.delete(cursor.coord, coord)
+
+            return
+        }
+
+        aqua.docMgr.delete(selection.start, selection.end)
+        cursor.moveToSelectionStart()
+        cursor.resetSelection()
     }
 }
 

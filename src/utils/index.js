@@ -2,16 +2,19 @@ const Algorithm = require('./Algorithm')
 const DataTransferItemHandler = require('./DataTransferItemHandler')
 const DOM = require('./DOM')
 const FnHelper = require('./FnHelper')
-const Khala = require('./Khala')
-const Range = require('./Range')
-const SizeObserver = require('./SizeObserver')
-const Kizuna = require('./Kizuna')
-const Marker = require('./Marker')
-const rAF = require('./rAF')
-const Noop = require('./Noop')
 const Iterator = require('./Iterator')
-const SpecialCharSet = require('./SpecialCharSet')
+const Khala = require('./Khala')
+const Kizuna = require('./Kizuna')
+const Limiter = require('./Limiter')
+const Marker = require('./Marker')
+const Progress = require('./Progress')
+const Range = require('./Range')
+const SimpleSet = require('./SimpleSet')
+const SizeObserver = require('./SizeObserver')
 
+const SpecialCharSet = require('./SpecialCharSet')
+const Noop = require('./Noop')
+const rAF = require('./rAF')
 const Echo = require('./Echo')
 
 module.exports = {
@@ -19,15 +22,18 @@ module.exports = {
     DataTransferItemHandler,
     DOM,
     FnHelper,
-    Khala,
-    Range,
-    SizeObserver,
-    Kizuna,
-    Marker,
-    rAF,
-    Noop,
     Iterator,
-    SpecialCharSet,
+    Khala,
+    Kizuna,
+    Limiter,
+    Marker,
+    Progress,
+    Range,
+    SimpleSet,
+    SizeObserver,
 
+    SpecialCharSet,
+    Noop,
+    rAF,
     Echo: new Echo,
 }

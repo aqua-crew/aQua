@@ -7,14 +7,16 @@ class Action {
         this.tags = [] // 用于分类
         this.shortcuts = []
         this.eventType = 'keyboard' // or 'mouse'
-        this.track = false
+        this.customMerge = false
+        this.record = true
     }
 
     exec() {}
 
     undo() {}
-
     redo() {}
+
+    merge() {}
 }
 
 module.exports = Action

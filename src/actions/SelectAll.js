@@ -13,15 +13,15 @@ class SelectAll extends Action {
     exec(aqua, event) {
         aqua.cursorMgr.removeAll()
         aqua.cursorMgr.traverse(cursor => {
-            cursor.logicalY = 0
-            cursor.logicalX = 0
-            cursor.updateCoord()
-            cursor.selection.setBase(cursor.coord)
+            cursor.y = 0
+            cursor.x = 0
+            cursor.selection.base = cursor.coord
 
-            cursor.logicalY = Infinity
-            cursor.logicalX = Infinity
-            cursor.updateCoord()
-            cursor.selection.setTerminal(cursor.coord)
+            cursor.y = Infinity
+            cursor.x = Infinity
+            cursor.selection.terminal = cursor.coord
+        }, {
+            track: false,
         })
     }
 }

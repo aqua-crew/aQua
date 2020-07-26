@@ -1,5 +1,287 @@
-const { CursorChain } = require('../models/index')
 const { ArgOpt } = require('../enums/index')
+const { CoordHelper } = require('../helpers/index')
+
+class ObjectMap {
+    constructor() {
+        this.arr = []
+        this.map = Object.create(null)
+    }
+
+    get size() {
+        return this.arr.length
+    }
+
+    useIterator() {
+        const map = this.map
+        const arr = this.arr
+        let i = -1
+        let index = -1
+
+        return function() {
+            i = i + 1
+
+            index = arr[i]
+
+            if (i > arr.length - 1) {
+                i = i - 1
+
+                return null
+            }
+
+            return {
+                key: index,
+                value: map[index],
+            }
+        }
+    }
+
+    traverse(cb) {
+        const arr = this.arr
+
+        for (let i = 0; i < arr.length; i++) {
+            cb(arr[i])
+        }
+    }
+
+    getByIndex(index) {
+        return this.map[this.arr[index]]
+    }
+
+    get(key) {
+        return this.map[key]
+    }
+
+    set(key, value) {
+        this.binaryInsert(key)
+        this.map[key] = value
+    }
+
+    binaryInsert(key) {
+        const arr = this.arr
+
+        if (arr.length === 0) {
+            arr.push(key)
+
+            return
+        }
+
+        let right = arr.length - 1
+
+        if (key > arr[right]) {
+            arr.push(key)
+
+            return
+        }
+
+        let left = 0
+
+        if (key < arr[left]) {
+            arr.unshift(key)
+
+            return
+        }
+
+        let center = -1
+
+        while (right - left !== 1) {
+            center = parseInt((left + right) / 2)
+
+            if (key < arr[center]) {
+                right = center - 1
+            } else {
+                left = center + 1
+            }
+        }
+
+        if (key < arr[left]) {
+            arr.splice(left, 0, key)
+
+            return
+        }
+
+        if (key > arr[right]) {
+            arr.splice(right, 0, key)
+
+            return
+        }
+
+        arr.splice(left + 1, 0, key)
+    }
+
+    reset() {
+        this.arr = []
+        this.map = Object.create(null)
+    }
+}
+
+class OffsetMap {
+    constructor() {
+        this.map = new ObjectMap
+    }
+
+    get size() {
+        return this.map.size
+    }
+
+    traverse(cb) {
+        const map = this.map
+
+        map.traverse(y => {
+            const xObjectMap = map.get(y)
+
+            xObjectMap.traverse(x => {
+                cb({ y, x }, xObjectMap.get(x))
+            })
+        })
+    }
+
+    useIterator() {
+        const yAndXObjectMapGenerator = this.map.useIterator()
+
+        let isGenerateNextYObjectMap = true
+
+        let yAndXObjectMap = null
+        let xAndOffsetCoord = null
+
+        let xAndOffsetCoordGenerator = null
+        let isGenerateXAndOffsetMapGenerator = true
+
+        const next = function() {
+            if (isGenerateNextYObjectMap) {
+                yAndXObjectMap = yAndXObjectMapGenerator()
+                isGenerateNextYObjectMap = false
+            }
+
+            if (!yAndXObjectMap) {
+                isGenerateNextYObjectMap = true
+
+                return null
+            }
+
+            const { key: y, value: xObjectMap } = yAndXObjectMap
+
+            if (isGenerateXAndOffsetMapGenerator) {
+                xAndOffsetCoordGenerator = xObjectMap.useIterator()
+
+                isGenerateXAndOffsetMapGenerator = false
+            }
+
+            xAndOffsetCoord = xAndOffsetCoordGenerator()
+
+            if (!xAndOffsetCoord) {
+                isGenerateNextYObjectMap = true
+                isGenerateXAndOffsetMapGenerator = true
+
+                return next()
+            }
+
+            return {
+                start: {
+                     y,
+                     x: xAndOffsetCoord.key,
+                 },
+                offsetCoord: xAndOffsetCoord.value,
+            }
+        }
+
+        return next
+
+
+
+        // const xObjectMapGenerator = this.map.useIterator()
+        // let nextYAndXObjectMap = xObjectMapGenerator()
+
+        // if (!nextYAndXObjectMap) {
+        //     return null
+        // }
+
+        // let y = nextYAndXObjectMap.key
+        // let xObjectMap = nextYAndXObjectMap.value
+
+        // let offsetCoordGenerator = xObjectMap.useIterator()
+        // let nextXAndOffsetCoord = null
+
+        // return function() {
+        //     nextXAndOffsetCoord = offsetCoordGenerator()
+
+        //     if (nextXAndOffsetCoord) {
+        //         return {
+        //             start: {
+        //                  y,
+        //                  x: nextXAndOffsetCoord.key,
+        //              },
+        //             offsetCoord: nextXAndOffsetCoord.value,
+        //         }
+        //     }
+
+        //     nextYAndXObjectMap = xObjectMapGenerator()
+
+        //     if (!nextYAndXObjectMap) {
+        //         return null
+        //     }
+
+        //     y = nextYAndXObjectMap.key
+        //     xObjectMap = nextYAndXObjectMap.value
+
+        //     offsetCoordGenerator = xObjectMap.useIterator()
+        //     nextXAndOffsetCoord = offsetCoordGenerator()
+
+        //     if (nextXAndOffsetCoord) {
+        //         return {
+        //             start: {
+        //                  y,
+        //                  x: nextXAndOffsetCoord.key,
+        //              },
+        //             offsetCoord: nextXAndOffsetCoord.value,
+        //         }
+        //     }
+        // }
+    }
+
+    get(coord) {
+        const xObjectMap = this.map.get(coord.y)
+
+        if (!xObjectMap) {
+            return null
+        }
+
+        const offsetCoord = xObjectMap.get(coord.x)
+
+        if (!offsetCoord) {
+            return null
+        }
+
+        return offsetCoord
+    }
+
+    add(coord, offsetCoord) {
+        let xObjectMap = this.map.get(coord.y)
+
+        if (!xObjectMap) {
+            xObjectMap = new ObjectMap
+
+            this.map.set(coord.y, xObjectMap)
+            xObjectMap.set(coord.x, offsetCoord)
+
+            return
+        }
+
+        const prevOffsetCoord = xObjectMap.get(coord.x)
+
+        if (!prevOffsetCoord) {
+            xObjectMap.set(coord.x, offsetCoord)
+
+            return
+        }
+
+        prevOffsetCoord.y = prevOffsetCoord.y + offsetCoord.y
+        prevOffsetCoord.x = prevOffsetCoord.x + offsetCoord.x
+    }
+
+    reset() {
+        this.map.reset()
+    }
+}
 
 class CursorMgr {
     constructor(aqua) {
@@ -8,13 +290,38 @@ class CursorMgr {
         this.primary = null
         this.mods = Object.create(null)
         this.cursors = []
+
+        this.offsetMap = new OffsetMap
     }
 
     init() {
         this.create()
+
         this.traverse(cursor => {
             cursor.y = 0
             cursor.x = 0
+        })
+
+        this.aqua.khala.on('microEvent', data => {
+            const { source, start, end } = data
+
+            if (source === 'write') {
+                this.offsetMap.add(start, {
+                    y: end.y - start.y,
+                    x: end.x - start.x,
+                })
+
+                return
+            }
+
+            if (source === 'delete') {
+                this.offsetMap.add(start, {
+                    y: start.y - end.y,
+                    x: start.x - end.x,
+                })
+
+                return
+            }
         })
     }
 
@@ -26,17 +333,21 @@ class CursorMgr {
         this.primary = cursor
     }
 
+    getPrimary(cb) {
+        cb && cb(this.primary)
+
+        return this.primary
+    }
+
     isPrimary(cursor) {
         return cursor === this.primary
     }
 
-    getPrimary(cb) {
-        cb(this.primary)
-    }
-
     pureTraverse(cb, start = 0, end = this.size, cursors = this.cursors) {
         for (let i = start; i < end; i++) {
-            cb(cursors[i])
+            if (cb(cursors[i]) === false) {
+                return
+            }
         }
     }
 
@@ -44,44 +355,27 @@ class CursorMgr {
         viewport = this.aqua.viewport,
         cursors = this.cursors,
         filter = cursor => true,
-        acc = true,
         force = false,
         detect = true,
         after = null,
+        track = true,
     } = {}) {
-        const accCoord = {
-            y: 0,
-            x: 0,
-        }
+        const flusher = this.useFlushOffsetIterator()
 
         for (let i = 0; i < cursors.length; i++) {
             const cursor = cursors[i]
 
-            if (acc) {
-                if (accCoord.y !== 0) { // cursor.y 的 set 会进行 inside 计算, 这里做判断避免多余的计算
-                    cursor.y = cursor.y + accCoord.y
-                }
-
-                if (accCoord.y !== 0) {
-                    cursor.x = cursor.x + accCoord.x
-                }
-            }
-
-            const coordBefore = cursor.coord.extract()
-
+            flusher.next(cursor)
             filter(cursor) && cb(cursor)
-
-            const coordAfter = cursor.coord.extract()
-
-            accCoord.y = coordAfter.y - coordBefore.y
-            accCoord.x = coordAfter.x - coordBefore.x
         }
 
         detect && this.detect() /* 检测光标与选区的冲突 */
         after && after()
 
+        flusher.reset()
+
         this.aqua.renderer.renderGroup('standard', viewport)
-        this.aqua.renderer.render('tracker', viewport)
+        track && this.aqua.renderer.render('tracker', viewport)
     }
 
     create(coord = null, setPrimary = true, modName = 'Anchor') {
@@ -121,6 +415,82 @@ class CursorMgr {
                 this.cursors.splice(index, 1)
             }
         }
+    }
+
+    useFlushOffsetIterator() {
+        const offsetMap = this.offsetMap
+        const offsetCoordGenerator = offsetMap.useIterator()
+
+        let yAcc = 0
+        let xAcc = 0
+
+        let lastY = -1
+        let isTerminate = false
+        let nextOffsetCoord = null
+
+        return {
+            next(cursor) {
+                const coord = cursor.coord
+
+                while(true) {
+                    if (!isTerminate) {
+                        nextOffsetCoord = offsetCoordGenerator()
+                    }
+
+                    if (!nextOffsetCoord) {
+
+                        break
+                    }
+
+                    const { start, offsetCoord } = nextOffsetCoord
+
+                    if (CoordHelper.less(coord, start, ArgOpt.ContainEqual)) {
+                        isTerminate = true
+
+                        break
+                    }
+
+                    yAcc = yAcc + offsetCoord.y
+
+                    if (lastY !== offsetCoord.y) {
+                        xAcc = 0
+                    }
+
+                    xAcc = xAcc + offsetCoord.x
+
+                    lastY = start.y
+
+                    isTerminate = false
+                }
+
+                if (yAcc !== 0) {
+                    cursor.y = cursor.y + yAcc
+                }
+
+                if (xAcc !== 0 && cursor.y === lastY) {
+                    cursor.x = cursor.x + xAcc
+                }
+            },
+
+            reset() {
+                offsetMap.reset()
+            },
+        }
+    }
+
+    flushOffset() {
+        const flusher = this.useFlushOffsetIterator()
+
+        if (!flusher) {
+            return
+        }
+
+        this.pureTraverse(cursor => {
+            flusher.next(cursor)
+        })
+
+
+        flusher.reset()
     }
 
     resort(cursors = this.cursors) {

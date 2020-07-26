@@ -1,8 +1,9 @@
 const ActionMgr = require('./ActionMgr')
+const Chronicle = require('./Chronicle')
 const ContentMgr = require('./ContentMgr')
 const CursorMgr = require('./CursorMgr')
 const DocMgr = require('./DocMgr')
-const History = require('./History')
+const Inputer = require('./Inputer')
 const Korwa = require('./Korwa')
 const LineMgr = require('./LineMgr')
 const Locator = require('./Locator')
@@ -17,10 +18,11 @@ const ViewportMgr = require('./ViewportMgr')
 
 module.exports = {
     ActionMgr,
+    Chronicle,
     ContentMgr,
     CursorMgr,
     DocMgr,
-    History,
+    Inputer,
     Korwa,
     LineMgr,
     Locator,

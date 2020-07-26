@@ -10,6 +10,10 @@ const CtrlEnter = require('./CtrlEnter')
 
 const Delete = require('./Delete')
 const Enter = require('./Enter')
+
+const Tab = require('./Tab')
+const ShiftTab = require('./ShiftTab')
+
 const LeftMousedown = require('./LeftMousedown')
 const LeftMousemove = require('./LeftMousemove')
 const LeftMouseup = require('./LeftMouseup')
@@ -57,6 +61,8 @@ module.exports = {
     CtrlEnter,
     Delete,
     Enter,
+    Tab,
+    ShiftTab,
     LeftMousedown,
     LeftMousemove,
     LeftMouseup,

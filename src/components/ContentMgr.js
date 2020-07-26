@@ -130,6 +130,12 @@ class ContentMgr {
         return $root
     }
 
+    split(content) {
+        if (typeof content === 'string') {
+            return content.split('\n')
+        }
+    }
+
     split(content, divider = '\n') {
         const result = []
 

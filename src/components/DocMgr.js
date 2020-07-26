@@ -1,17 +1,15 @@
 const { Doc, Coord, Line, Chunk } = require('../models/index')
 const { LineStatus, DocUpdateOptions } = require('../enums/index')
+const { CoordHelper } = require('../helpers/index')
 
 class DocMgr {
     constructor(aqua) {
+        this.khala = aqua.khala
         this.docWatcher = aqua.docWatcher
+        this.chronicle = aqua.chronicle
+        this.cursorMgr = aqua.cursorMgr
 
         this.doc = new Doc
-    }
-
-    init() {
-        this.docWatcher.on('resize', lines => {
-            this.resize(lines)
-        })
     }
 
     get size() {
@@ -33,6 +31,70 @@ class DocMgr {
         return {
             y: this.size - 1,
             x: this.getLastLine().length,
+        }
+    }
+
+    init() {
+        this.docWatcher.on('resize', lines => {
+            this.resize(lines)
+        })
+
+        this.wrap()
+        this.writePrototype('')
+    }
+
+    wrap() {
+        this.write = (contents, cursor = null, isInsert = false) => {
+            if (!Array.isArray(contents)) {
+                contents = [contents]
+            }
+
+            const coord = (cursor && cursor.coord) || cursor || this.cursorMgr.getPrimary().coord
+
+            this.correctCoord(coord)
+
+            const result = this.writePrototype(contents, coord, isInsert)
+            const start = (coord.extract && coord.extract()) || coord
+            const end = {
+                y: coord.y + result.y,
+                x: result.y > 0 ? result.x : coord.x + result.x
+            }
+
+            this.khala.emit('microEvent', {
+                source: 'write',
+                contents,
+                start,
+                end,
+            })
+
+            return result
+        }
+
+        this.delete = (start, end) => {
+            this.correctCoord(start)
+            this.correctCoord(end)
+
+            if (CoordHelper.greater(start, end)) {
+                [start, end] = [end, start]
+            }
+
+            const result = this.deletePrototype(start, end)
+
+            if (result.length === 0) {
+                return result
+            }
+
+            start = (start.extract && start.extract()) || start
+            end = (end.extract && end.extract()) || end
+
+            this.khala.emit('microEvent', {
+                source: 'delete',
+                contents: result,
+                start,
+                end,
+            })
+
+            return result
         }
     }
 
@@ -98,18 +160,7 @@ class DocMgr {
     }
 
     /* APIs */
-    writeAsNewLine(contents, coord = new Coord) {
-        if (!Array.isArray(contents)) {
-            contents = [contents]
-        }
-
-        contents.unshift('')
-
-        this.write(contents, coord)
-    }
-
-    write(contents, coord = new Coord) {
-        console.error('Execute', contents, coord)
+    writePrototype(contents, coord = new Coord, isInsert = false) {
         if (!Array.isArray(contents)) {
             contents = [contents]
         }
@@ -122,17 +173,25 @@ class DocMgr {
             const { chunk, offset } = this.doc.get(startLineNum)
             const line = chunk.get(offset)
 
-            effectLines.push(line)
-
-            if (contents.length > 1) {
-                const lines = Line.toInstances(contents, 1)
-                lines[lines.length - 1].write(line.delete(coord.x))
+            if (isInsert) {
+                const lines = Line.toInstances(contents)
                 this.doc.insert(startLineNum + 1, lines)
 
-                effectLines = effectLines.concat(lines)
-            }
+                effectLines = lines
+            } else {
+                effectLines.push(line)
 
-            line.write(contents[0], coord.x)
+                if (contents.length > 1) {
+                    const lines = Line.toInstances(contents, 1)
+                    lines[lines.length - 1].write(line.delete(coord.x))
+
+                    this.doc.insert(startLineNum + 1, lines)
+
+                    effectLines = effectLines.concat(lines)
+                }
+
+                line.write(contents[0], coord.x)
+            }
         } else {
             const lines = Line.toInstances(contents)
             this.doc.insert(startLineNum, lines)
@@ -146,7 +205,82 @@ class DocMgr {
             source: 'write',
         })
 
-        return
+        const effectY = contents.length - 1
+
+        return {
+            y: isInsert ? effectY + 1 : effectY,
+            x: contents[effectY].length,
+        }
+    }
+
+    deletePrototype(start, end) {
+        let deleteAsset = []
+
+        if (start.y === end.y && start.x === end.x) {
+            return deleteAsset
+        }
+
+        const startLineNum = start.y
+        const endLineNum = end.y
+        const distance = endLineNum - startLineNum
+
+        let effectLines = []
+        let effectCount = 0
+
+        if (distance === 0) {
+            const { chunk, offset } = this.doc.search(startLineNum)
+            const line = chunk.get(offset)
+            deleteAsset.push(line.delete(start.x, end.x))
+
+            effectLines = [line]
+        }
+
+        if (distance === 1) {
+            const lines = this.doc.getLeaves(startLineNum, endLineNum + 1)
+            const startLine = lines[0]
+            const lastLine = lines[1]
+
+            deleteAsset.push(startLine.delete(start.x))
+            deleteAsset.push(lastLine.read(0, end.x))
+
+            startLine.write(lastLine.read(end.x))
+
+            lastLine.release() // 用于其他地方的 diff 比较
+
+            this.doc.remove(endLineNum, 1)
+
+            effectLines = [startLine]
+            effectCount = 1
+        }
+
+        if (distance > 1) {
+            const lines = this.doc.getLeaves(startLineNum, endLineNum + 1)
+            const startLine = lines[0]
+            const lastLine = lines[lines.length - 1]
+
+            deleteAsset.push(startLine.delete(start.x))
+            startLine.write(lastLine.read(end.x))
+
+            Line.setStatus(lines.slice(1), LineStatus.DELETED)
+            const removeLines = this.doc.remove(startLineNum + 1, endLineNum - startLineNum)
+
+            for (let i = 0; i < removeLines.length - 1; i++) {
+                deleteAsset.push(removeLines[i].data)
+            }
+
+            deleteAsset.push(removeLines[removeLines.length - 1].read(0, end.x))
+
+            effectLines = [startLine]
+            effectCount = lines.length - 1
+        }
+
+        this.docWatcher.emit('change', {
+            effectLineNum: startLineNum,
+            effectLines,
+            source: 'delete',
+        })
+
+        return deleteAsset
     }
 
     /**
@@ -186,62 +320,6 @@ class DocMgr {
         result.push(endLineContent)
 
         return result
-    }
-
-    delete(start, end) {
-        // this.correctCoord(start)
-        // this.correctCoord(end)
-
-        const startLineNum = start.y
-        const endLineNum = end.y
-        const distance = endLineNum - startLineNum
-
-        let effectLines = []
-        let effectCount = 0
-
-        if (distance === 0) {
-            const { chunk, offset } = this.doc.search(startLineNum)
-            const line = chunk.get(offset)
-            const deletedData = line.delete(start.x, end.x)
-
-            effectLines = [line]
-        }
-
-        if (distance === 1) {
-            const lines = this.doc.getLeaves(startLineNum, endLineNum + 1)
-            const startLine = lines[0]
-            const lastLine = lines[1]
-
-            startLine.delete(start.x)
-            startLine.write(lastLine.read(end.x))
-
-            lastLine.release()
-            this.doc.remove(endLineNum, 1)
-
-            effectLines = [startLine]
-            effectCount = 1
-        }
-
-        if (distance > 1) {
-            const lines = this.doc.getLeaves(startLineNum, endLineNum + 1)
-            const startLine = lines[0]
-            const lastLine = lines[lines.length - 1]
-
-            startLine.delete(start.x)
-            startLine.write(lastLine.read(end.x))
-
-            Line.setStatus(lines.slice(1), LineStatus.DELETED)
-            this.doc.remove(startLineNum + 1, endLineNum - startLineNum)
-
-            effectLines = [startLine]
-            effectCount = lines.length - 1
-        }
-
-        this.docWatcher.emit('change', {
-            effectLineNum: startLineNum,
-            effectLines,
-            source: 'delete',
-        })
     }
 
     getLine(lineNum, returnHeight = false) {
@@ -297,7 +375,12 @@ class DocMgr {
 
         const y = coord.y
 
-        if (y < 0 || y >= yMax) {
+        if (y < 0) {
+            coord.y = 0
+            coord.x = 0
+
+            return coord
+        } else if (y >= yMax) {
             coord.y = yMax - 1
             coord.x = this.getLastLine().length
 
@@ -311,28 +394,6 @@ class DocMgr {
 
         return coord
     }
-
-    // getText(start = null, end = null) {
-    //     if (start === null) {
-    //         start = 0
-    //         end = Infinity
-    //     }
-
-    //     if (end === null) {
-    //         end = start + 1
-    //     }
-
-    //     let str = ''
-
-    //     const lines = this.doc.getLeaves(start, end)
-
-    //     for (let i = 0; i < lines.length; i++) {
-    //         const line = lines[i]
-    //         str = str + line.toString()
-    //     }
-
-    //     return str
-    // }
 }
 
 module.exports = DocMgr

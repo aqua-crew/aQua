@@ -15,15 +15,15 @@ class Korwa {
     }
 
     getViewportRect() {
-        return aqua.uiMgr.get('viewport').getBoundingClientRect()
+        return this.aqua.uiMgr.get('viewport').getBoundingClientRect()
     }
 
     getScrollerRect() {
-        return aqua.uiMgr.get('scroller').getBoundingClientRect()
+        return this.aqua.uiMgr.get('scroller').getBoundingClientRect()
     }
 
     getLineWidthRect() {
-        return aqua.uiMgr.get('lineWidthCntr').getBoundingClientRect()
+        return this.aqua.uiMgr.get('lineWidthCntr').getBoundingClientRect()
     }
 
     getClientRect($ele) {

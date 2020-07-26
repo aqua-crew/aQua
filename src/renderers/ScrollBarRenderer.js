@@ -6,22 +6,36 @@ const SLIDER_MIN_HEIGHT = 40
 class ScrollBarRenderer {
     constructor(aqua) {
         this.applyName = 'scrollBar'
+
+        this.cursorMgr = aqua.cursorMgr
         this.scroller = aqua.scroller
         this.$slider = aqua.uiMgr.get('scrollBar').firstChild
     }
 
     render(viewport) {
-        this.updateScrollerBar(this.$slider, this.scroller.y, viewport.height, this.scroller.max)
+        this.updateScrollerBar(this.$slider, viewport)
     }
 
-    updateScrollerBar($slider, scrollDistance, viewportHeight, max) {
-        const height = Math.max(viewportHeight / (max + viewportHeight) * viewportHeight, SLIDER_MIN_HEIGHT)
-        const y = scrollDistance / max * (viewportHeight - height)
+    updateScrollerBar($slider, viewport) {
+        const height = this.transformToScrollBarHeight(viewport, viewport.height, SLIDER_MIN_HEIGHT)
+        const y = this.transformToScrollBarY(viewport, this.scroller.y, height)
 
         rAF(() => {
             this.$slider.style.height = height + 'px'
             this.$slider.style.transform = `translateY(${y}px)`
         })
+
+        this.cursorMgr.pureTraverse(cursor => {
+
+        })
+    }
+
+    transformToScrollBarHeight(viewport, heightInViewport, minHeight = 0) {
+        return Math.max(heightInViewport / (this.scroller.max + viewport.height) * viewport.height, minHeight)
+    }
+
+    transformToScrollBarY(viewport, yInViewport, heightInViewport = 0) {
+        return yInViewport / this.scroller.max * (viewport.height - heightInViewport)
     }
 }
 

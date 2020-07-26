@@ -23,7 +23,7 @@ class ImageProcessor extends Processor {
     toElement(token, line) {
         const { type, value } = token
         const $img = new Image()
-        const measurer = this.korwa.getMeasurer(line.getId(), line)
+        const measurer = this.korwa.getMeasurer(line.id, line)
 
         const cb = () => {
             const height = measurer()

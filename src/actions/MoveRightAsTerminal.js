@@ -16,9 +16,7 @@ class MoveRightAsTerminal extends Action {
                 cursor.selection.base = cursor.coord
             }
 
-            aqua.actionMgr.exec('MoveRight', event, {
-                cursor,
-            })
+            aqua.actionMgr.execWithName('MoveRight', 'moveRight', cursor)
 
             cursor.selection.terminal = cursor.coord
         }, {

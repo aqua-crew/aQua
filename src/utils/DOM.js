@@ -46,6 +46,10 @@ module.exports = {
         return parent.removeChild(children)
     },
 
+    insertBefore(children, anchor) {
+        return anchor.parentNode.insertBefore(children, anchor)
+    },
+
     clear(ele) {
         ele.innerHTML = ''
     },

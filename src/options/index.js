@@ -45,9 +45,8 @@ module.exports = {
 
     lifetimes: {
         setup() {},
-        mounted() {},
         ready() {},
-        beforeDestroy() {},
+        complete() {},
         destroyed() {},
     },
 

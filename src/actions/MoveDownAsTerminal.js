@@ -16,9 +16,7 @@ class MoveDownWithTerminal extends Action {
                 cursor.selection.base = cursor.coord
             }
 
-            aqua.actionMgr.exec('MoveDown', event, {
-                cursor,
-            })
+            aqua.actionMgr.execWithName('MoveDown', 'moveDown', cursor)
 
             cursor.selection.terminal = cursor.coord
         }, {

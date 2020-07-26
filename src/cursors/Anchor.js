@@ -6,13 +6,15 @@ class Anchor {
         this.docMgr = aqua.docMgr
         this.locator = aqua.locator
 
+        this.effect = new Coord().extract()
+
         this.coord = new Coord
         this.layout = new Coord
         this.selection = new Selection
 
         this.filter = null
 
-        this.state = Object.create(null)
+        this.status = Object.create(null)
     }
 
     set y(y) {
@@ -66,6 +68,19 @@ class Anchor {
 
     get maxInsideY() {
         return this.coord.maxInsideY
+    }
+
+    resetSelection() {
+        this.selection.base = this.coord.clone()
+        this.selection.terminal = this.coord.clone()
+    }
+
+    moveToSelectionStart() {
+        this.coord = this.selection.start.clone()
+    }
+
+    moveToSelectionEnd() {
+        this.coord = this.selection.end.clone()
     }
 
     updateLayout() {

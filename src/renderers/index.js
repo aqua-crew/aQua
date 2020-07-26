@@ -3,6 +3,7 @@ const InputerRenderer = require('./InputerRenderer')
 const LineNumRenderer = require('./LineNumRenderer')
 const LineRenderer = require('./LineRenderer')
 const MinimapRenderer = require('./MinimapRenderer')
+const PadRenderer = require('./PadRenderer')
 const ScrollBarRenderer = require('./ScrollBarRenderer')
 const ScrollerRenderer = require('./ScrollerRenderer')
 const SelectedLineRenderer = require('./SelectedLineRenderer')
@@ -15,6 +16,7 @@ module.exports = {
     LineNumRenderer,
     LineRenderer,
     MinimapRenderer,
+    PadRenderer,
     ScrollBarRenderer,
     ScrollerRenderer,
     SelectedLineRenderer,

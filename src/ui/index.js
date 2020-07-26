@@ -2,109 +2,109 @@ const { DOM } = require('../utils/index')
 
 module.exports = {
     /* Host */
-    aqua: function() {
+    aqua() {
         return DOM.e('div', {'class': 'aqua theme-aqua'})
     },
 
     /* Editor */
-    editor: function() {
+    editor() {
         return DOM.e('div', {'class': 'aqua-editor'})
     },
 
     /* Viewport */
-    viewport: function() {
+    viewport() {
         return DOM.e('div', {'class': 'aqua-viewport'})
     },
 
-    scroller: function() {
+    scroller() {
         return DOM.e('div', {'class': 'aqua-scroller'})
     },
 
     /* Components Container */
-    components: function() {
+    components() {
         return DOM.e('div', {'class': 'aqua-components aqua-variables'})
     },
 
-    fullWidthCntr: function() {
+    fullWidthCntr() {
         return DOM.e('div', {'class': 'full-width-container'})
     },
 
-    lineWidthCntr: function() {
+    lineWidthCntr() {
         return DOM.e('div', {'class': 'line-width-container'})
     },
 
     /* Fixed */
-    fixed: function() {
+    fixed() {
         return DOM.e('div', {'class': 'aqua-fixed'})
     },
 
-    sideBarCntr: function() {
+    sideBarCntr() {
         return DOM.e('div', {'class': 'side-bar-container'})
     },
 
-    minimap: function() {
+    minimap() {
         return DOM.e('div', {'class': 'aqua-minimap'})
     },
 
-    scrollBar: function() {
+    scrollBar() {
         return DOM.e('div', {'class': 'aqua-scroll-bar'}, [
             DOM.e('div', {'class': 'aqua-slider'}),
         ])
     },
 
     /* Measurers */
-    measurerCntr: function() {
+    measurerCntr() {
         return DOM.e('div', {'class': 'measurer-container'})
     },
 
-    ramMeasurer: function() {
+    ramMeasurer() {
         return DOM.e('div', {'class': 'ram-measurer'})
     },
 
-    lineMeasurer: function() {
+    lineMeasurer() {
         return DOM.e('div', {'class': 'line-measurer'})
     },
 
-    remMeasurer: function() {
+    remMeasurer() {
         return DOM.e('div', {'class': 'rem-measurer'})
     },
 
     /* Container in Components Container */
-    inputerCntr: function() {
+    inputerCntr() {
         return DOM.e('div', {'class': 'inputer-container'})
     },
 
-    cursorCntr: function() {
+    cursorCntr() {
         return DOM.e('div', {'class': 'cursor-container'})
     },
 
-    selectedLineCntr: function() {
+    selectedLineCntr() {
         return DOM.e('div', {'class': 'selected-line-container'})
     },
 
-    selectionCntr: function() {
+    selectionCntr() {
         return DOM.e('div', {'class': 'selection-container'})
     },
 
-    lineCntr: function() {
+    lineCntr() {
         return DOM.e('div', {'class': 'line-container'})
     },
 
     /* Bg & Fg Container */
-    bgCntr: function() {
-        return DOM.e('div', {'class': 'bg'})
+    bgCntr() {
+        return DOM.e('div', {'class': 'aqua-bg'})
     },
 
-    fgCntr: function() {
-        return DOM.e('div', {'class': 'fg'})
+    fgCntr() {
+        return DOM.e('div', {'class': 'aqua-fg'})
     },
 
     /* Vital Components Children */
-    inputerLocator: function() {
+    inputerLocator() {
         return DOM.e('div', {'class': 'inputer-locator'})
     },
 
-    inputer: function() {
+    inputer() {
         return (
             DOM.e('textarea', {'class': 'inputer',
                 'autocomplete': 'off',  // 关闭自动补全提示, 防止出戏 (笑

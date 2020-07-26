@@ -11,13 +11,21 @@ class Enter extends Action {
     }
 
     exec(aqua, event) {
-        console.error(this.name)
+        event.preventDefault()
 
         aqua.cursorMgr.traverse(cursor => {
-            aqua.write(['', ''], cursor.coord)
+            if (!cursor.selection.isCollapsed()) {
+                aqua.actionMgr.exec('Backspace', event, {
+                    cursor,
+                })
+            }
+
+            aqua.write(['', ''], cursor)
+
+            cursor.y = cursor.y + 1
+            cursor.x = 0
         })
     }
 }
 
 module.exports = Enter
-

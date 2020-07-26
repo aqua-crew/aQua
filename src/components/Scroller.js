@@ -1,4 +1,4 @@
-const { rAF } = require('../utils/index')
+const { rAF, Limiter } = require('../utils/index')
 
 class Scroller {
     constructor(aqua, options) {
@@ -15,6 +15,8 @@ class Scroller {
         // this.overflowTimeout = 0.5
         // this.prevent = true
         this.lastScrollTime = 0
+
+        this.limitedScroll = Limiter.toNextTick(this.scrollPrototype.bind(this), 34, 34)
     }
 
     init({
@@ -38,7 +40,7 @@ class Scroller {
             this.max = docMgr.height - korwa.getSingleLineHeight()
 
             if (this.y > this.max) {
-                this.scrollTo(this.max)
+                this.scroll(this.max)
             }
         })
     }
@@ -46,7 +48,7 @@ class Scroller {
     handleScroll(event) {
         const y = this.correctY(this.y + event.delta * this.speed)
 
-        this.scrollTo(y)
+        this.scroll(y)
 
         if (y <= this.max && y >= this.min) {
             event.preventDefault()
@@ -55,20 +57,34 @@ class Scroller {
         }
     }
 
-    scrollTo(y = this.y, force = false) {
-        this.y = y = this.correctY(y)
+    // scrollTo(y = this.y, force = false) {
+    //     this.y = this.correctY(y)
 
-        clearTimeout(this.timeoutId)
+    //     clearTimeout(this.timeoutId)
 
-        if (new Date().getTime() - this.lastScrollTime >= 17) {
-            this.lastScrollTime = new Date().getTime()
-            this.aqua.khala.emit('scroll', y, this.y, force)
-        } else {
-            this.timeoutId = setTimeout(() => {
-                this.lastScrollTime = new Date().getTime()
-                this.aqua.khala.emit('scroll', y, this.y, force)
-            }, 17)
-        }
+    //     if (new Date().getTime() - this.lastScrollTime >= 17) {
+    //         this.lastScrollTime = new Date().getTime()
+    //         this.aqua.khala.emit('scroll', this.y, force)
+    //     } else {
+    //         this.timeoutId = setTimeout(() => {
+    //             this.lastScrollTime = new Date().getTime()
+    //             this.aqua.khala.emit('scroll', this.y, force)
+    //         }, 17)
+    //     }
+    // }
+
+    scroll(y = this.y, force = false) {
+        this.y = this.correctY(y)
+        this.limitedScroll(this.y, force)
+    }
+
+    scrollImmediately(y = this.y, force = false) {
+        this.y = this.correctY(y)
+        this.scrollPrototype(this.y, force)
+    }
+
+    scrollPrototype(y = this.y, force = false) {
+        this.aqua.khala.emit('scroll', y, force)
     }
 
     correctY(y) {

@@ -88,7 +88,6 @@ class Kizuna {
 
             this.mouseEvents[id] = fn
         }
-        window.kizuna = this
     }
 
     emitKeyboardFn(event, payload) {
@@ -121,22 +120,26 @@ class Kizuna {
         events && events(event, payload)
     }
 
-    on(ele, eventType, fn) {
+    on(ele, eventType, fn, options = {
+        capture: false,
+        passive: false,
+        once: false,
+    }) {
         if (eventType === 'scroll') {
             this.on(ele, 'mousewheel', event => {
                 event.delta = event.wheelDelta > 0 ? -1 : 1
                 fn(event)
-            })
+            }, options)
 
             this.on(ele, 'DOMMouseScroll', event => {
                 event.delta = event.detail > 0 ? 1 : -1
                 fn(event)
-            })
+            }, options)
 
             return
         }
 
-        ele.addEventListener(eventType, fn)
+        ele.addEventListener(eventType, fn, options)
     }
 
     filterMousedown(event) {

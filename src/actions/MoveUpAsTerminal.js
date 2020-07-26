@@ -16,9 +16,7 @@ class MoveUpAsTerminal extends Action {
                 cursor.selection.base = cursor.coord
             }
 
-            aqua.actionMgr.exec('MoveUp', event, {
-                cursor,
-            })
+            aqua.actionMgr.execWithName('MoveUp', 'moveUp', cursor)
 
             cursor.selection.terminal = cursor.coord
         }, {
