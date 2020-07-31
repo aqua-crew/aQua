@@ -29,13 +29,13 @@ class SelectionRenderer {
                 return
             }
 
-            this.renderSelection(cursor.selection, cursor.state)
+            this.renderSelection(cursor.selection, cursor.status)
         })
 
         this.pool.clearUnuse()
     }
 
-    renderSelection(selection, state = {}) {
+    renderSelection(selection, status = {}) {
         let count = selection.containMinLines()
         let $selections = []
 
@@ -45,8 +45,8 @@ class SelectionRenderer {
 
         let cssText = ''
 
-        if (this.marker.isMarked(state, 'OverlayMark')) {
-            cssText = this.marker.use(state, 'OverlayMark')
+        if (this.marker.isMarked(status, 'OverlayMark')) {
+            cssText = this.marker.use(status, 'OverlayMark')
         }
 
         this.updateSelection($selections, selection.getStart(), selection.getEnd(), cssText)

@@ -8,6 +8,7 @@ class LeftMousemove extends Action {
         this.desc = 'Locate'
         this.shortcuts = ['LeftMousemove']
         this.eventType = 'mouse'
+        this.record = false
     }
 
     exec(aqua, event, state) {
@@ -26,7 +27,6 @@ class LeftMousemove extends Action {
             cursor.selection.terminal = cursor.coord
         }, {
             filter: cursor => aqua.cursorMgr.isPrimary(cursor),
-            acc: false,
             detect: false,
             after: state.isCreateCursor ? () => { this.detectAndMark(aqua) } : null,
         })
@@ -36,7 +36,7 @@ class LeftMousemove extends Action {
         const cursors = aqua.cursorMgr.detectCursorSelectionOverlay()
 
         for (let i = 0; i < cursors.length; i++) {
-            aqua.marker.mark(cursors[i].state, 'OverlayMark')
+            aqua.marker.mark(cursors[i].status, 'OverlayMark')
         }
     }
 }

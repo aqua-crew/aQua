@@ -346,7 +346,7 @@ class Aqua {
         })
 
         this.khala.on('input', text => {
-            this.chronicle.start('Input')
+            this.chronicle.start('Input', this.cursorMgr.getCursorsCoord())
 
             this.cursorMgr.traverse(cursor => {
                 if (!cursor.selection.isCollapsed()) {
@@ -359,7 +359,7 @@ class Aqua {
                 cursor.x = cursor.x + x
             })
 
-            this.chronicle.end('Input')
+            this.chronicle.end('Input', this.cursorMgr.getCursorsCoord())
         })
     }
 

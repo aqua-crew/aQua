@@ -1,10 +1,17 @@
 class MacroStep {
-    constructor(type = null, micros = null, author = null) {
+    constructor(type = null, {
+        author = null,
+        micros = null,
+        before = null,
+        after = null,
+    } = {}) {
         const currentTime = this.getTime()
 
         this.type = type
         this.author = author
         this.micros = micros
+        this.before = before
+        this.after = after
         this.createdTime = currentTime
         this.updatedTime = currentTime
     }

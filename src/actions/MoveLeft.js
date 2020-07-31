@@ -13,14 +13,16 @@ class MoveLeft extends Action {
     exec(aqua, event) {
         aqua.cursorMgr.traverse(cursor => {
             this.moveLeft(aqua, cursor, true)
-        }, {
-            acc: false,
         })
     }
 
     moveLeft(aqua, cursor, clearSelection = false) {
         if (clearSelection) {
-            cursor.resetSelection()
+            if (!cursor.selection.isCollapsed()) {
+                cursor.resetSelection()
+
+                return
+            }
         }
 
         const coord = this.getMoveLeftCoord(aqua, cursor.coord)

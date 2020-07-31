@@ -8,6 +8,7 @@ class LeftMousedown extends Action {
         this.desc = 'Locate'
         this.shortcuts = ['LeftMousedown']
         this.eventType = 'mouse'
+        this.record = false
     }
 
     exec(aqua, event, state) {
@@ -31,7 +32,6 @@ class LeftMousedown extends Action {
             cursor.selection.terminal = cursor.coord
     }, {
             filter: cursor => cursors.isPrimary(cursor),
-            acc: false,
             detect: false,
         })
     }

@@ -19,11 +19,13 @@ class Undo extends Action {
                 return
             }
 
-            this.executeMicros(aqua, macro.micros)
+            this.undo(aqua, macro)
         })
     }
 
-    executeMicros(aqua, micros) {
+    undo(aqua, macro) {
+        const micros = macro.micros
+
         for (let i = micros.length - 1; i >= 0; i--) {
             const { source, start, end, contents } = micros[i].record
 

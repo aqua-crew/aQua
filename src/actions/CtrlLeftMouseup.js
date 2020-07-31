@@ -7,6 +7,7 @@ class CtrlLeftMouseUp extends Action {
         this.desc = 'Locate'
         this.shortcuts = ['Ctrl + LeftMouseUp']
         this.eventType = 'mouse'
+        this.record = false
     }
 
     exec(aqua, event, state) {

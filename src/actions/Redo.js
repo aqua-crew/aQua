@@ -19,11 +19,13 @@ class Redo extends Action {
                 return
             }
 
-            this.executeMicros(aqua, macro.micros)
+            this.redo(aqua, macro)
         })
     }
 
-    executeMicros(aqua, micros) {
+    redo(aqua, macro) {
+        const micros = macro.micros
+
         for (let i = 0; i < micros.length; i++) {
             const { source, start, end, contents } = micros[i].record
 
@@ -39,6 +41,8 @@ class Redo extends Action {
                 continue
             }
         }
+
+        console.error('macro.after', macro)
     }
 }
 

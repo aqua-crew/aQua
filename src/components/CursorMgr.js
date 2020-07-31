@@ -11,7 +11,7 @@ class ObjectMap {
         return this.arr.length
     }
 
-    useIterator() {
+    useIterator(str) {
         const map = this.map
         const arr = this.arr
         let i = -1
@@ -23,7 +23,7 @@ class ObjectMap {
             index = arr[i]
 
             if (i > arr.length - 1) {
-                i = i - 1
+                i = arr.length - 1
 
                 return null
             }
@@ -83,7 +83,7 @@ class ObjectMap {
 
         let center = -1
 
-        while (right - left !== 1) {
+        while (right - left > 1) {
             center = parseInt((left + right) / 2)
 
             if (key < arr[center]) {
@@ -136,7 +136,7 @@ class OffsetMap {
     }
 
     useIterator() {
-        const yAndXObjectMapGenerator = this.map.useIterator()
+        const yAndXObjectMapGenerator = this.map.useIterator('Y')
 
         let isGenerateNextYObjectMap = true
 
@@ -146,96 +146,96 @@ class OffsetMap {
         let xAndOffsetCoordGenerator = null
         let isGenerateXAndOffsetMapGenerator = true
 
-        const next = function() {
-            if (isGenerateNextYObjectMap) {
-                yAndXObjectMap = yAndXObjectMapGenerator()
-                isGenerateNextYObjectMap = false
-            }
+        let isLastY = false
 
-            if (!yAndXObjectMap) {
-                isGenerateNextYObjectMap = true
+        // const next = function() {
+        //     let curYAndXObjectMap = null
 
-                return null
-            }
+        //     if (isGenerateNextYObjectMap) {
+        //         curYAndXObjectMap = yAndXObjectMapGenerator()
 
-            const { key: y, value: xObjectMap } = yAndXObjectMap
-
-            if (isGenerateXAndOffsetMapGenerator) {
-                xAndOffsetCoordGenerator = xObjectMap.useIterator()
-
-                isGenerateXAndOffsetMapGenerator = false
-            }
-
-            xAndOffsetCoord = xAndOffsetCoordGenerator()
-
-            if (!xAndOffsetCoord) {
-                isGenerateNextYObjectMap = true
-                isGenerateXAndOffsetMapGenerator = true
-
-                return next()
-            }
-
-            return {
-                start: {
-                     y,
-                     x: xAndOffsetCoord.key,
-                 },
-                offsetCoord: xAndOffsetCoord.value,
-            }
-        }
-
-        return next
-
-
-
-        // const xObjectMapGenerator = this.map.useIterator()
-        // let nextYAndXObjectMap = xObjectMapGenerator()
-
-        // if (!nextYAndXObjectMap) {
-        //     return null
-        // }
-
-        // let y = nextYAndXObjectMap.key
-        // let xObjectMap = nextYAndXObjectMap.value
-
-        // let offsetCoordGenerator = xObjectMap.useIterator()
-        // let nextXAndOffsetCoord = null
-
-        // return function() {
-        //     nextXAndOffsetCoord = offsetCoordGenerator()
-
-        //     if (nextXAndOffsetCoord) {
-        //         return {
-        //             start: {
-        //                  y,
-        //                  x: nextXAndOffsetCoord.key,
-        //              },
-        //             offsetCoord: nextXAndOffsetCoord.value,
+        //         if (!curYAndXObjectMap) {
+        //             isGenerateNextYObjectMap = true
+        //             isLastY = true
+        //         } else {
+        //             isGenerateNextYObjectMap = false
+        //             yAndXObjectMap = curYAndXObjectMap
+        //             isLastY = false
         //         }
         //     }
 
-        //     nextYAndXObjectMap = xObjectMapGenerator()
-
-        //     if (!nextYAndXObjectMap) {
+        //     /* 初次 next, yAndXObjectMap 可能是 null */
+        //     if (!yAndXObjectMap) {
         //         return null
         //     }
 
-        //     y = nextYAndXObjectMap.key
-        //     xObjectMap = nextYAndXObjectMap.value
+        //     const { key: y, value: xObjectMap } = yAndXObjectMap
 
-        //     offsetCoordGenerator = xObjectMap.useIterator()
-        //     nextXAndOffsetCoord = offsetCoordGenerator()
+        //     if (isGenerateXAndOffsetMapGenerator) {
+        //         console.warn('使用了新的 xOffsetMap')
+        //         xAndOffsetCoordGenerator = xObjectMap.useIterator('X')
 
-        //     if (nextXAndOffsetCoord) {
-        //         return {
-        //             start: {
-        //                  y,
-        //                  x: nextXAndOffsetCoord.key,
-        //              },
-        //             offsetCoord: nextXAndOffsetCoord.value,
-        //         }
+        //         isGenerateXAndOffsetMapGenerator = false
+        //     }
+
+        //     xAndOffsetCoord = xAndOffsetCoordGenerator()
+
+        //     if (!xAndOffsetCoord) {
+        //         isGenerateNextYObjectMap = true
+        //         isGenerateXAndOffsetMapGenerator = true
+
+        //         return isLastY ? null : next()
+        //     }
+
+        //     return {
+        //         start: {
+        //              y,
+        //              x: xAndOffsetCoord.key,
+        //          },
+        //         offsetCoord: xAndOffsetCoord.value,
         //     }
         // }
+
+        let y = -1
+
+        const next = function() {
+            let xAndOffsetCoord = null
+
+            /* 没有 x 生成器, 从当前 y 生成器拿一个 */
+            if (xAndOffsetCoordGenerator) {
+                /* 尝试拿到下一个 x */
+                xAndOffsetCoord = xAndOffsetCoordGenerator()
+            }
+
+            /* 有当前 y 下 x 生成器, 且拿到了下一个 */
+            if (xAndOffsetCoord) {
+                return {
+                    start: {
+                         y,
+                         x: xAndOffsetCoord.key,
+                     },
+                    offsetCoord: xAndOffsetCoord.value,
+                }
+            }
+
+            /* 再试一次, 可能只是当前 y 下的 xObjectMap 到头了, 但是下一个 y 可能有 */
+            yAndXObjectMap = yAndXObjectMapGenerator()
+
+            /* 下一个 y 也没有 */
+            if (!yAndXObjectMap) {
+                return null
+            }
+
+            /* 惊了 */
+            // const { key: y, value: xObjectMap } = yAndXObjectMap
+
+            y = yAndXObjectMap.key
+            xAndOffsetCoordGenerator = yAndXObjectMap.value.useIterator('X')
+
+            return next()
+        }
+
+        return next
     }
 
     get(coord) {
@@ -360,6 +360,8 @@ class CursorMgr {
         after = null,
         track = true,
     } = {}) {
+        const start = performance.now()
+
         const flusher = this.useFlushOffsetIterator()
 
         for (let i = 0; i < cursors.length; i++) {
@@ -371,8 +373,11 @@ class CursorMgr {
 
         detect && this.detect() /* 检测光标与选区的冲突 */
         after && after()
-
         flusher.reset()
+
+        const end = performance.now()
+
+        console.error("Use TIme", end - start)
 
         this.aqua.renderer.renderGroup('standard', viewport)
         track && this.aqua.renderer.render('tracker', viewport)
@@ -417,65 +422,14 @@ class CursorMgr {
         }
     }
 
-    useFlushOffsetIterator() {
-        const offsetMap = this.offsetMap
-        const offsetCoordGenerator = offsetMap.useIterator()
+    getCursorsCoord() {
+        const coords = []
 
-        let yAcc = 0
-        let xAcc = 0
+        this.pureTraverse(cursor => {
+            coords.push(cursor.coord.extract())
+        })
 
-        let lastY = -1
-        let isTerminate = false
-        let nextOffsetCoord = null
-
-        return {
-            next(cursor) {
-                const coord = cursor.coord
-
-                while(true) {
-                    if (!isTerminate) {
-                        nextOffsetCoord = offsetCoordGenerator()
-                    }
-
-                    if (!nextOffsetCoord) {
-
-                        break
-                    }
-
-                    const { start, offsetCoord } = nextOffsetCoord
-
-                    if (CoordHelper.less(coord, start, ArgOpt.ContainEqual)) {
-                        isTerminate = true
-
-                        break
-                    }
-
-                    yAcc = yAcc + offsetCoord.y
-
-                    if (lastY !== offsetCoord.y) {
-                        xAcc = 0
-                    }
-
-                    xAcc = xAcc + offsetCoord.x
-
-                    lastY = start.y
-
-                    isTerminate = false
-                }
-
-                if (yAcc !== 0) {
-                    cursor.y = cursor.y + yAcc
-                }
-
-                if (xAcc !== 0 && cursor.y === lastY) {
-                    cursor.x = cursor.x + xAcc
-                }
-            },
-
-            reset() {
-                offsetMap.reset()
-            },
-        }
+        return coords
     }
 
     flushOffset() {
@@ -648,14 +602,14 @@ class CursorMgr {
                 }
             } else { // 当前光标有选区
                 if (nextSelection.isCollapsed()) { // 下一个光标没选区
-                    if (currentSelection.end.greater(next.coord, ArgOpt.ContainEqual)) { // 但是当前光标得选区终点比下一个光标还大
+                    if (currentSelection.end.greater(next.coord, ArgOpt.ContainEqual)) { // 但是当前光标的选区终点比下一个光标还大
                         next.merge(current)
                         remover.push(current, next)
 
                         continue
                     }
                 } else { // 下一个光标有选区
-                    if (currentSelection.end.greater(nextSelection.start)) { // 但是当前光标得选区终点比下一个光标的选区起点还大
+                    if (currentSelection.end.greater(nextSelection.start)) { // 但是当前光标的选区终点比下一个光标的选区起点还大
                         next.merge(current)
                         remover.push(current, next)
 
@@ -691,9 +645,76 @@ class CursorMgr {
         }
     }
 
-    usePhantom(cb, modName = 'Anchor') {
+    usePhantom(modName = 'Anchor') {
         const Cursor = this.mods[modName]
-        cb(new Cursor(this.aqua))
+
+        return new Cursor(this.aqua)
+    }
+
+    useFlushOffsetIterator() {
+        const offsetMap = this.offsetMap
+        const offsetCoordGenerator = offsetMap.useIterator()
+
+        let yAcc = 0
+        let xAcc = 0
+
+        let lastY = -1
+        let isTerminate = false
+        let nextOffsetCoord = null
+
+        return {
+            next(cursor) {
+                const offsetUpdater = cursor.useOffsetUpdater()
+                const coord = cursor.coord.clone()
+
+                coord.y = coord.y + yAcc
+                coord.x = coord.x + xAcc
+
+                while(true) {
+                    if (!isTerminate) {
+                        nextOffsetCoord = offsetCoordGenerator()
+                    }
+
+                    if (!nextOffsetCoord) {
+                        break
+                    }
+
+                    const { start, offsetCoord } = nextOffsetCoord
+
+                    if (CoordHelper.less(coord, start, ArgOpt.ContainEqual)) {
+                        isTerminate = true
+
+                        break
+                    }
+
+                    yAcc = yAcc + offsetCoord.y
+
+                    if (lastY !== offsetCoord.y) {
+                        xAcc = 0
+                    }
+
+                    xAcc = xAcc + offsetCoord.x
+
+                    lastY = start.y
+
+                    isTerminate = false
+                }
+
+                if (yAcc !== 0) {
+                    offsetUpdater.setY(yAcc)
+                }
+
+                if (xAcc !== 0 && coord.y === lastY) {
+                    offsetUpdater.setX(xAcc)
+                }
+
+                cursor.updateOffset(offsetUpdater.flush())
+            },
+
+            reset() {
+                offsetMap.reset()
+            },
+        }
     }
 
     /**

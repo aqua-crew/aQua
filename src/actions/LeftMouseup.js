@@ -8,6 +8,7 @@ class LeftMouseup extends Action {
         this.desc = 'Locate'
         this.shortcuts = ['LeftMouseup']
         this.eventType = 'mouse'
+        this.record = false
     }
 
     exec(aqua, event, state) {
@@ -24,7 +25,6 @@ class LeftMouseup extends Action {
             cursor.selection.terminal = cursor.coord
         }, {
             filter: cursor => aqua.cursorMgr.isPrimary(cursor),
-            acc: false,
             detect: false,
             after: state.isCreateCursor ? () => { this.detectAndRemove(aqua) } : null,
         })

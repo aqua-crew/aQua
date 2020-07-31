@@ -15,11 +15,9 @@ class CtrlEnter extends Action {
         event.preventDefault()
 
         aqua.cursorMgr.traverse(cursor => {
-            return
-
             cursor.x = Infinity
 
-            aqua.write(['', ''], cursor.coord)
+            aqua.write(['', ''], cursor)
 
             cursor.y = cursor.y + 1
             cursor.x = 0

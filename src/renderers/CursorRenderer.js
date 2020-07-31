@@ -16,7 +16,6 @@ class CursorRenderer {
         const renderArea = viewport.getRenderArea()
 
         if (this.cursors.offsetMap.size > 0) {
-            console.warn('渲染时触发了 offsetMap', this.cursors.offsetMap.size)
             this.cursors.flushOffset()
         }
 
@@ -31,20 +30,20 @@ class CursorRenderer {
                 return
             }
 
-            this.renderCursor(cursor, cursor.state)
+            this.renderCursor(cursor, cursor.status)
         })
 
         this.pool.clearUnuse()
     }
 
-    renderCursor(cursor, state = {}) {
+    renderCursor(cursor, status = {}) {
         const $cursor = this.pool.get()
         const layout = cursor.updateLayout()
 
         let cssText = ''
 
-        if (this.marker.isMarked(state, 'OverlayMark')) {
-            cssText = this.marker.use(state, 'OverlayMark')
+        if (this.marker.isMarked(status, 'OverlayMark')) {
+            cssText = this.marker.use(status, 'OverlayMark')
         }
 
         this.updateCursor($cursor, layout, cssText)

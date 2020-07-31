@@ -8,6 +8,7 @@ class CtrlLeftMousemove extends Action {
         this.shortcuts = ['Ctrl + LeftMousemove']
         this.eventType = 'mouse'
         this.before = false
+        this.record = false
     }
 
     exec(aqua, event, state) {

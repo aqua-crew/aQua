@@ -132,6 +132,10 @@ class Text extends Mode {
     }
 
     tokenize(raw, tokens = []) {
+        return raw.split('').map(char => ({
+            type: 'word',
+            value: char,
+        }))
         const len = raw.length
         const modes = ['text']
         let token = ''
@@ -154,6 +158,7 @@ class Text extends Mode {
             token = feedback.token || ''
         }
 
+        console.log(tokens)
         return tokens
     }
 }

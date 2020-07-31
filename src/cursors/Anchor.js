@@ -70,6 +70,28 @@ class Anchor {
         return this.coord.maxInsideY
     }
 
+    useOffsetUpdater() {
+        let offsetY = 0
+        let offsetX = 0
+
+        return {
+            setY(y) {
+                offsetY = y
+            },
+
+            setX(x) {
+                offsetX = x
+            },
+
+            flush() {
+                return {
+                    y: offsetY,
+                    x: offsetX,
+                }
+            },
+        }
+    }
+
     resetSelection() {
         this.selection.base = this.coord.clone()
         this.selection.terminal = this.coord.clone()
@@ -100,6 +122,46 @@ class Anchor {
         } else if (this.selection.direction === ArgOpt.SelectionDirectionIsTopLeft) {
             this.coord.assign(this.selection.start)
         }
+    }
+
+    updateOffset(offsetCoord) {
+        if (offsetCoord.y === 0 && offsetCoord.x === 0) {
+            return
+        }
+
+        if (offsetCoord.y !== 0) {
+            this.y = this.y + offsetCoord.y
+        }
+
+        if (offsetCoord.x !== 0) {
+            this.x = this.x + offsetCoord.x
+        }
+
+
+        if (this.selection.isCollapsed()) {
+            return
+        }
+
+        const coord = this.coord.clone()
+        const selection = this.selection
+        const direction = selection.direction
+
+        if (direction === ArgOpt.SelectionDirectionIsBottomRight) {
+            this.y = selection.start.y + offsetCoord.y
+            this.x = selection.start.x + offsetCoord.x
+
+            selection.base = this.coord.clone()
+            selection.terminal = coord.clone()
+        } else if (direction === ArgOpt.SelectionDirectionIsTopLeft) {
+            selection.base = coord.clone()
+
+            this.y = selection.end.y + offsetCoord.y
+            this.x = selection.end.x + offsetCoord.x
+
+            selection.terminal = this.coord.clone()
+        }
+
+        this.coord = coord.clone()
     }
 }
 

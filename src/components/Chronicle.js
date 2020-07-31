@@ -1,20 +1,18 @@
 const { MacroStep, MicroStep } = require('../models/index')
-const { ChronicleStatus } = require('../enums/index')
 
 class Chronicle {
     constructor(aqua) {
         this.khala = aqua.khala
 
         this.backMacroEvents = []
-        this.macroEvents = []
-        this.microEvents = []
-
-        this.status = ChronicleStatus.Pending
+        this.forwardMacroEvents = []
 
         this.options = {
             mergeDisabled: false,
             mergeTimeout: 1500,
         }
+
+        this.currentMacroEvent = null
     }
 
     init() {
@@ -24,32 +22,45 @@ class Chronicle {
     }
 
     record(data) {
-        if (this.status !== ChronicleStatus.Recording) {
+        if (!this.currentMacroEvent) {
             return
         }
 
-        this.microEvents.push(new MicroStep(data))
+        this.currentMacroEvent.micros.push(new MicroStep(data))
     }
 
-    start(type) {
-        this.status = ChronicleStatus.Recording
+    start(type, before = null) {
+        const macro = new MacroStep(type)
+
+        macro.micros = []
+        macro.before = before
+
+        this.currentMacroEvent = macro
     }
 
-    end(type, merge = this.merge) {
-        this.status = ChronicleStatus.Pending
+    end(type, after = null, merge = this.merge) {
+        const macro = this.currentMacroEvent
 
-        if (this.microEvents.length === 0) {
+        if (!macro) {
             return
         }
+
+        macro.after = after
+
+        if (macro.micros.length === 0) {
+            this.currentMacroEvent = null
+
+            return
+        }
+
+        this.currentMacroEvent = null
 
         if (this.backMacroEvents.length > 0) {
             this.backMacroEvents = []
         }
 
-        const macro = new MacroStep(type, this.flushMicros())
-
-        if (this.macroEvents.length < 1) {
-            this.macroEvents.push(macro)
+        if (this.forwardMacroEvents.length < 1) {
+            this.forwardMacroEvents.push(macro)
 
             return
         }
@@ -58,21 +69,15 @@ class Chronicle {
             merge = this.merge
         }
 
-        merge(macro, this, this.mergeStrategy) || this.macroEvents.push(macro)
-    }
-
-    flushMicros() {
-        const micros = this.microEvents
-
-        this.microEvents = []
-
-        return micros
+        merge(macro, this, this.mergeStrategy) || this.forwardMacroEvents.push(macro)
     }
 
     merge(next, chronicle, mergeStrategy) {
+        // console.log('Merge', chronicle.forwardMacroEvents)
+
         return
 
-        const macros = chronicle.macroEvents
+        const macros = chronicle.forwardMacroEvents
         const len = macros.length
         const prev = macros[len - 1]
 
@@ -80,7 +85,7 @@ class Chronicle {
             return false
         }
 
-        return false
+        return
 
         const mergedMicros = []
 
@@ -94,11 +99,29 @@ class Chronicle {
             const prevMicro = prevMicros[prevIndex]
             const nextMicro = nextMicros[nextIndex]
 
+            if (prevMicro.source === prevMicro.source) {
+
+            }
+
             if (nextMicro < prevMicro) {
                 mergedMicros.push(nextMicro)
                 nextIndex = nextIndex + 1
 
                 continue
+            }
+        }
+
+        prev.updateTime = prev.getTime()
+
+        const mergeMicros = (prevMicros, nextMicros) => {
+            const merged = []
+
+            let prevIndex = 0
+            let nextIndex = 0
+
+            return
+
+            while(true) {
             }
         }
     }
@@ -108,9 +131,9 @@ class Chronicle {
             return false
         }
 
-        // if (next.author !== prev.author) {
-        //     return false
-        // }
+        if (next.author !== prev.author) {
+            return false
+        }
 
         if (next.type !== prev.type) {
             return false
@@ -124,7 +147,7 @@ class Chronicle {
     }
 
     back(fn) {
-        const macroEvent = this.macroEvents.pop()
+        const macroEvent = this.forwardMacroEvents.pop()
 
         if (!macroEvent) {
             return fn(macroEvent)
@@ -142,7 +165,7 @@ class Chronicle {
             return fn(macroEvent)
         }
 
-        this.macroEvents.push(macroEvent)
+        this.forwardMacroEvents.push(macroEvent)
 
         return fn(macroEvent)
     }
