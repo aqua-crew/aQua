@@ -198,8 +198,24 @@ class OffsetMap {
 
         let y = -1
 
+        let lastXAndOffsetCoord = null
+
         const next = function() {
             let xAndOffsetCoord = null
+
+            /* 尝试看看上次的 offsetCoord 是否被更新了 */
+            console.error('检查是否是被更新的 xAndOffsetCoord', JSON.parse(JSON.stringify(lastXAndOffsetCoord)))
+            if (lastXAndOffsetCoord && lastXAndOffsetCoord.value.updated) {
+                lastXAndOffsetCoord.value.updated = false
+
+                return {
+                    start: {
+                        y,
+                        x: lastXAndOffsetCoord.key,
+                    },
+                    offsetCoord: lastXAndOffsetCoord.value,
+                }
+            }
 
             /* 没有 x 生成器, 从当前 y 生成器拿一个 */
             if (xAndOffsetCoordGenerator) {
@@ -209,6 +225,8 @@ class OffsetMap {
 
             /* 有当前 y 下 x 生成器, 且拿到了下一个 */
             if (xAndOffsetCoord) {
+                lastXAndOffsetCoord = xAndOffsetCoord
+
                 return {
                     start: {
                          y,
@@ -226,9 +244,7 @@ class OffsetMap {
                 return null
             }
 
-            /* 惊了 */
-            // const { key: y, value: xObjectMap } = yAndXObjectMap
-
+            /* 惊了, 有了 */
             y = yAndXObjectMap.key
             xAndOffsetCoordGenerator = yAndXObjectMap.value.useIterator('X')
 
@@ -254,6 +270,12 @@ class OffsetMap {
         return offsetCoord
     }
 
+    /**
+     * 1. 标记一个 offsetCoord 被更新过了, 以便当使用 useIterator 的时候, 保证这个更新过的 offsetCoord 不会被跳过
+     * 2. 标记一个 offsetCoord 的 x 偏移量
+     * @param {CoordLike} coord       [偏移起始点]
+     * @param {CoordLike} offsetCoord [偏移坐标向量]
+     */
     add(coord, offsetCoord) {
         let xObjectMap = this.map.get(coord.y)
 
@@ -276,6 +298,11 @@ class OffsetMap {
 
         prevOffsetCoord.y = prevOffsetCoord.y + offsetCoord.y
         prevOffsetCoord.x = prevOffsetCoord.x + offsetCoord.x
+
+        /* 1 */
+        prevOffsetCoord.updated = true
+        /* 2 */
+        prevOffsetCoord.redundanceX = offsetCoord.x
     }
 
     reset() {
@@ -304,6 +331,8 @@ class CursorMgr {
 
         this.aqua.khala.on('microEvent', data => {
             const { source, start, end } = data
+
+            console.error('添加了 microEvent', data)
 
             if (source === 'write') {
                 this.offsetMap.add(start, {
@@ -360,14 +389,18 @@ class CursorMgr {
         after = null,
         track = true,
     } = {}) {
-        const start = performance.now()
+        console.group('action start')
 
         const flusher = this.useFlushOffsetIterator()
 
         for (let i = 0; i < cursors.length; i++) {
+            console.warn('Cursor', i)
             const cursor = cursors[i]
 
             flusher.next(cursor)
+
+            console.log('Cursor Coord After Flush', cursor.coord.clone())
+
             filter(cursor) && cb(cursor)
         }
 
@@ -375,9 +408,7 @@ class CursorMgr {
         after && after()
         flusher.reset()
 
-        const end = performance.now()
-
-        console.error("Use TIme", end - start)
+        console.groupEnd('action start')
 
         this.aqua.renderer.renderGroup('standard', viewport)
         track && this.aqua.renderer.render('tracker', viewport)
@@ -667,12 +698,16 @@ class CursorMgr {
                 const offsetUpdater = cursor.useOffsetUpdater()
                 const coord = cursor.coord.clone()
 
+                console.log('coord 预处理, coord, yAcc, xAcc', coord.clone(), yAcc, xAcc)
+
                 coord.y = coord.y + yAcc
                 coord.x = coord.x + xAcc
 
                 while(true) {
                     if (!isTerminate) {
                         nextOffsetCoord = offsetCoordGenerator()
+
+                        console.error('使用的 nextOffsetCoord', JSON.parse(JSON.stringify(nextOffsetCoord)))
                     }
 
                     if (!nextOffsetCoord) {
@@ -693,7 +728,7 @@ class CursorMgr {
                         xAcc = 0
                     }
 
-                    xAcc = xAcc + offsetCoord.x
+                    xAcc = xAcc + (offsetCoord.redundanceX ? offsetCoord.redundanceX : offsetCoord.x)
 
                     lastY = start.y
 
@@ -704,6 +739,7 @@ class CursorMgr {
                     offsetUpdater.setY(yAcc)
                 }
 
+                console.error('before set', xAcc, coord.y, lastY)
                 if (xAcc !== 0 && coord.y === lastY) {
                     offsetUpdater.setX(xAcc)
                 }

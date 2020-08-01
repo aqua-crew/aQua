@@ -11,7 +11,8 @@ class CtrlEnter extends Action {
     }
 
     exec(aqua, event) {
-        console.error('CtrlEnter')
+        return
+
         event.preventDefault()
 
         aqua.cursorMgr.traverse(cursor => {
