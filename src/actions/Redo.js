@@ -30,19 +30,35 @@ class Redo extends Action {
             const { source, start, end, contents } = micros[i].record
 
             if (source === 'write') {
-                aqua.docMgr.write(contents, start)
+                aqua.docMgr.write(contents, start, {
+                    track: false,
+                })
 
                 continue
             }
 
             if (source === 'delete') {
-                aqua.docMgr.delete(start, end)
+                aqua.docMgr.delete(start, end, {
+                    track: false,
+                })
 
                 continue
             }
         }
 
-        console.error('macro.after', macro)
+        const cursors = macro.after
+        const creator = aqua.cursorMgr.useCreator()
+
+        for (let i = 0; i < cursors.length; i++) {
+            const after = cursors[i]
+
+            creator.create(cursor => {
+                cursor.y = after.y
+                cursor.x = after.x
+            })
+        }
+
+        creator.finish()
     }
 }
 

@@ -44,7 +44,10 @@ class DocMgr {
     }
 
     wrap() {
-        this.write = (contents, cursor = null, isInsert = false) => {
+        this.write = (contents, cursor = null, {
+            isInsert = false,
+            track = true,
+        } = {}) => {
             if (!Array.isArray(contents)) {
                 contents = [contents]
             }
@@ -54,23 +57,28 @@ class DocMgr {
             this.correctCoord(coord)
 
             const result = this.writePrototype(contents, coord, isInsert)
-            const start = (coord.extract && coord.extract()) || coord
-            const end = {
-                y: coord.y + result.y,
-                x: result.y > 0 ? result.x : coord.x + result.x
-            }
 
-            this.khala.emit('microEvent', {
-                source: 'write',
-                contents,
-                start,
-                end,
-            })
+            if (track) {
+                const start = (coord.extract && coord.extract()) || coord
+                const end = {
+                    y: coord.y + result.y,
+                    x: result.y > 0 ? result.x : coord.x + result.x
+                }
+
+                this.khala.emit('microEvent', {
+                    source: 'write',
+                    contents,
+                    start,
+                    end,
+                })
+            }
 
             return result
         }
 
-        this.delete = (start, end) => {
+        this.delete = (start, end, {
+            track = true,
+        } = {}) => {
             this.correctCoord(start)
             this.correctCoord(end)
 
@@ -84,15 +92,17 @@ class DocMgr {
                 return result
             }
 
-            start = (start.extract && start.extract()) || start
-            end = (end.extract && end.extract()) || end
+            if (track) {
+                start = (start.extract && start.extract()) || start
+                end = (end.extract && end.extract()) || end
 
-            this.khala.emit('microEvent', {
-                source: 'delete',
-                contents: result,
-                start,
-                end,
-            })
+                this.khala.emit('microEvent', {
+                    source: 'delete',
+                    contents: result,
+                    start,
+                    end,
+                })
+            }
 
             return result
         }

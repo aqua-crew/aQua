@@ -137,68 +137,13 @@ class OffsetMap {
 
     useIterator() {
         const yAndXObjectMapGenerator = this.map.useIterator('Y')
-
-        let isGenerateNextYObjectMap = true
+        let xAndOffsetCoordGenerator = null
 
         let yAndXObjectMap = null
         let xAndOffsetCoord = null
-
-        let xAndOffsetCoordGenerator = null
-        let isGenerateXAndOffsetMapGenerator = true
-
-        let isLastY = false
-
-        // const next = function() {
-        //     let curYAndXObjectMap = null
-
-        //     if (isGenerateNextYObjectMap) {
-        //         curYAndXObjectMap = yAndXObjectMapGenerator()
-
-        //         if (!curYAndXObjectMap) {
-        //             isGenerateNextYObjectMap = true
-        //             isLastY = true
-        //         } else {
-        //             isGenerateNextYObjectMap = false
-        //             yAndXObjectMap = curYAndXObjectMap
-        //             isLastY = false
-        //         }
-        //     }
-
-        //     /* 初次 next, yAndXObjectMap 可能是 null */
-        //     if (!yAndXObjectMap) {
-        //         return null
-        //     }
-
-        //     const { key: y, value: xObjectMap } = yAndXObjectMap
-
-        //     if (isGenerateXAndOffsetMapGenerator) {
-        //         console.warn('使用了新的 xOffsetMap')
-        //         xAndOffsetCoordGenerator = xObjectMap.useIterator('X')
-
-        //         isGenerateXAndOffsetMapGenerator = false
-        //     }
-
-        //     xAndOffsetCoord = xAndOffsetCoordGenerator()
-
-        //     if (!xAndOffsetCoord) {
-        //         isGenerateNextYObjectMap = true
-        //         isGenerateXAndOffsetMapGenerator = true
-
-        //         return isLastY ? null : next()
-        //     }
-
-        //     return {
-        //         start: {
-        //              y,
-        //              x: xAndOffsetCoord.key,
-        //          },
-        //         offsetCoord: xAndOffsetCoord.value,
-        //     }
-        // }
+        let lastXAndOffsetCoord = null
 
         let y = -1
-
-        let lastXAndOffsetCoord = null
 
         const next = function() {
             let xAndOffsetCoord = null
@@ -474,7 +419,6 @@ class CursorMgr {
             flusher.next(cursor)
         })
 
-
         flusher.reset()
     }
 
@@ -673,6 +617,29 @@ class CursorMgr {
         return {
             push,
             remove,
+        }
+    }
+
+    /**
+     * 只允许设定光标的位置信息哦
+     * @return {Object} [description]
+     */
+    useCreator() {
+        const self = this
+        const cursors = []
+
+        return {
+            create(cb, modName = 'Anchor') {
+                const cursor = self.usePhantom(modName)
+                cursors.push(cursor)
+
+                cb(cursor)
+            },
+
+            finish() {
+                self.cursors = cursors
+                self.resort()
+            },
         }
     }
 

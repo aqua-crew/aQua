@@ -12,6 +12,7 @@ const PluginMgr = require('./PluginMgr')
 const Renderer = require('./Renderer')
 const Scroller = require('./Scroller')
 const ProcessorMgr = require('./ProcessorMgr')
+const Shaper = require('./Shaper')
 const State = require('./State')
 const UIMgr = require('./UIMgr')
 const ViewportMgr = require('./ViewportMgr')
@@ -31,6 +32,7 @@ module.exports = {
     ProcessorMgr,
     Renderer,
     Scroller,
+    Shaper,
     State,
     UIMgr,
     ViewportMgr,
