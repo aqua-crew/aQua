@@ -19,6 +19,15 @@ class MoveLeft extends Action {
     moveLeft(aqua, cursor, clearSelection = false) {
         if (clearSelection) {
             if (!cursor.selection.isCollapsed()) {
+                const start = cursor.selection.start
+
+                if (!cursor.coord.equal(start)) {
+                    cursor.y = start.y
+                    cursor.x = start.x
+
+                    return
+                }
+
                 cursor.resetSelection()
 
                 return

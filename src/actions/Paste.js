@@ -5,7 +5,7 @@ class Paste extends Action {
         super()
         this.name = 'Paste'
         this.desc = 'Paste'
-        this.shortcuts = ['Ctrl + LeftMousedown']
+        this.shortcuts = null
     }
 
     exec(aqua, event, state) {

@@ -83,7 +83,7 @@ class Anchor {
                 offsetX = x
             },
 
-            flush() {
+            flush(start) {
                 return {
                     y: offsetY,
                     x: offsetX,
@@ -124,19 +124,13 @@ class Anchor {
         }
     }
 
-    updateOffset(offsetCoord) {
+    updateOffset(offsetCoord, lastY) {
         if (offsetCoord.y === 0 && offsetCoord.x === 0) {
             return
         }
 
-        if (offsetCoord.y !== 0) {
-            this.y = this.y + offsetCoord.y
-        }
-
-        if (offsetCoord.x !== 0) {
-            this.x = this.x + offsetCoord.x
-        }
-
+        this.y = this.y + offsetCoord.y
+        this.x = this.y === lastY ? offsetCoord.x + this.x : this.x
 
         if (this.selection.isCollapsed()) {
             return
@@ -148,7 +142,7 @@ class Anchor {
 
         if (direction === ArgOpt.SelectionDirectionIsBottomRight) {
             this.y = selection.start.y + offsetCoord.y
-            this.x = selection.start.x + offsetCoord.x
+            this.x = this.y === lastY ? selection.start.x + offsetCoord.x : selection.start.x
 
             selection.base = this.coord.clone()
             selection.terminal = coord.clone()
@@ -156,12 +150,39 @@ class Anchor {
             selection.base = coord.clone()
 
             this.y = selection.end.y + offsetCoord.y
-            this.x = selection.end.x + offsetCoord.x
+            this.x = this.y === lastY ? selection.end.x + offsetCoord.x : selection.end.x
 
             selection.terminal = this.coord.clone()
         }
 
         this.coord = coord.clone()
+    }
+
+    /* Extract */
+    extract() {
+        return {
+            coord: this.coord.extract(),
+            selection: this.selection.extract(),
+        }
+    }
+
+    rebuild(data) {
+        const { coord, selection } = data
+
+        if (selection) {
+            this.y = selection.base.y
+            this.x = selection.base.x
+
+            this.selection.base = this.coord.clone()
+
+            this.y = selection.terminal.y
+            this.x = selection.terminal.x
+
+            this.selection.terminal = this.coord.clone()
+        }
+
+        this.y = coord.y
+        this.x = coord.x
     }
 }
 

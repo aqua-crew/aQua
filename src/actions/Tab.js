@@ -13,8 +13,6 @@ class Tab extends Action {
     exec(aqua, event) {
         event.preventDefault()
 
-        console.error(this.name)
-
         aqua.cursorMgr.traverse(cursor => {
             this.genConsoleInfo(aqua, cursor)
         })
@@ -30,7 +28,9 @@ class Tab extends Action {
         const infilling = aqua.docMgr.read(cursor.selection.start, cursor.selection.end)
         const contents = `console.log('${infilling} :', ${infilling})`
 
-        aqua.docMgr.write(contents, cursor.coord, true)
+        aqua.docMgr.write(contents, cursor.coord, {
+            isInsert: true,
+        })
 
         cursor.y = cursor.y + 1
         cursor.x = 0

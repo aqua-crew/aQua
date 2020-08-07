@@ -46,19 +46,7 @@ class Undo extends Action {
             }
         }
 
-        const cursors = macro.before
-        const creator = aqua.cursorMgr.useCreator()
-
-        for (let i = 0; i < cursors.length; i++) {
-            const before = cursors[i]
-
-            creator.create(cursor => {
-                cursor.y = before.y
-                cursor.x = before.x
-            })
-        }
-
-        creator.finish()
+        aqua.cursorMgr.rebuild(macro.before)
     }
 }
 

@@ -19,8 +19,6 @@ class MoveLeftWithTerminal extends Action {
             aqua.actionMgr.execWithName('MoveLeft', 'moveLeft', cursor)
 
             cursor.selection.terminal = cursor.coord
-        }, {
-            acc: false,
         })
     }
 }

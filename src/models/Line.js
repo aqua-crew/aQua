@@ -17,6 +17,14 @@ class Line {
         this.parent = parent
     }
 
+    get id() {
+        if (this._id) {
+            return this._id
+        }
+
+        return this._id = 'L' + (new Date().getTime() + Math.random()).toString(36).replace('.', '')
+    }
+
     set height(height) {
         this._heightBuffer = this._heightBuffer + (height - this._height)
         this._height = height
@@ -257,14 +265,6 @@ class Line {
         }, asset.next)
 
         return head
-    }
-
-    get id() {
-        if (this._id) {
-            return this._id
-        }
-
-        return this._id = 'L' + (new Date().getTime() + Math.random()).toString(36).replace('.', '')
     }
 
     traverse(cb, data = this.data) {

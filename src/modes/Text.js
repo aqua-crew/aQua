@@ -136,6 +136,7 @@ class Text extends Mode {
             type: 'word',
             value: char,
         }))
+
         const len = raw.length
         const modes = ['text']
         let token = ''

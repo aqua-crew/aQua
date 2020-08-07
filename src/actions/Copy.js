@@ -5,11 +5,24 @@ class Copy extends Action {
         super()
         this.name = 'Copy'
         this.desc = 'Copy'
-        this.shortcuts = ['Ctrl + LeftMousedown']
+        this.shortcuts = null
     }
 
     exec(aqua, event, state) {
-        console.error('Copy', event)
+        event.preventDefault()
+
+        const datas = []
+
+        aqua.cursorMgr.pureTraverse(cursor => {
+            if (cursor.selection.isCollapsed()) {
+                return
+            }
+
+            const { start, end } = cursor.selection
+            datas.push(aqua.docMgr.read(start, end).join('\n'))
+        })
+
+        event.clipboardData.setData('text/plain', datas.join('\n'))
     }
 }
 

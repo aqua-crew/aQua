@@ -46,19 +46,7 @@ class Redo extends Action {
             }
         }
 
-        const cursors = macro.after
-        const creator = aqua.cursorMgr.useCreator()
-
-        for (let i = 0; i < cursors.length; i++) {
-            const after = cursors[i]
-
-            creator.create(cursor => {
-                cursor.y = after.y
-                cursor.x = after.x
-            })
-        }
-
-        creator.finish()
+        aqua.cursorMgr.rebuild(macro.after)
     }
 }
 

@@ -19,6 +19,15 @@ class MoveRight extends Action {
     moveRight(aqua, cursor, clearSelection = false) {
         if (clearSelection) {
             if (!cursor.selection.isCollapsed()) {
+                const end = cursor.selection.end
+
+                if (!cursor.coord.equal(end)) {
+                    cursor.y = end.y
+                    cursor.x = end.x
+
+                    return
+                }
+
                 cursor.resetSelection()
 
                 return

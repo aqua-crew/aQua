@@ -6,17 +6,6 @@ class ProcessorMgr {
         this.registry = Object.create(null)
     }
 
-    load(Processor) {
-        const processor = new Processor(this.aqua.docWatcher, this.aqua.korwa)
-        const targets = processor.targets
-
-        for (let i = 0; i < targets.length; i++) {
-            const target = targets[i]
-
-            this.registry[target] = processor
-        }
-    }
-
     transformToElements(line, fileType = this.aqua.state.file.suffix) {
         const $root = DOM.f()
 
@@ -51,6 +40,17 @@ class ProcessorMgr {
 
         for (; asset !== null; asset = asset.next) {
             cb(asset.data, asset.type)
+        }
+    }
+
+    load(Processor) {
+        const processor = new Processor(this.aqua.docWatcher, this.aqua.korwa)
+        const targets = processor.targets
+
+        for (let i = 0; i < targets.length; i++) {
+            const target = targets[i]
+
+            this.registry[target] = processor
         }
     }
 }

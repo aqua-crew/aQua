@@ -43,7 +43,16 @@ class DocMgr {
         this.writePrototype('')
     }
 
+    /**
+     * 为 writePrototype 和 deletePrototype 添加更多特殊效果
+     * @return {Undefined}
+     */
     wrap() {
+        /**
+         * 1. 将 writePrototype 作为 microEvent, 此时将计入 Undo & Redo
+         * @param  {Boolean} options.isInsert [是否将 contengs 插入到下一行开头]
+         * @param  {Boolean} options.track    [是否将该次写入计入 Undo & Redo]
+         */
         this.write = (contents, cursor = null, {
             isInsert = false,
             track = true,
@@ -60,6 +69,12 @@ class DocMgr {
 
             if (track) {
                 const start = (coord.extract && coord.extract()) || coord
+
+                if (isInsert) {
+                    start.x = this.getLine(start.y).length
+                    contents.unshift('')
+                }
+
                 const end = {
                     y: coord.y + result.y,
                     x: result.y > 0 ? result.x : coord.x + result.x
@@ -76,6 +91,10 @@ class DocMgr {
             return result
         }
 
+        /**
+         * 1. 将 deletePrototype 作为 microEvent, 此时将计入 Undo & Redo
+         * @param  {Boolean} options.track    [是否将该次删除计入 Undo & Redo]
+         */
         this.delete = (start, end, {
             track = true,
         } = {}) => {

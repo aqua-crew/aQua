@@ -22,8 +22,10 @@ class ObjectMap {
 
             index = arr[i]
 
-            if (i > arr.length - 1) {
-                i = arr.length - 1
+            const max = arr.length - 1
+
+            if (i > max) {
+                i = max
 
                 return null
             }
@@ -140,28 +142,37 @@ class OffsetMap {
         let xAndOffsetCoordGenerator = null
 
         let yAndXObjectMap = null
-        let xAndOffsetCoord = null
         let lastXAndOffsetCoord = null
+        let offsetCoordList = null
 
+        let offsetIndex = -1
         let y = -1
+        let x = -1
+
+        const that = this
 
         const next = function() {
-            let xAndOffsetCoord = null
+            if (offsetCoordList) {
+                /* 尝试拿到下一个 offsetCoord */
+                const offsetCoord = offsetCoordList[offsetIndex + 1]
 
-            /* 尝试看看上次的 offsetCoord 是否被更新了 */
-            console.error('检查是否是被更新的 xAndOffsetCoord', JSON.parse(JSON.stringify(lastXAndOffsetCoord)))
-            if (lastXAndOffsetCoord && lastXAndOffsetCoord.value.updated) {
-                lastXAndOffsetCoord.value.updated = false
+                /* 拿到了就直接返回 */
+                if (offsetCoord) {
+                    offsetIndex = offsetIndex + 1
 
-                return {
-                    start: {
-                        y,
-                        x: lastXAndOffsetCoord.key,
-                    },
-                    offsetCoord: lastXAndOffsetCoord.value,
+                    return {
+                        start: {
+                            y,
+                            x,
+                        },
+                        offsetCoord,
+                    }
                 }
             }
 
+            let xAndOffsetCoord = null
+
+            /* 如果没有的话, 尝试拿到下一个 x 下的 offsetCoordList */
             /* 没有 x 生成器, 从当前 y 生成器拿一个 */
             if (xAndOffsetCoordGenerator) {
                 /* 尝试拿到下一个 x */
@@ -170,15 +181,11 @@ class OffsetMap {
 
             /* 有当前 y 下 x 生成器, 且拿到了下一个 */
             if (xAndOffsetCoord) {
-                lastXAndOffsetCoord = xAndOffsetCoord
+                x = xAndOffsetCoord.key
+                offsetCoordList = xAndOffsetCoord.value
+                offsetIndex = -1
 
-                return {
-                    start: {
-                         y,
-                         x: xAndOffsetCoord.key,
-                     },
-                    offsetCoord: xAndOffsetCoord.value,
-                }
+                return next()
             }
 
             /* 再试一次, 可能只是当前 y 下的 xObjectMap 到头了, 但是下一个 y 可能有 */
@@ -192,6 +199,11 @@ class OffsetMap {
             /* 惊了, 有了 */
             y = yAndXObjectMap.key
             xAndOffsetCoordGenerator = yAndXObjectMap.value.useIterator('X')
+
+            xAndOffsetCoord = xAndOffsetCoordGenerator()
+            x = xAndOffsetCoord.key
+            offsetCoordList = xAndOffsetCoord.value
+            offsetIndex = -1
 
             return next()
         }
@@ -228,7 +240,7 @@ class OffsetMap {
             xObjectMap = new ObjectMap
 
             this.map.set(coord.y, xObjectMap)
-            xObjectMap.set(coord.x, offsetCoord)
+            xObjectMap.set(coord.x, [offsetCoord])
 
             return
         }
@@ -236,18 +248,12 @@ class OffsetMap {
         const prevOffsetCoord = xObjectMap.get(coord.x)
 
         if (!prevOffsetCoord) {
-            xObjectMap.set(coord.x, offsetCoord)
+            xObjectMap.set(coord.x, [offsetCoord])
 
             return
         }
 
-        prevOffsetCoord.y = prevOffsetCoord.y + offsetCoord.y
-        prevOffsetCoord.x = prevOffsetCoord.x + offsetCoord.x
-
-        /* 1 */
-        prevOffsetCoord.updated = true
-        /* 2 */
-        prevOffsetCoord.redundanceX = offsetCoord.x
+        xObjectMap.get(coord.x).push(offsetCoord)
     }
 
     reset() {
@@ -276,8 +282,6 @@ class CursorMgr {
 
         this.aqua.khala.on('microEvent', data => {
             const { source, start, end } = data
-
-            console.error('添加了 microEvent', data)
 
             if (source === 'write') {
                 this.offsetMap.add(start, {
@@ -339,14 +343,13 @@ class CursorMgr {
         const flusher = this.useFlushOffsetIterator()
 
         for (let i = 0; i < cursors.length; i++) {
-            console.warn('Cursor', i)
+            console.group('当前光标序号', i)
             const cursor = cursors[i]
 
             flusher.next(cursor)
 
-            console.log('Cursor Coord After Flush', cursor.coord.clone())
-
             filter(cursor) && cb(cursor)
+            console.groupEnd('当前光标序号', i)
         }
 
         detect && this.detect() /* 检测光标与选区的冲突 */
@@ -398,16 +401,6 @@ class CursorMgr {
         }
     }
 
-    getCursorsCoord() {
-        const coords = []
-
-        this.pureTraverse(cursor => {
-            coords.push(cursor.coord.extract())
-        })
-
-        return coords
-    }
-
     flushOffset() {
         const flusher = this.useFlushOffsetIterator()
 
@@ -430,6 +423,12 @@ class CursorMgr {
         })
     }
 
+    /**
+     * 用于检测 cursor 在 cursors 中是否重合, 返回与其重合的光标列表
+     * @param  {Cursor} cursor  [检测的光标]
+     * @param  {Array<Cursor>} cursors [光标处于的光标列表]
+     * @return {Array<Cursor>}         [与 cursor 重合的光标]
+     */
     detectCursorCoordOverlay(cursor = this.primary, cursors = this.cursors) {
         if (cursors.length < 2) {
             return null
@@ -473,6 +472,12 @@ class CursorMgr {
         return null
     }
 
+    /**
+     * 用于检测 cursor 与其 selection 在 cursors 中是否重合, 返回与其重合的光标列表
+     * @param  {Cursor} cursor  [检测的光标]
+     * @param  {Array<Cursor>} cursors [光标处于的光标列表]
+     * @return {Array<Cursor>}         [与 cursor 重合的光标]
+     */
     detectCursorSelectionOverlay(cursor = this.primary, cursors = this.cursors) {
         const overlayCursors = []
 
@@ -598,6 +603,13 @@ class CursorMgr {
     }
 
     /* Tool */
+    /**
+     * 在调用遍历类的方法进行删除操作时, 由于直接删除会导致数组下标对不上, 会报错.
+     * 所以在遍历时, 需要将删除的光标推入队列, 然后在遍历结束后进行删除
+     * @param  {Array}  list             [光标的删除队列]
+     * @param  {Cursor} primaryCandidate [该光标在队列清空后作为主光标]
+     * @return {Object}                  []
+     */
     useDelayRemover(list = [], primaryCandidate = null) {
         const push = (cursor, fromCursor) => {
             if (this.isPrimary(cursor)) {
@@ -628,18 +640,20 @@ class CursorMgr {
         const self = this
         const cursors = []
 
+        const push = (cb, modName = 'Anchor') => {
+            const cursor = self.usePhantom(modName)
+            cursors.push(cursor)
+
+            cb(cursor)
+        }
+
+        const create = () => {
+            return cursors
+        }
+
         return {
-            create(cb, modName = 'Anchor') {
-                const cursor = self.usePhantom(modName)
-                cursors.push(cursor)
-
-                cb(cursor)
-            },
-
-            finish() {
-                self.cursors = cursors
-                self.resort()
-            },
+            push,
+            create,
         }
     }
 
@@ -665,16 +679,17 @@ class CursorMgr {
                 const offsetUpdater = cursor.useOffsetUpdater()
                 const coord = cursor.coord.clone()
 
-                console.log('coord 预处理, coord, yAcc, xAcc', coord.clone(), yAcc, xAcc)
-
                 coord.y = coord.y + yAcc
-                coord.x = coord.x + xAcc
+
+                if (coord.y === lastY) {
+                    coord.x = coord.x + xAcc
+                } else {
+                    xAcc = 0
+                }
 
                 while(true) {
                     if (!isTerminate) {
                         nextOffsetCoord = offsetCoordGenerator()
-
-                        console.error('使用的 nextOffsetCoord', JSON.parse(JSON.stringify(nextOffsetCoord)))
                     }
 
                     if (!nextOffsetCoord) {
@@ -684,6 +699,8 @@ class CursorMgr {
                     const { start, offsetCoord } = nextOffsetCoord
 
                     if (CoordHelper.less(coord, start, ArgOpt.ContainEqual)) {
+                        lastY = start.y + (offsetCoord.y < 0 ? -offsetCoord.y : offsetCoord.y)
+
                         isTerminate = true
 
                         break
@@ -691,33 +708,56 @@ class CursorMgr {
 
                     yAcc = yAcc + offsetCoord.y
 
-                    if (lastY !== offsetCoord.y) {
+                    const currentY = offsetCoord.y < 0 ? start.y : start.y - offsetCoord.y
+                    if (currentY !== lastY) {
                         xAcc = 0
                     }
 
-                    xAcc = xAcc + (offsetCoord.redundanceX ? offsetCoord.redundanceX : offsetCoord.x)
+                    xAcc = xAcc + offsetCoord.x
 
-                    lastY = start.y
+                    lastY = currentY
 
                     isTerminate = false
                 }
 
-                if (yAcc !== 0) {
-                    offsetUpdater.setY(yAcc)
-                }
+                offsetUpdater.setY(yAcc)
+                offsetUpdater.setX(xAcc)
 
-                console.error('before set', xAcc, coord.y, lastY)
-                if (xAcc !== 0 && coord.y === lastY) {
-                    offsetUpdater.setX(xAcc)
-                }
-
-                cursor.updateOffset(offsetUpdater.flush())
+                cursor.updateOffset(offsetUpdater.flush(), lastY)
             },
 
             reset() {
                 offsetMap.reset()
             },
         }
+    }
+
+    /* Extract */
+    extract() {
+        const cursors = []
+
+        this.pureTraverse(cursor => {
+            cursors.push(cursor.extract())
+        })
+
+        return {
+            primary: this.cursors.indexOf(this.primary),
+            cursors,
+        }
+    }
+
+    rebuild(data) {
+        const { primary, cursors } = data
+        const creator = this.useCreator()
+
+        for (let i = 0; i < cursors.length; i++) {
+            creator.push(cursor => {
+                cursor.rebuild(cursors[i])
+            })
+        }
+
+        this.cursors = creator.create()
+        this.setPrimary(this.cursors[primary])
     }
 
     /**
@@ -735,10 +775,6 @@ class CursorMgr {
 
         return this
     }
-
-    // transform(cursor) {
-
-    // }
 }
 
 module.exports = CursorMgr

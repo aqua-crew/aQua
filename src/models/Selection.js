@@ -158,17 +158,10 @@ class Selection {
         selection._base = this._base.clone()
         selection.start = this.start.clone()
         selection.end = this.end.clone()
+        selection.direction = this.direction
         selection.collapsed = this.collapsed
 
         return selection
-    }
-
-    extract() {
-        return {
-            start: this.start.extract(),
-            end: this.end.extract(),
-            collapsed: this.collapsed,
-        }
     }
 
     /**
@@ -199,6 +192,28 @@ class Selection {
 
         if (selection.end.greater(this.end)) {
             this.end.assign(selection.end)
+        }
+    }
+
+    extract() {
+        const direction = this.direction
+
+        if (direction === ArgOpt.SelectionDirectionIsNone) {
+            return null
+        }
+
+        if (direction === ArgOpt.SelectionDirectionIsTopLeft) {
+            return {
+                base: this.end.extract(),
+                terminal: this.start.extract(),
+            }
+        }
+
+        if (direction === ArgOpt.SelectionDirectionIsBottomRight) {
+            return {
+                base: this.start.extract(),
+                terminal: this.end.extract(),
+            }
         }
     }
 }

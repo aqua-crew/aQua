@@ -8,9 +8,9 @@ const Actions = require('./actions/index')
 const UI = require('./ui/index')
 const Processors = require('./processors/index')
 const Marks = require('./marks/index')
-const { StringAsset, ImageAsset } = require('./assets/index')
 const plugins = require('./plugins/index')
 
+const { StringAsset, ImageAsset } = require('./assets/index')
 // const aqua = require('./aquaqua.jpg')
 
 class Aqua {
@@ -98,9 +98,9 @@ class Aqua {
 
     expose() {
         this.write = (...payload) => {
-            this.chronicle.start('Input')
+            this.chronicle.start('Input', this.cursorMgr.extract())
             this.docMgr.write(...payload)
-            this.chronicle.end('Input')
+            this.chronicle.end('Input', this.cursorMgr.extract())
         }
         this.read = this.docMgr.read.bind(this.docMgr)
         this.delete = this.docMgr.delete.bind(this.docMgr)
@@ -300,18 +300,17 @@ class Aqua {
         })
 
         this.kizuna.on($inputer, 'copy', event => {
-            event.preventDefault()
-
-            console.error('copy event', event)
+            this.actionMgr.exec('Copy', event)
         })
 
         this.kizuna.on($inputer, 'cut', event => {
-            console.error('cut event', event)
-            event.preventDefault()
+            this.actionMgr.exec('Cut', event)
         })
 
         this.kizuna.on($inputer, 'paste', event => {
-            this.inputer.poll()
+            // this.inputer.poll()
+
+            this.actionMgr.exec('Copy', event)
 
             // const items = event.clipboardData.items
             // console.error('Paste event.clipboardData', event.clipboardData)
@@ -346,7 +345,7 @@ class Aqua {
         })
 
         this.khala.on('input', text => {
-            this.chronicle.start('Input', this.cursorMgr.getCursorsCoord())
+            this.chronicle.start('Input', this.cursorMgr.extract())
 
             this.cursorMgr.traverse(cursor => {
                 if (!cursor.selection.isCollapsed()) {
@@ -359,7 +358,7 @@ class Aqua {
                 cursor.x = cursor.x + x
             })
 
-            this.chronicle.end('Input', this.cursorMgr.getCursorsCoord())
+            this.chronicle.end('Input', this.cursorMgr.extract())
         })
     }
 
@@ -379,6 +378,12 @@ class Aqua {
 
             document.title = document.hidden ? 'Minato' : 'Aqua'
         })
+    }
+
+    /* Extract */
+    extract() {
+        const doc = this.docMgr.extract()
+        const cursors = this.cursors.extract()
     }
 }
 

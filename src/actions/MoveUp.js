@@ -13,8 +13,6 @@ class MoveUp extends Action {
     exec(aqua, event) {
         aqua.cursorMgr.traverse(cursor => {
             this.moveUp(aqua, cursor, true)
-        }, {
-            acc: false,
         })
     }
 

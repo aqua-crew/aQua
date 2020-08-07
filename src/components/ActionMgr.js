@@ -28,6 +28,10 @@ class ActionMgr {
 
         this.actions[instance.name] = instance
 
+        if (!instance.shortcuts) {
+            return
+        }
+
         for (let i = 0; i < instance.shortcuts.length; i++) {
             const shortcut = instance.shortcuts[i]
 
@@ -35,9 +39,9 @@ class ActionMgr {
                 this.aqua.kizuna.load(shortcut, (event, payload) => {
                     const name = instance.name
 
-                    this.chronicle.start(name, this.aqua.cursorMgr.getCursorsCoord())
+                    this.chronicle.start(name, this.aqua.cursorMgr.extract())
                     instance.exec(this.aqua, event, payload)
-                    this.chronicle.end(name, this.aqua.cursorMgr.getCursorsCoord(), customMerge)
+                    this.chronicle.end(name, this.aqua.cursorMgr.extract(), customMerge)
                 }, instance.eventType)
             } else {
                 this.aqua.kizuna.load(shortcut, (event, payload) => {

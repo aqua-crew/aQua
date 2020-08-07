@@ -13,8 +13,6 @@ class MoveDown extends Action {
     exec(aqua, event) {
         aqua.cursorMgr.traverse(cursor => {
             this.moveDown(aqua, cursor, true)
-        }, {
-            acc: false,
         })
     }
 
