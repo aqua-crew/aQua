@@ -57,22 +57,6 @@ class Scroller {
         }
     }
 
-    // scrollTo(y = this.y, force = false) {
-    //     this.y = this.correctY(y)
-
-    //     clearTimeout(this.timeoutId)
-
-    //     if (new Date().getTime() - this.lastScrollTime >= 17) {
-    //         this.lastScrollTime = new Date().getTime()
-    //         this.aqua.khala.emit('scroll', this.y, force)
-    //     } else {
-    //         this.timeoutId = setTimeout(() => {
-    //             this.lastScrollTime = new Date().getTime()
-    //             this.aqua.khala.emit('scroll', this.y, force)
-    //         }, 17)
-    //     }
-    // }
-
     scroll(y = this.y, force = false) {
         this.y = this.correctY(y)
         this.limitedScroll(this.y, force)
@@ -97,6 +81,14 @@ class Scroller {
         }
 
         return y
+    }
+
+    transformHeight(viewport, heightInViewport, minHeight = 0) {
+        return Math.max(heightInViewport / (this.max + viewport.height) * viewport.height, minHeight)
+    }
+
+    transformY(viewport, yInViewport, heightInScrollBar = 0) {
+        return yInViewport / this.max * (viewport.height - heightInScrollBar)
     }
 }
 

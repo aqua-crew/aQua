@@ -338,15 +338,15 @@ class CursorMgr {
         after = null,
         track = true,
     } = {}) {
-        console.group('action start')
+        console.groupCollapsed('action start')
 
         const flusher = this.useFlushOffsetIterator()
 
         for (let i = 0; i < cursors.length; i++) {
             console.group('当前光标序号', i)
             const cursor = cursors[i]
-
             flusher.next(cursor)
+            console.warn('光标位置', cursor.coord.extract())
 
             filter(cursor) && cb(cursor)
             console.groupEnd('当前光标序号', i)
@@ -699,7 +699,7 @@ class CursorMgr {
                     const { start, offsetCoord } = nextOffsetCoord
 
                     if (CoordHelper.less(coord, start, ArgOpt.ContainEqual)) {
-                        lastY = start.y + (offsetCoord.y < 0 ? -offsetCoord.y : offsetCoord.y)
+                        lastY = offsetCoord.y < 0 ? start.y : start.y + offsetCoord.y
 
                         isTerminate = true
 
@@ -708,15 +708,14 @@ class CursorMgr {
 
                     yAcc = yAcc + offsetCoord.y
 
-                    const currentY = offsetCoord.y < 0 ? start.y : start.y - offsetCoord.y
-                    if (currentY !== lastY) {
+                    const currentY = offsetCoord.y < 0 ? start.y : start.y + offsetCoord.y
+                    if (start.y !== lastY) {
                         xAcc = 0
                     }
 
                     xAcc = xAcc + offsetCoord.x
 
                     lastY = currentY
-
                     isTerminate = false
                 }
 

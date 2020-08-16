@@ -34,9 +34,6 @@ class Renderer {
         const khala = this.aqua.khala
         const uiMgr = this.aqua.uiMgr
 
-        // let lastChange = 0
-        // let timeoutId = null
-
         docWatcher.on('change', data => {
             const lines = data.effectLines
 
@@ -75,9 +72,11 @@ class Renderer {
 
         this.setGroup('standard', viewport => {
             this.render('cursor', viewport)
+
             this.render('inputer', viewport)
             this.render('selection', viewport)
             this.render('selectedLine', viewport)
+            this.render('scrollBarCursor', viewport)
             this.render('lineNum', viewport)
         })
 

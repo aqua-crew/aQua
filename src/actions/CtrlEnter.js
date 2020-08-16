@@ -11,16 +11,25 @@ class CtrlEnter extends Action {
     }
 
     exec(aqua, event) {
-        return
-
         event.preventDefault()
 
+        let yAcc = 0
+        let lastY = -1
+
         aqua.cursorMgr.traverse(cursor => {
-            cursor.x = Infinity
+            aqua.docMgr.write([''], cursor, {
+                isInsert: true,
+            })
 
-            aqua.write(['', ''], cursor)
+            if (lastY !== cursor.y) {
+                yAcc = 0
+            }
 
-            cursor.y = cursor.y + 1
+            yAcc = yAcc + 1
+
+            lastY = cursor.y
+
+            cursor.y = cursor.y + yAcc
             cursor.x = 0
         })
     }

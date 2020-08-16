@@ -129,8 +129,14 @@ class Anchor {
             return
         }
 
+        console.log('before Update', this.coord.clone(), JSON.parse(JSON.stringify(offsetCoord)), this.x)
+
         this.y = this.y + offsetCoord.y
         this.x = this.y === lastY ? offsetCoord.x + this.x : this.x
+
+        console.log('lastY, this.y', lastY, this.y)
+        console.log('offsetCoord.x, this.x', offsetCoord.x)
+        console.log('Update', this.coord.clone())
 
         if (this.selection.isCollapsed()) {
             return
@@ -147,12 +153,11 @@ class Anchor {
             selection.base = this.coord.clone()
             selection.terminal = coord.clone()
         } else if (direction === ArgOpt.SelectionDirectionIsTopLeft) {
-            selection.base = coord.clone()
-
             this.y = selection.end.y + offsetCoord.y
             this.x = this.y === lastY ? selection.end.x + offsetCoord.x : selection.end.x
 
-            selection.terminal = this.coord.clone()
+            selection.base = this.coord.clone()
+            selection.terminal = coord.clone()
         }
 
         this.coord = coord.clone()
@@ -160,10 +165,12 @@ class Anchor {
 
     /* Extract */
     extract() {
-        return {
-            coord: this.coord.extract(),
-            selection: this.selection.extract(),
-        }
+        const data = Object.create(null)
+
+        data.coord = this.coord.extract()
+        data.selection = this.selection.extract()
+
+        return data
     }
 
     rebuild(data) {

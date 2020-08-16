@@ -13,27 +13,44 @@ class Tab extends Action {
     exec(aqua, event) {
         event.preventDefault()
 
-        aqua.cursorMgr.traverse(cursor => {
-            this.genConsoleInfo(aqua, cursor)
+        let offset = 0
+        let lastY = -1
+
+        aqua.cursorMgr.traverse((cursor, index) => {
+            if (cursor.y !== lastY) {
+                lastY = cursor.y
+                offset = 0
+            } else {
+                cursor.y = cursor.y + offset
+            }
+
+            offset = offset + 1
+
+            this.update(aqua, cursor)
+
+            cursor.y = cursor.y + 1
+            cursor.x = 0
         })
     }
 
-    genConsoleInfo(aqua, cursor) {
+    update(aqua, cursor) {
         if (cursor.selection.isCollapsed()) {
             return
         }
 
         cursor.resetSelection()
 
-        const infilling = aqua.docMgr.read(cursor.selection.start, cursor.selection.end)
-        const contents = `console.log('${infilling} :', ${infilling})`
+        const content = this.genConsoleInfo(aqua.docMgr.read(cursor.selection.start, cursor.selection.end))
 
-        aqua.docMgr.write(contents, cursor.coord, {
+        aqua.docMgr.write(content, cursor.coord, {
             isInsert: true,
         })
+    }
 
-        cursor.y = cursor.y + 1
-        cursor.x = 0
+    genConsoleInfo(infilling, type = 'log') {
+        const content = `console.log('${infilling}:', ${infilling})`
+
+        return content
     }
 }
 

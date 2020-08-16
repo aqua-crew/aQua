@@ -39,7 +39,7 @@ class Korwa {
 
         if (typeof functionOrKey === 'function') {
             const fn = functionOrKey
-            const fnNames = fn.name.split(' ') // if fn return by Function.prototype.bind , fn.name = 'bound fn'
+            const fnNames = fn.name.split(' ') // 如果 fn 被 bind 过, 那么 fn.name = 'bound fn'
 
             value = fn
             key = fnNames[fnNames.length - 1]

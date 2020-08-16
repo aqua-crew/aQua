@@ -1,5 +1,6 @@
 const { Processor } = require('../interfaces/index')
 const { DOM } = require('../utils/index')
+const { LineStatus } = require('../enums/index')
 
 class ImageProcessor extends Processor {
     constructor(docWatcher, korwa) {
@@ -7,6 +8,8 @@ class ImageProcessor extends Processor {
 
         this.docWatcher = docWatcher
         this.korwa = korwa
+
+        this.cache = Object.create(null)
     }
 
     onCreated() {
@@ -22,19 +25,25 @@ class ImageProcessor extends Processor {
 
     toElement(token, line) {
         const { type, value } = token
+
+        if (this.cache[value]) {
+            return this.cache[value]
+        }
+
         const $img = new Image()
-        const measurer = this.korwa.getMeasurer(line.id, line)
+
+        this.cache[value] = $img
 
         const cb = () => {
-            const height = measurer()
-
             if (!line.isAlive()) {
                 return
             }
 
-            line.height = height
-            console.error('line', line)
-            this.docWatcher.emit('resize', [line])
+            line.setStatus(LineStatus.UPDATED)
+
+            this.docWatcher.emit('change', {
+                effectLines: [line],
+            })
         }
 
         $img.onload = cb

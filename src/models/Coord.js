@@ -1,14 +1,14 @@
 class Coord {
     constructor({
         y = 0,
+        x = 0,
         insideY = 0,
         maxInsideY = 0,
-        x = 0,
     } = {}) {
         this.y = y
+        this.x = x
         this.insideY = insideY
         this.maxInsideY = maxInsideY
-        this.x = x
     }
 
     assign(coord) {

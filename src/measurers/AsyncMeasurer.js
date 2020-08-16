@@ -15,10 +15,11 @@ class AsyncMeasurer {
             return measurer
         }
 
-        const $measure = this.createMeasure(modName)
+        // const $measure = this.createMeasure(modName)
 
         measurer = function() {
-            const height = $measure.getBoundingClientRect().height
+            // const height = $measure.getBoundingClientRect().height
+            const height = this.korwa.measureHeight()
             console.error('measure', height)
             delete $asyncMeasurers[key]
             // $measure.remove()

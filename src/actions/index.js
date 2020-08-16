@@ -4,6 +4,8 @@ const Copy = require('./Copy')
 const Cut = require('./Cut')
 const Paste = require('./Paste')
 
+const Quote = require('./Quote')
+
 const CtrlBackspace = require('./CtrlBackspace')
 const CtrlDelete = require('./CtrlDelete')
 const CtrlEnter = require('./CtrlEnter')
@@ -56,6 +58,7 @@ module.exports = {
     Copy,
     Cut,
     Paste,
+    Quote,
     CtrlBackspace,
     CtrlDelete,
     CtrlEnter,

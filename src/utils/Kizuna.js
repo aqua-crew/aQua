@@ -17,6 +17,7 @@ const KEYBOARD_MAP = {
     '↓': 40, 'down': 40, 'arrow-down': 40,
     'insert': 45,
     'delete': 46,
+    '\'': 222,
 }
 
 const MOUSE_MAP = {

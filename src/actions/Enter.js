@@ -15,12 +15,10 @@ class Enter extends Action {
 
         aqua.cursorMgr.traverse(cursor => {
             if (!cursor.selection.isCollapsed()) {
-                aqua.actionMgr.exec('Backspace', event, {
-                    cursor,
-                })
+                aqua.actionMgr.execWithName('Backspace', 'backspace', cursor)
             }
 
-            aqua.write(['', ''], cursor)
+            aqua.docMgr.write(['', ''], cursor)
 
             cursor.y = cursor.y + 1
             cursor.x = 0

@@ -1,4 +1,5 @@
 const { MacroStep, MicroStep } = require('../models/index')
+const { CoordHelper, AssetHelper } = require('../helpers/index')
 
 class Chronicle {
     constructor(aqua) {
@@ -26,7 +27,19 @@ class Chronicle {
             return
         }
 
-        this.currentMacroEvent.micros.push(new MicroStep(data))
+        const micros = this.currentMacroEvent.micros
+        const prev = micros[micros.length - 1]
+        const next = new MicroStep(data)
+
+        if (!prev) {
+            this.currentMacroEvent.micros.push(next)
+
+            return
+        }
+
+        const isMerged = this.mergeMicro(prev, next)
+
+        isMerged || this.currentMacroEvent.micros.push(next)
     }
 
     start(type, before = null) {
@@ -72,58 +85,82 @@ class Chronicle {
         merge(macro, this, this.mergeStrategy) || this.forwardMacroEvents.push(macro)
     }
 
-    merge(next, chronicle, mergeStrategy) {
-        // console.log('Merge', chronicle.forwardMacroEvents)
+    /**
+     * 如果存在连续的坐标但是中间夹了不同 source 的 microStep, 由于情况较少, 且需要做额外的处理, 不处理这种情况.
+     * 1. 前后的类型不同, 不合并
+     * 2. 前后的起始坐标不同, 不合并
+     * 3. 合并坐标以及内容
+     *     3.1 如果后一个 macro 的影响行数只有1, 那么合并后的内容会在前一个 macro 的最后一行的最后面, 所以需要加上 x
+     * @param  {MicroStep}   prev []
+     * @param  {MicroStep} next []
+     * @return {Boolean}        [next 是否已经被合并]
+     */
+    mergeMicro(prev, next) {
+        const prevRecord = prev.record
+        const nextRecord = next.record
 
-        return
-
-        const macros = chronicle.forwardMacroEvents
-        const len = macros.length
-        const prev = macros[len - 1]
-
-        if (mergeStrategy(next, prev, chronicle.options)) {
+        /* 1 */
+        if (prevRecord.source !== nextRecord.source) {
             return false
         }
 
+        /* 2 */
+        if (!CoordHelper.equal(prevRecord.start, nextRecord.start)) {
+            return false
+        }
+
+        /* 3 */
+        const prevContents = prevRecord.contents
+        const nextContents = nextRecord.contents
+
+        prevContents[prevContents.length - 1] = AssetHelper.append(prevContents[prevContents.length - 1], nextContents[0])
+
+        const prevEnd = prevRecord.end
+
+        if (nextContents.length < 2) {
+            /* 3.1 */
+            prevEnd.x = prevEnd.x + nextRecord.end.x - nextRecord.start.x
+        } else {
+            prevRecord.contents = prevContents.concat(nextContents.slice(1))
+
+            prevEnd.y = prevEnd.y + nextRecord.end.y - nextRecord.start.y
+            prevEnd.x = prevEnd.x + nextRecord.end.x - nextRecord.start.x
+        }
+
+        return true
+    }
+
+    /**
+     * TODO: 需要考虑协同下的 merge 情况
+     * 1. 过滤不需要 merge 的情况
+     * @param  {Function} next          [description]
+     * @param  {[type]}   chronicle     [description]
+     * @param  {[type]}   mergeStrategy [description]
+     * @return {[type]}                 [description]
+     */
+    merge(next, chronicle, mergeStrategy) {
         return
 
-        const mergedMicros = []
+        // console.log('Merge', chronicle.forwardMacroEvents)
 
-        const prevMicros = prev.micros
-        const nextMicros = next.micros
+        // const macros = chronicle.forwardMacroEvents
+        // const len = macros.length
+        // const prev = macros[len - 1]
 
-        let prevIndex = 0
-        let nextIndex = 0
+        // /* 1 */
+        // if (!mergeStrategy(next, prev, chronicle.options)) {
+        //     return false
+        // }
 
-        while(true) {
-            const prevMicro = prevMicros[prevIndex]
-            const nextMicro = nextMicros[nextIndex]
+        // let nextRecord = null
+        // let yAcc = 0
+        // let xAcc = 0
 
-            if (prevMicro.source === prevMicro.source) {
+        // for (let i = 0; i < prev.length; i++) {
+        //     const prevRecord = prev.record
+        // }
 
-            }
-
-            if (nextMicro < prevMicro) {
-                mergedMicros.push(nextMicro)
-                nextIndex = nextIndex + 1
-
-                continue
-            }
-        }
-
-        prev.updateTime = prev.getTime()
-
-        const mergeMicros = (prevMicros, nextMicros) => {
-            const merged = []
-
-            let prevIndex = 0
-            let nextIndex = 0
-
-            return
-
-            while(true) {
-            }
-        }
+        // prev.updateTime = prev.getTime()
     }
 
     mergeStrategy(next, prev, options) {

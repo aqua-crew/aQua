@@ -89,9 +89,10 @@ class LineMeasurer {
         }
 
         const $measure = this.$measures[modName]
+        const $code = $measure.children[1].firstChild
 
-        DOM.clear($measure.children[1].firstChild)
-        DOM.appendChild($measure.children[1].firstChild, this.aqua.processorMgr.transformToElements(lineOrData))
+        DOM.clear($code)
+        DOM.appendChild($code, this.aqua.processorMgr.transformToElements(lineOrData))
 
         return $measure
     }

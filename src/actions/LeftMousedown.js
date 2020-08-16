@@ -23,7 +23,9 @@ class LeftMousedown extends Action {
         const rect = aqua.korwa.getLineWidthRect()
 
         cursors.traverse(cursor => {
-            if (event.target.getAttribute(HTMLVariables.DisableMouseEvent)) return
+            if (event.target.getAttribute(HTMLVariables.DisableMouseEvent)) {
+                return
+            }
 
             cursor.$y = event.clientY - rect.top
             cursor.$x = event.clientX - rect.left

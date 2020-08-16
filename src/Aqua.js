@@ -11,7 +11,8 @@ const Marks = require('./marks/index')
 const plugins = require('./plugins/index')
 
 const { StringAsset, ImageAsset } = require('./assets/index')
-// const aqua = require('./aquaqua.jpg')
+
+const aqua = require('./aquaqua.jpg')
 
 class Aqua {
     constructor(options) {
@@ -102,8 +103,15 @@ class Aqua {
             this.docMgr.write(...payload)
             this.chronicle.end('Input', this.cursorMgr.extract())
         }
+
         this.read = this.docMgr.read.bind(this.docMgr)
-        this.delete = this.docMgr.delete.bind(this.docMgr)
+
+        this.delete = (...payload) => {
+            this.chronicle.start('Delete', this.cursorMgr.extract())
+            this.docMgr.delete(...payload)
+            this.chronicle.end('Delete', this.cursorMgr.extract())
+        }
+
         this.do = this.cursorMgr.traverse.bind(this.cursorMgr)
     }
 
