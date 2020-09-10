@@ -4,26 +4,23 @@ class ToEndAsTerminal extends Action {
     constructor() {
         super()
         this.name = 'ToEndAsTerminal'
-        this.desc = 'ToEndAsTerminal'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['Shift + End']
     }
 
     exec(aqua, event) {
         aqua.cursorMgr.traverse(cursor => {
-            if (cursor.selection.isCollapsed()) {
-                cursor.selection.base = cursor.coord
-            }
-
-            aqua.actionMgr.exec('ToEnd', event, {
-                cursor,
-            })
-
-            cursor.selection.terminal = cursor.coord
-        }, {
-            acc: false,
+            this.update(aqua, cursor)
         })
+    }
+
+    update(aqua, cursor) {
+        if (cursor.selection.isCollapsed()) {
+            cursor.selection.base = cursor.coord
+        }
+
+        aqua.actionMgr.execWithName('ToEnd', 'update', cursor)
+
+        cursor.selection.terminal = cursor.coord
     }
 }
 

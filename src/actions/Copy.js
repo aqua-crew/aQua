@@ -4,8 +4,6 @@ class Copy extends Action {
     constructor() {
         super()
         this.name = 'Copy'
-        this.desc = 'Copy'
-        this.shortcuts = null
     }
 
     exec(aqua, event, state) {
@@ -22,7 +20,9 @@ class Copy extends Action {
             datas.push(aqua.docMgr.read(start, end).join('\n'))
         })
 
-        event.clipboardData.setData('text/plain', datas.join('\n'))
+        if (datas.length > 0) {
+            event.clipboardData.setData('text/plain', datas.join('\n'))
+        }
     }
 }
 

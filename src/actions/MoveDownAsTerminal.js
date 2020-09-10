@@ -4,9 +4,6 @@ class MoveDownWithTerminal extends Action {
     constructor() {
         super()
         this.name = 'MoveDownWithTerminal'
-        this.desc = 'MoveDownWithTerminal'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['Shift + ↓']
     }
 

@@ -1,3 +1,4 @@
+const CatalogueNode = require('./CatalogueNode')
 const Chunk = require('./Chunk')
 const Content = require('./Content')
 const Coord = require('./Coord')
@@ -11,6 +12,7 @@ const Snippet = require('./Snippet')
 const Viewport = require('./Viewport')
 
 module.exports = {
+    CatalogueNode,
     Chunk,
     Content,
     Coord,

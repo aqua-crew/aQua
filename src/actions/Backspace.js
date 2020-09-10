@@ -4,9 +4,6 @@ class Backspace extends Action {
     constructor() {
         super()
         this.name = 'Backspace'
-        this.desc = 'Backspace'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['Backspace']
     }
 

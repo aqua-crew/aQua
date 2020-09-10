@@ -9,13 +9,23 @@ class DisposablePool extends Pool {
         this.templateType = template + 'Tpl'
         this.pool = pool
         this.usedPointer = 0
+        this.ids = Object.create(null)
     }
 
     resetUnuse() {
         this.usedPointer = 0
+        this.ids = Object.create(null)
     }
 
-    get() {
+    get(id) {
+        if (id !== undefined) {
+            if (this.ids[id]) {
+                return null
+            }
+
+            this.ids[id] = true
+        }
+
         let $element = this.pool[this.usedPointer]
 
         if (!$element) {

@@ -6,7 +6,11 @@ class ProcessorMgr {
         this.registry = Object.create(null)
     }
 
-    transformToElements(line, fileType = this.aqua.state.file.suffix) {
+    tokenize(asset, options, cb) {
+
+    }
+
+    transformToElements(line, fileType = this.aqua.optionMgr.get('ext')) {
         const $root = DOM.f()
 
         if (line.length === 0) {

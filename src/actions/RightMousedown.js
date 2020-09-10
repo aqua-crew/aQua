@@ -1,13 +1,12 @@
 const { Action } = require('../interfaces/index')
-const { HTMLVariables } = require('../enums/index')
+const { HTMLVariables, ActionEventType } = require('../enums/index')
 
 class RightMousedown extends Action {
     constructor() {
         super()
         this.name = 'RightMousedown'
-        this.desc = 'Locate'
         this.shortcuts = ['RightMousedown']
-        this.eventType = 'mouse'
+        this.eventType = ActionEventType.Mouse
         this.record = false
     }
 

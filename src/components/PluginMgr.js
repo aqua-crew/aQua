@@ -5,23 +5,25 @@ class PluginMgr {
         this.plugins = Object.create(null)
     }
 
-    install(plugin) {
-        this.plugins[plugin.name] = plugin
-        plugin.installed(this.aqua)
-    }
+    install(plugins) {
+        const ins = plugin => {
+            this.plugins[plugin.name] = plugin
+            plugin.install(this.aqua)
+        }
 
-    active(plugin) {
-        plugin.active()
-    }
+        if (Array.isArray(plugins)) {
+            plugins.forEach(ins)
 
-    inactive(plugin) {
-        plugin.inactive()
+            return
+        }
+
+        ins(plugins)
     }
 
     uninstall(plugin) {
-        this.plugins[plugin.name] = void 0
+        this.plugins[plugin.name] = undefined
 
-        plugin.destroy()
+        plugin.uninstall()
     }
 }
 

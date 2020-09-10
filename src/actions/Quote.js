@@ -5,9 +5,6 @@ class Quote extends Action {
     constructor() {
         super()
         this.name = 'Quote'
-        this.desc = 'Quote'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = [`'`]
     }
 

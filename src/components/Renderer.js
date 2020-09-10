@@ -115,6 +115,10 @@ class Renderer {
         this.render('minimap', viewport)
     }
 
+    load(Renderer) {
+        this.setRenderer(Renderer)
+    }
+
     setRenderer(Renderer) {
         const renderer = new Renderer(this.aqua)
         this.renderers[renderer.applyName] = renderer

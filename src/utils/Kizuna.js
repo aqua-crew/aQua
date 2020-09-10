@@ -61,9 +61,10 @@ class Kizuna {
 
     load(keys, fn, type) {
         if (type === 'keyboard') {
+            const permutation = []
+
             let id = -1
 
-            const permutation = []
             if (typeof keys === 'string') {
                 id = keys.trim().toLowerCase().split(this.break).reduce((total, key) => {
                     const keyCode = this.getKeyboardKeyCode(key.trim())

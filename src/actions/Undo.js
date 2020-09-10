@@ -4,9 +4,6 @@ class Undo extends Action {
     constructor() {
         super()
         this.name = 'Undo'
-        this.desc = 'Undo'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['Ctrl + Z']
         this.record = false
     }

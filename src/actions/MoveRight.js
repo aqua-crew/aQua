@@ -4,9 +4,6 @@ class MoveRight extends Action {
     constructor() {
         super()
         this.name = 'MoveRight'
-        this.desc = 'MoveRight'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['→']
     }
 

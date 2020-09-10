@@ -1,4 +1,9 @@
 const { rAF, DOM } = require('../utils/index')
+const { DisposablePool } = require('../pools/index')
+
+const ArgOpt = {
+    ScrollBarCursorHeight: 5,
+}
 
 class ScrollBarCursor {
     constructor(aqua) {
@@ -7,23 +12,30 @@ class ScrollBarCursor {
         this.docMgr = aqua.docMgr
         this.cursorMgr = aqua.cursorMgr
         this.scroller = aqua.scroller
-        this.$scrollBar = aqua.uiMgr.get('scrollBar')
 
-        this.$mark = DOM.e('div', {'class': 'aqua-cursor-mark'})
-        this.$scrollBar.appendChild(this.$mark)
+        this.pool = new DisposablePool(aqua.uiMgr.get('scrollBar'), 'cursorMark')
     }
 
     render(viewport) {
-        this.update(this.$scrollBar, viewport)
+        this.pool.resetUnuse()
+
+        this.cursorMgr.pureTraverse(cursor => {
+            this.update(viewport, cursor)
+        })
+
+        this.pool.clearUnuse()
     }
 
-    update($scrollBar, viewport) {
-        rAF(() => {
-            this.cursorMgr.pureTraverse(cursor => {
-                const y = this.scroller.transformY(viewport, cursor.$y, 5)
+    update(viewport, cursor) {
+        const y = this.scroller.transformY(viewport, cursor.$y, ArgOpt.ScrollBarCursorHeight)
+        const $mark = this.pool.get(y)
 
-                this.$mark.style.transform = `translateY(${y}px)`
-            })
+        if (!$mark) {
+            return
+        }
+
+        rAF(() => {
+            $mark.style.transform = `translateY(${y}px)`
         })
     }
 }

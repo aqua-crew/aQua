@@ -5,7 +5,13 @@ class Inputer {
         this.aqua = aqua
         this.$inputer = $inputer
 
-        this.limitedPoll = Limiter.limit(this.normalPoll.bind(this), 34, 34)
+        this.limitedPoll = Limiter.toNextTick(this.normalPoll.bind(this), 17, 17)
+    }
+
+    focus() {
+        if (!this.aqua.state.focus) {
+            this.$inputer.focus({ preventScroll: true })
+        }
     }
 
     init() {

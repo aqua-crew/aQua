@@ -1,12 +1,12 @@
 const { Action } = require('../interfaces/index')
+const { ActionEventType } = require('../enums/index')
 
 class CreateCursor extends Action {
     constructor() {
         super()
         this.name = 'CreateCursor'
-        this.desc = 'Create And Locate'
         this.shortcuts = ['Ctrl + LeftMousedown']
-        this.eventType = 'mouse'
+        this.eventType = ActionEventType.Mouse
         this.record = false
     }
 

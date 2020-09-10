@@ -3,13 +3,18 @@ const { DOM } = require('../utils/index')
 const { LineStatus } = require('../enums/index')
 
 class ImageProcessor extends Processor {
-    constructor(docWatcher, korwa) {
+    constructor(docWatcher, korwa, options = {}) {
         super('Image')
 
         this.docWatcher = docWatcher
         this.korwa = korwa
 
         this.cache = Object.create(null)
+
+        /**
+         * this.maxSize = ''
+         * this.allowList = ['image/*']
+         */
     }
 
     onCreated() {

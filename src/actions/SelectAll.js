@@ -4,9 +4,6 @@ class SelectAll extends Action {
     constructor() {
         super()
         this.name = 'SelectAll'
-        this.desc = 'SelectAll'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['Ctrl + A']
     }
 

@@ -474,7 +474,6 @@ class Doc {
     }
 
     onRelease(chunk) {
-        console.error('onRelease', chunk)
         if (Array.isArray(chunk) ) {
             const chunks = chunk
 
@@ -515,7 +514,7 @@ class Doc {
         }
 
         if (this.isRoot(chunk)) {
-            console.error('Try to remove root')
+            console.info('Try to remove root')
             chunk.level = 0
 
             return

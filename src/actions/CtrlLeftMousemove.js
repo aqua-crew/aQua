@@ -1,13 +1,12 @@
 const { Action } = require('../interfaces/index')
+const { ActionEventType } = require('../enums/index')
 
 class CtrlLeftMousemove extends Action {
     constructor() {
         super()
         this.name = 'CtrlLeftMousemove'
-        this.desc = 'Locate'
+        this.eventType = ActionEventType.Mouse
         this.shortcuts = ['Ctrl + LeftMousemove']
-        this.eventType = 'mouse'
-        this.before = false
         this.record = false
     }
 

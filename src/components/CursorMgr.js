@@ -323,7 +323,7 @@ class CursorMgr {
 
     pureTraverse(cb, start = 0, end = this.size, cursors = this.cursors) {
         for (let i = start; i < end; i++) {
-            if (cb(cursors[i]) === false) {
+            if (cb(cursors[i], i) === false) {
                 return
             }
         }
@@ -348,7 +348,7 @@ class CursorMgr {
             flusher.next(cursor)
             console.warn('光标位置', cursor.coord.extract())
 
-            filter(cursor) && cb(cursor)
+            filter(cursor, i) && cb(cursor, i)
             console.groupEnd('当前光标序号', i)
         }
 

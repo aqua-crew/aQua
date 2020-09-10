@@ -4,9 +4,6 @@ class ToStart extends Action {
     constructor() {
         super()
         this.name = 'ToStart'
-        this.desc = 'ToStart'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['Home']
     }
 

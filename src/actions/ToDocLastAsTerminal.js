@@ -4,9 +4,6 @@ class ToDocLastAsTerminal extends Action {
     constructor() {
         super()
         this.name = 'ToDocLastAsTerminal'
-        this.desc = 'ToDocLastAsTerminal'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['Shift + Ctrl + End']
     }
 
@@ -16,13 +13,9 @@ class ToDocLastAsTerminal extends Action {
                 cursor.selection.base = cursor.coord
             }
 
-            aqua.actionMgr.exec('ToDocLast', event, {
-                cursor,
-            })
+            aqua.actionMgr.execWithName('ToDocLast', 'update', cursor)
 
             cursor.selection.terminal = cursor.coord
-        }, {
-            acc: false,
         })
     }
 }

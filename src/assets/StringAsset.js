@@ -22,7 +22,7 @@ class StringAsset extends Asset {
 
     /* Override */
     /**
-     * 1. 见 @project/src/interfaces/Asset 的 search，理论上不会有 x === 0 的判断分支
+     * 1. 见 @project/src/models/Line 的 write, 理论上不会有 x === 0 的判断分支
      * @param  {String || Asset} asset
      * @param  {Number} x       [x > 0]
      */
@@ -39,8 +39,8 @@ class StringAsset extends Asset {
 
         /* 1 */
         if (x === 0) {
-            asset.head.setPrev(this.prev)
-            asset.setTail(this)
+            // asset.head.setPrev(this.prev)
+            // asset.setTail(this)
         } else if (x === len) {
             asset.setTail(this.next)
             this.setNext(asset.head)

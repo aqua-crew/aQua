@@ -8,13 +8,10 @@ class SelectedLineRenderer {
         this.doc = aqua.docMgr
         this.cursors = aqua.cursorMgr
         this.pool = new DisposablePool(aqua.uiMgr.get('selectedLineCntr'), 'selectedLine')
-
-        this.selected = Object.create(null)
     }
 
     render(viewport) {
         this.pool.resetUnuse()
-        this.selected = Object.create(null)
 
         const renderArea = viewport.getRenderArea()
 
@@ -25,20 +22,20 @@ class SelectedLineRenderer {
                 return
             }
 
-            if (this.selected[y]) {
-                return
-            }
-
-            this.selected[y] = true
-
             const { top, height } = this.doc.getLineWithHeight(y)
-            this.updateSelectedLine(this.pool.get(), top, height)
+            this.updateSelectedLine(top, height)
         })
 
         this.pool.clearUnuse()
     }
 
-    updateSelectedLine($selectedLine, top, height) {
+    updateSelectedLine(top, height) {
+        const $selectedLine = this.pool.get(top)
+
+        if (!$selectedLine) {
+            return
+        }
+
         rAF(() => {
             $selectedLine.style.cssText = `opacity: 1; top: ${top}px; height: ${height}px;`
         })

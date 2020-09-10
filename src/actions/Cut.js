@@ -4,7 +4,6 @@ class Cut extends Action {
     constructor() {
         super()
         this.name = 'Cut'
-        this.desc = 'Cut'
         this.shortcuts = ['Ctrl + LeftMousedown']
     }
 

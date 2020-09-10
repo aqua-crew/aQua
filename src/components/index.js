@@ -2,6 +2,7 @@ const ActionMgr = require('./ActionMgr')
 const Chronicle = require('./Chronicle')
 const ContentMgr = require('./ContentMgr')
 const CursorMgr = require('./CursorMgr')
+const DetailBarMgr = require('./DetailBarMgr')
 const DocMgr = require('./DocMgr')
 const Inputer = require('./Inputer')
 const Korwa = require('./Korwa')
@@ -22,6 +23,7 @@ module.exports = {
     Chronicle,
     ContentMgr,
     CursorMgr,
+    DetailBarMgr,
     DocMgr,
     Inputer,
     Korwa,

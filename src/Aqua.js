@@ -1,6 +1,6 @@
 const { DataTransferItemHandler, Iterator, Khala, Kizuna, Marker, Noop, Progress } = require('./utils/index')
 const { DefaultOptions } = require('./options/index')
-const { ActionMgr, Chronicle, ContentMgr, CursorMgr, DocMgr, History, Inputer, Korwa, LineMgr, Locator, OptionMgr, PluginMgr, ProcessorMgr, Renderer, Scroller, State, UIMgr, ViewportMgr } = require('./components/index')
+const { ActionMgr, Chronicle, ContentMgr, CursorMgr, DetailBarMgr, DocMgr, History, Inputer, Korwa, LineMgr, Locator, OptionMgr, PluginMgr, ProcessorMgr, Renderer, Scroller, State, UIMgr, ViewportMgr } = require('./components/index')
 const { Coord, Content } = require('./models/index')
 const Lines = require('./lines/index')
 const Cursors = require('./cursors/index')
@@ -31,14 +31,17 @@ class Aqua {
         this.uiMgr = new UIMgr(this)
         this.loadUI(UI)
         this.mountUI()
-        this.loadPlugins([...plugins, ...this.optionMgr.get('plugins')])
+
+        this.pluginMgr = new PluginMgr(this)
+        this.pluginMgr.install([...plugins, ...this.optionMgr.get('plugins')])
 
         this.optionMgr.normalize()
         this.lifetimes.emit('setup', this)
         this.progress.set(0)
 
+        this.detailBar = new DetailBarMgr(this) /* @Temp */
+
         this.chronicle = new Chronicle(this)
-        this.pluginMgr = new PluginMgr(this)
         this.scroller = new Scroller(this)
         this.processorMgr = new ProcessorMgr(this)
         this.korwa = new Korwa(this)
@@ -63,17 +66,23 @@ class Aqua {
         this.loadInputerEvents()
         this.loadDocumentEvents()
 
+        this.expose()
+
         this.lifetimes.emit('ready', this)
         this.progress.set(60)
 
         this.init()
-        this.expose()
 
         this.lifetimes.emit('complete', this)
         this.progress.set(100)
 
         this.releaseExtendPlugins()
         this.progress = null
+
+
+
+
+
 
         /* Dev test */
         window.aqua = this
@@ -116,6 +125,8 @@ class Aqua {
     }
 
     init() {
+        this.detailBar.init()
+
         this.lineMgr.init()
         this.korwa.init()
         this.docMgr.init()
@@ -169,29 +180,32 @@ class Aqua {
     mountUI() {
         const structure = `
             aqua
-                bgCntr
-                editor
-                    viewport
-                        inputerCntr
-                            inputerLocator
-                                inputer
-                        scroller
-                            components
-                                fullWidthCntr
-                                    selectedLineCntr
-                                lineWidthCntr
-                                    measurerCntr
-                                        ramMeasurer
-                                        lineMeasurer
-                                        remMeasurer
-                                    cursorCntr
-                                    selectionCntr
-                                    lineCntr
-                        fixed
-                            sideBarCntr
-                                minimap
-                                scrollBar
-                fgCntr
+                functionBar
+                detailBar
+                stage
+                    editor
+                        bgCntr
+                        viewport
+                            inputerCntr
+                                inputerLocator
+                                    inputer
+                            scroller
+                                components
+                                    fullWidthCntr
+                                        selectedLineCntr
+                                    lineWidthCntr
+                                        measurerCntr
+                                            ramMeasurer
+                                            lineMeasurer
+                                            remMeasurer
+                                        cursorCntr
+                                        selectionCntr
+                                        lineCntr
+                            fixed
+                                sideBarCntr
+                                    minimap
+                                    scrollBar
+                        fgCntr
         `
 
         const $aqua = this.uiMgr.mountByString(structure, {
@@ -233,10 +247,7 @@ class Aqua {
         this.kizuna.on($viewport, 'mousedown', event => {
             event.preventDefault()
             this.kizuna.filterMousedown(event)
-
-            if (!this.state.focus) {
-                this.uiMgr.get('inputer').focus({ preventScroll: true })
-            }
+            this.inputer.focus()
         })
 
         this.kizuna.on($viewport, 'mousemove', event => {
@@ -318,7 +329,7 @@ class Aqua {
         this.kizuna.on($inputer, 'paste', event => {
             // this.inputer.poll()
 
-            this.actionMgr.exec('Copy', event)
+            this.actionMgr.exec('Paste', event)
 
             // const items = event.clipboardData.items
             // console.error('Paste event.clipboardData', event.clipboardData)
@@ -353,20 +364,24 @@ class Aqua {
         })
 
         this.khala.on('input', text => {
-            this.chronicle.start('Input', this.cursorMgr.extract())
+            this.actionMgr.exec('Input', text)
+            // this.chronicle.start('Input', this.cursorMgr.extract())
 
-            this.cursorMgr.traverse(cursor => {
-                if (!cursor.selection.isCollapsed()) {
-                    this.actionMgr.execWithName('Backspace', 'backspace', cursor)
-                }
+            // this.cursorMgr.traverse(cursor => {
+            //     if (!cursor.selection.isCollapsed()) {
+            //         this.actionMgr.execWithName('Backspace', 'backspace', cursor)
+            //     }
 
-                const { y, x } = this.docMgr.write(text, cursor)
+            //     const { y, x } = this.docMgr.write(text, cursor)
 
-                cursor.y = cursor.y + y
-                cursor.x = cursor.x + x
-            })
+            //     cursor.y = cursor.y + y
+            //     cursor.x = cursor.x + x
+            // })
 
-            this.chronicle.end('Input', this.cursorMgr.extract())
+            // this.chronicle.end('Input', this.cursorMgr.extract())
+
+            const dictionary = [] // Try to Get Dictionary
+            this.renderer.render('dictionary', this.viewport, dictionary)
         })
     }
 

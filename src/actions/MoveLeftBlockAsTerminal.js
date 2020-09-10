@@ -4,9 +4,6 @@ class MoveLeftBlockAsTerminal extends Action {
     constructor() {
         super()
         this.name = 'MoveLeftBlockAsTerminal'
-        this.desc = 'MoveLeftBlockAsTerminal'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['Shift + Ctrl + ←']
     }
 

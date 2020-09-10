@@ -1,6 +1,7 @@
 const { DOM, rAF } = require('../../utils/index')
-const { Plugin } = require('../../interfaces/index')
 const { PluginType, CSSVariables } = require('../../enums/index')
+
+const { Plugin } = require('../../interfaces/index')
 
 class AquaProgress extends Plugin {
     constructor() {
@@ -8,6 +9,7 @@ class AquaProgress extends Plugin {
 
         this.$loading = this.$template()
         this.$progress = this.$loading.firstChild.firstChild
+        this.name = 'AquaProgress'
         this.type = PluginType.Buildin
     }
 
@@ -22,8 +24,7 @@ class AquaProgress extends Plugin {
         /* TODO */
         lifetimes.on('complete', () => {
             setTimeout(() => {
-                this.$loading.style.opacity = 0
-                this.$loading.style.visibility = 'hidden'
+                this.$loading.remove()
             }, 500)
         })
 

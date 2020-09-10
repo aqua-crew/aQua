@@ -4,19 +4,22 @@ class ToDocLast extends Action {
     constructor() {
         super()
         this.name = 'ToDocLast'
-        this.desc = 'ToDocLast'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['Ctrl + End']
     }
 
     exec(aqua, event) {
         aqua.cursorMgr.traverse(cursor => {
-            cursor.y = Infinity
-            cursor.x = Infinity
-        }, {
-            acc: false,
+            if (!cursor.selection.isCollapsed()) {
+                cursor.resetSelection()
+            }
+
+            this.update(aqua, cursor)
         })
+    }
+
+    update(aqua, cursor) {
+        cursor.y = Infinity
+        cursor.x = Infinity
     }
 }
 

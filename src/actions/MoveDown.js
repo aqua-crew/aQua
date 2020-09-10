@@ -4,9 +4,6 @@ class MoveDown extends Action {
     constructor() {
         super()
         this.name = 'MoveDown'
-        this.desc = 'MoveDown'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['↓']
     }
 

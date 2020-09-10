@@ -4,9 +4,6 @@ class Delete extends Action {
     constructor() {
         super()
         this.name = 'Delete'
-        this.desc = 'Delete'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['Delete']
     }
 
@@ -14,8 +11,6 @@ class Delete extends Action {
         aqua.cursorMgr.traverse(cursor => {
             this.delete(aqua, cursor)
         })
-
-        console.error(this.name)
     }
 
     delete(aqua, cursor) {

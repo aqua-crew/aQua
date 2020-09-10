@@ -5,10 +5,15 @@ class Plugin {
         this.name = ''
         this.desc = ''
         this.type = PluginType.Custom
+        this.enabled = false
     }
 
-    install(aqua) {}
-    uninstalled() {}
+    install(aqua) {
+        this.enabled = true
+    }
+    uninstall() {
+        this.enabled = false
+    }
 }
 
 module.exports = Plugin

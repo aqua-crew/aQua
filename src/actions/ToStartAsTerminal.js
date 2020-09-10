@@ -4,9 +4,6 @@ class ToStartAsTerminal extends Action {
     constructor() {
         super()
         this.name = 'ToStartAsTerminal'
-        this.desc = 'ToStartAsTerminal'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['Shift + Home']
     }
 

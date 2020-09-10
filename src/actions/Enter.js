@@ -4,9 +4,6 @@ class Enter extends Action {
     constructor() {
         super()
         this.name = 'Enter'
-        this.desc = 'Enter'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['Enter']
     }
 

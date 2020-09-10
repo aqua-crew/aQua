@@ -4,9 +4,6 @@ class MoveUpAsTerminal extends Action {
     constructor() {
         super()
         this.name = 'MoveUpAsTerminal'
-        this.desc = 'MoveUpAsTerminal'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['Shift + ↑']
     }
 

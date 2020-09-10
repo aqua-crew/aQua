@@ -1,7 +1,7 @@
 module.exports = {
     el: null,
     content: '',
-    ext: 'txt', // extension: 'txt',
+    ext: 'js', // extension: 'txt',
 
     ui: {
         theme: 'aqua',
@@ -14,6 +14,10 @@ module.exports = {
 
         background($ctnr, DOM) {},
         foreground($ctnr, DOM) {},
+    },
+
+    syntaxHint: {
+        enabled: true,
     },
 
     components: {

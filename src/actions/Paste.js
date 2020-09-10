@@ -4,12 +4,27 @@ class Paste extends Action {
     constructor() {
         super()
         this.name = 'Paste'
-        this.desc = 'Paste'
-        this.shortcuts = null
     }
 
     exec(aqua, event, state) {
-        console.error('Paste', event)
+        event.preventDefault()
+        const data = event.clipboardData.getData('text/plain')
+
+        const cursorSize = aqua.cursorMgr.size
+        const dataArr = data.split('\n')
+
+        if (cursorSize === dataArr.length) {
+            aqua.cursorMgr.traverse((cursor, index) => {
+                aqua.docMgr.write(dataArr[index], cursor)
+            })
+        } else {
+            aqua.cursorMgr.traverse((cursor, index) => {
+                aqua.docMgr.write(dataArr, cursor)
+            })
+        }
+
+        console.log(aqua.cursorMgr.size)
+        console.error('Paste', data)
     }
 }
 

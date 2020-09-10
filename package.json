@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "parcel ./doc/index.html --open"
+    "dev": "parcel ./docs/index.html --open"
   },
   "keywords": [
     "editor"
@@ -12,6 +12,9 @@
   "author": "ayarin",
   "license": "MIT",
   "devDependencies": {
-    "sass": "^1.26.5"
+    "sass": "^1.26.10"
+  },
+  "dependencies": {
+    "esprima": "^4.0.1"
   }
 }

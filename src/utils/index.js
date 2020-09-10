@@ -11,6 +11,7 @@ const Progress = require('./Progress')
 const Range = require('./Range')
 const SimpleSet = require('./SimpleSet')
 const SizeObserver = require('./SizeObserver')
+const TrieTree = require('./TrieTree')
 
 const SpecialCharSet = require('./SpecialCharSet')
 const Noop = require('./Noop')
@@ -31,6 +32,7 @@ module.exports = {
     Range,
     SimpleSet,
     SizeObserver,
+    TrieTree,
 
     SpecialCharSet,
     Noop,

@@ -4,9 +4,6 @@ class ShiftTab extends Action {
     constructor() {
         super()
         this.name = 'ShiftTab'
-        this.desc = 'ShiftTab'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['Shift + Tab']
     }
 

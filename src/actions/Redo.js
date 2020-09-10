@@ -4,9 +4,6 @@ class Redo extends Action {
     constructor() {
         super()
         this.name = 'Redo'
-        this.desc = 'Redo'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['Ctrl + Y']
         this.record = false
     }

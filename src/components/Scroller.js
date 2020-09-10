@@ -33,11 +33,8 @@ class Scroller {
         this.min = min
         this.max = max
 
-        const docMgr = this.aqua.docMgr
-        const korwa = this.aqua.korwa
-
         this.aqua.docWatcher.on('resize', () => {
-            this.max = docMgr.height - korwa.getSingleLineHeight()
+            this.max = this.aqua.docMgr.height - this.aqua.korwa.getSingleLineHeight()
 
             if (this.y > this.max) {
                 this.scroll(this.max)

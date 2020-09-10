@@ -129,14 +129,14 @@ class Anchor {
             return
         }
 
-        console.log('before Update', this.coord.clone(), JSON.parse(JSON.stringify(offsetCoord)), this.x)
+        // console.log('before Update', this.coord.clone(), JSON.parse(JSON.stringify(offsetCoord)), this.x)
 
         this.y = this.y + offsetCoord.y
         this.x = this.y === lastY ? offsetCoord.x + this.x : this.x
 
-        console.log('lastY, this.y', lastY, this.y)
-        console.log('offsetCoord.x, this.x', offsetCoord.x)
-        console.log('Update', this.coord.clone())
+        // console.log('lastY, this.y', lastY, this.y)
+        // console.log('offsetCoord.x, this.x', offsetCoord.x)
+        // console.log('Update', this.coord.clone())
 
         if (this.selection.isCollapsed()) {
             return

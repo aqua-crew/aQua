@@ -6,6 +6,18 @@ module.exports = {
         return DOM.e('div', {'class': 'aqua theme-aqua'})
     },
 
+    functionBar() {
+        return DOM.e('div', {'class': 'aqua-function-bar'})
+    },
+
+    detailBar() {
+        return DOM.e('div', {'class': 'aqua-detail-bar'})
+    },
+
+    stage() {
+        return DOM.e('div', {'class': 'aqua-stage'})
+    },
+
     /* Editor */
     editor() {
         return DOM.e('div', {'class': 'aqua-editor'})

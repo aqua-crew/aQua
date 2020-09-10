@@ -4,9 +4,6 @@ class Tab extends Action {
     constructor() {
         super()
         this.name = 'Tab'
-        this.desc = 'Tab'
-        this.cmd = null
-        this.icons = null
         this.shortcuts = ['Tab']
     }
 
