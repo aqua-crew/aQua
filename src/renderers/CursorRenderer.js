@@ -1,13 +1,23 @@
 const { rAF } = require('../utils/index')
 const { DisposablePool } = require('../pools/index')
 
+const BlinkAnimationConfig = {
+    OpacityMin: '.05',
+    OpacityMax: '1',
+    BlinkInterval: 600,
+}
+
 class CursorRenderer {
     constructor(aqua) {
         this.applyName = 'cursor'
 
         this.cursors = aqua.cursorMgr
         this.marker = aqua.marker
-        this.pool = new DisposablePool(aqua.uiMgr.get('cursorCntr'), 'cursor')
+
+        this.$cursorCntr = aqua.uiMgr.get('cursorCntr')
+        this.pool = new DisposablePool(this.$cursorCntr, 'cursor')
+
+        this.pesudoOpacity = 1
     }
 
     render(viewport) {
@@ -34,6 +44,8 @@ class CursorRenderer {
         })
 
         this.pool.clearUnuse()
+
+        this.blink(true)
     }
 
     renderCursor(cursor, status = {}) {
@@ -53,6 +65,24 @@ class CursorRenderer {
         rAF(() => {
             $cursor.style.cssText = cssText + `transform: translate(${layout.x}px, ${layout.y}px);`
         })
+    }
+
+    blink(focus = false) {
+        clearTimeout(this.timeout)
+
+        if (focus) {
+            rAF(() => {
+                this.$cursorCntr.style.opacity = this.pesudoOpacity = BlinkAnimationConfig.OpacityMax
+            })
+        }
+
+        this.timeout = setTimeout(() => {
+            rAF(() => {
+                this.$cursorCntr.style.opacity = this.pesudoOpacity = this.pesudoOpacity === BlinkAnimationConfig.OpacityMax ? BlinkAnimationConfig.OpacityMin : BlinkAnimationConfig.OpacityMax
+            })
+
+            this.blink()
+        }, BlinkAnimationConfig.BlinkInterval)
     }
 }
 
