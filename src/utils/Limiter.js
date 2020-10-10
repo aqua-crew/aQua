@@ -3,6 +3,16 @@ function getCurrentTime() {
 }
 
 module.exports = {
+    debounce(fn, timeout = 300) {
+        let timeoutId = 0
+
+        return function(...payload) {
+            clearTimeout(timeoutId)
+
+            timeoutId = setTimeout(fn, timeout, ...payload)
+        }
+    },
+
     limit(fn, timeout = 17, lastTimeout = 17) {
         let timeoutId = null
         let lastTime = 0

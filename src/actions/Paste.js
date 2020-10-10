@@ -8,6 +8,9 @@ class Paste extends Action {
 
     exec(aqua, event, state) {
         event.preventDefault()
+
+        aqua.chronicle.start('Paste', aqua.cursorMgr.extract())
+
         const data = event.clipboardData.getData('text/plain')
 
         const cursorSize = aqua.cursorMgr.size
@@ -15,16 +18,15 @@ class Paste extends Action {
 
         if (cursorSize === dataArr.length) {
             aqua.cursorMgr.traverse((cursor, index) => {
-                aqua.docMgr.write(dataArr[index], cursor)
+                aqua.actionMgr.execWithName('Input', 'input', cursor, dataArr[index])
             })
         } else {
             aqua.cursorMgr.traverse((cursor, index) => {
-                aqua.docMgr.write(dataArr, cursor)
+                aqua.actionMgr.execWithName('Input', 'input', cursor, dataArr)
             })
         }
 
-        console.log(aqua.cursorMgr.size)
-        console.error('Paste', data)
+        aqua.chronicle.end('Paste', aqua.cursorMgr.extract())
     }
 }
 

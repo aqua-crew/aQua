@@ -17,6 +17,7 @@ const Shaper = require('./Shaper')
 const State = require('./State')
 const UIMgr = require('./UIMgr')
 const ViewportMgr = require('./ViewportMgr')
+const WorkerMgr = require('./WorkerMgr')
 
 module.exports = {
     ActionMgr,
@@ -38,4 +39,5 @@ module.exports = {
     State,
     UIMgr,
     ViewportMgr,
+    WorkerMgr,
 }

@@ -359,7 +359,7 @@ class CursorMgr {
         console.groupEnd('action start')
 
         this.aqua.renderer.renderGroup('standard', viewport)
-        track && this.aqua.renderer.render('tracker', viewport)
+        track && this.aqua.renderer.renderWithLowPriority('tracker', viewport)
     }
 
     create(coord = null, setPrimary = true, modName = 'Anchor') {

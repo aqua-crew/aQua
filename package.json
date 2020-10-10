@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "parcel ./docs/index.html --open"
+    "dev": "parcel ./demo/index.html --open",
+    "build": "parcel build ./demo/index.html --public-url ./docs/"
   },
   "keywords": [
     "editor"

@@ -1,7 +1,6 @@
 const Algorithm = require('./Algorithm')
 const DataTransferItemHandler = require('./DataTransferItemHandler')
 const DOM = require('./DOM')
-const FnHelper = require('./FnHelper')
 const Iterator = require('./Iterator')
 const Khala = require('./Khala')
 const Kizuna = require('./Kizuna')
@@ -22,7 +21,6 @@ module.exports = {
     Algorithm,
     DataTransferItemHandler,
     DOM,
-    FnHelper,
     Iterator,
     Khala,
     Kizuna,

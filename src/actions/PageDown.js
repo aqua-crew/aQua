@@ -13,9 +13,12 @@ class PageDown extends Action {
         aqua.do(cursor => {
             cursor.$y = cursor.$y + aqua.viewport.height - lineHeight
             cursor.$x = cursor.$x
-        }, {
-            acc: false,
         })
+    }
+
+    update(aqua, cursor, lineHeight) {
+        cursor.$y = cursor.$y + aqua.viewport.height - lineHeight
+        cursor.$x = cursor.$x
     }
 }
 

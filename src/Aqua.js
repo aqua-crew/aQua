@@ -1,6 +1,6 @@
 const { DataTransferItemHandler, Iterator, Khala, Kizuna, Marker, Noop, Progress } = require('./utils/index')
 const { DefaultOptions } = require('./options/index')
-const { ActionMgr, Chronicle, ContentMgr, CursorMgr, DetailBarMgr, DocMgr, History, Inputer, Korwa, LineMgr, Locator, OptionMgr, PluginMgr, ProcessorMgr, Renderer, Scroller, State, UIMgr, ViewportMgr } = require('./components/index')
+const { ActionMgr, Chronicle, ContentMgr, CursorMgr, DetailBarMgr, DocMgr, History, Inputer, Korwa, LineMgr, Locator, OptionMgr, PluginMgr, ProcessorMgr, Renderer, Scroller, State, UIMgr, ViewportMgr, WorkerMgr } = require('./components/index')
 const { Coord, Content } = require('./models/index')
 const Lines = require('./lines/index')
 const Cursors = require('./cursors/index')
@@ -17,6 +17,7 @@ const aqua = require('./aquaqua.jpg')
 class Aqua {
     constructor(options) {
         this.optionMgr = new OptionMgr(this)
+        this.workerMgr = new WorkerMgr(this)
 
         this.progress = new Progress
         this.khala = new Khala

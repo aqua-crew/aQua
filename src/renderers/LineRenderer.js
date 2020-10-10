@@ -75,7 +75,6 @@ class LineRenderer {
             const line = lines[curIndex]
             const status = line.status
 
-
             if (line === oldLine) {
                 line.setStatus(LineStatus.DONE)
 

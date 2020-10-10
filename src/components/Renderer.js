@@ -13,8 +13,10 @@ class Renderer {
 
         this.doc = aqua.docMgr
         this.korwa = aqua.korwa
+        this.worker = aqua.workerMgr
 
         this.renderSet = new SimpleSet
+        this.lowPriorityRenderSet = new SimpleSet
 
         this.renderViewport = Limiter.toNextTick(this.renderViewport.bind(this), 17)
         this.startup = Limiter.toNextTick(this.startup.bind(this), 17)
@@ -43,6 +45,14 @@ class Renderer {
             this.renderViewport(viewport, ArgOpt.SkipVisionCheck)
         })
 
+       docWatcher.on('change', data => {
+           const code = this.aqua.docMgr.getLines(0, Infinity).map(line => line.toString()).join('\n')
+
+           this.worker.post('highlight', {
+               data: code,
+           })
+        })
+
         khala.on('scroll', (y, force) => {
             viewport.update(y)
 
@@ -65,6 +75,12 @@ class Renderer {
                 this.renderViewport(viewport, ArgOpt.SkipVisionCheck)
             })
         })
+
+        this.worker.on('highlight', Limiter.debounce(msg => {
+            console.log('msg', msg)
+            // viewport.getRenderArea()
+            // this.renderViewport(viewport, ArgOpt.SkipVisionCheck)
+        }), 500)
     }
 
     initGroups() {
@@ -134,6 +150,12 @@ class Renderer {
         this.startup()
     }
 
+    renderWithLowPriority(applyName, ...payload) {
+        this.lowPriorityRenderSet.add(applyName, payload)
+
+        this.startup()
+    }
+
     renderImmediately(applyName, ...payload) {
         this.getRenderer(applyName).render(...payload)
     }
@@ -151,7 +173,13 @@ class Renderer {
     }
 
     startup() {
-        const [ renderers, traverse ] = this.renderSet.use()
+        let [ renderers, traverse ] = this.renderSet.use()
+
+        traverse(renderers, renderer => {
+            this.renderImmediately(renderer.name, ...renderer.payload)
+        })
+
+        {[ renderers, traverse ] = this.lowPriorityRenderSet.use()}
 
         traverse(renderers, renderer => {
             this.renderImmediately(renderer.name, ...renderer.payload)
