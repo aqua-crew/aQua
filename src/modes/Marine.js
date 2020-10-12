@@ -5,14 +5,7 @@ const Character = {
 }
 
 const TokenType = {
-    Eof: 'eof',
-    Select: 'Select',
-    ObjectListId: 'objectListId',
-    Object: 'object',
-    File: 'file',
-
-    Comma: 'comma',
-    Dot: 'dot',
+    StringLiteral: 1,
 }
 
 class Scanner {
@@ -28,6 +21,30 @@ class Scanner {
 
     isEof() {
         return this.index >= this.length
+    }
+
+    scanStringLiteral() {
+        const start = this.index
+        const quote = this.code[start]
+
+        let value = ''
+        this.index++
+
+        while(!this.isEof()) {
+            const ch = this.code[this.index++]
+
+            if (ch === quote) {
+                quote = ''
+                break
+            }
+        }
+
+        return {
+            type: TokenType.StringLiteral,
+            value,
+            start,
+            end: this.index,
+        }
     }
 
     scanObjectList() {
@@ -53,14 +70,11 @@ class Scanner {
     scanLex() {
         const char = this.code[this.index]
 
-
-
-        const charCode = this.code.charCodeAt(this.index)
-
-        /* charcode 为 s 开头 */
-        if (charCode === ) {
-
+        if (char === '\'' || char === '"') {
+            return this.scanStringLiteral()
         }
+
+        return this.scanWord()
     }
 
 /*
