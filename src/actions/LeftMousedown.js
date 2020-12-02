@@ -29,6 +29,7 @@ class LeftMousedown extends Action {
             cursor.$y = event.clientY - rect.top
             cursor.$x = event.clientX - rect.left
 
+
             cursor.selection.base = cursor.coord
             cursor.selection.terminal = cursor.coord
     }, {

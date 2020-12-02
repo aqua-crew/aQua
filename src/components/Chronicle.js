@@ -133,10 +133,10 @@ class Chronicle {
     /**
      * TODO: 需要考虑协同下的 merge 情况
      * 1. 过滤不需要 merge 的情况
-     * @param  {Function} next          [description]
-     * @param  {[type]}   chronicle     [description]
-     * @param  {[type]}   mergeStrategy [description]
-     * @return {[type]}                 [description]
+     * @param  {Function} next
+     * @param  {[type]}   chronicle
+     * @param  {[type]}   mergeStrategy
+     * @return {[type]}
      */
     merge(next, chronicle, mergeStrategy) {
         return
@@ -205,6 +205,25 @@ class Chronicle {
         this.forwardMacroEvents.push(macroEvent)
 
         return fn(macroEvent)
+    }
+
+    extract() {
+        return {
+            backMacroEvents: this.backMacroEvents,
+            forwardMacroEvents: this.forwardMacroEvents,
+        }
+    }
+
+    rebuild(chronicle) {
+        if (!chronicle) {
+            this.backMacroEvents = []
+            this.forwardMacroEvents = []
+
+            return
+        }
+
+        this.backMacroEvents = chronicle.backMacroEvents
+        this.forwardMacroEvents = chronicle.forwardMacroEvents
     }
 }
 

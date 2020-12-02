@@ -366,7 +366,7 @@ class Doc {
     }
 
     /* Rare */
-
+    
     onInsert(chunk, objs, payload) {
         let effectSize = 0
         let effectHeight = 0

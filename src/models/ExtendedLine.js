@@ -28,6 +28,11 @@ class ExtendedLine {
     getElementRect(x) {
         const map = this.map
 
+        /* Temp */
+        if (x > this.length) {
+            x = this.length - 1
+        }
+
         for (let i = map.length - 1; i >= 0; i -= 2) {
             if (x < map[i]) {
                 continue
@@ -90,7 +95,7 @@ class ExtendedLine {
         for (; insideY >= 0; insideY--) {
             const bottom = this.transformToRealBottom(lineRects[insideY].bottom) - top
 
-            if ($y > bottom - 2) { // <---------------------
+            if ($y > bottom) {
                 break
             }
         }
@@ -99,12 +104,6 @@ class ExtendedLine {
     }
 
     transformToLayoutY(insideY) {
-        // const top = this.getClientRect().top
-        // const rects = this.getClientRects()
-
-        // // return rects[insideY].bottom - this.korwa.getScrollerRect().top
-        // return rects[insideY].bottom - top
-
         const rects = this.getClientRects()
 
         return this.transformToInsideLayoutY(rects[insideY].bottom)

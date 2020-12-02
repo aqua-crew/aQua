@@ -1,7 +1,7 @@
 const { rAF, Limiter } = require('../utils/index')
 
 class Scroller {
-    constructor(aqua, options) {
+    constructor(aqua) {
         this.aqua = aqua
 
         this.$el = null
@@ -9,12 +9,6 @@ class Scroller {
         this.speed = -1
         this.min = -1
         this.max = -1
-
-        // this.overflowType = 'buffer' // 'buffer', ['timeout', 'timeout'], null
-        // this.overflowBuffer = 2500
-        // this.overflowTimeout = 0.5
-        // this.prevent = true
-        this.lastScrollTime = 0
 
         this.limitedScroll = Limiter.toNextTick(this.scrollPrototype.bind(this), 34, 34)
     }

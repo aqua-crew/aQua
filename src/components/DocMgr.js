@@ -53,7 +53,7 @@ class DocMgr {
          * @param  {Boolean} options.isInsert [是否将 contengs 插入到下一行开头]
          * @param  {Boolean} options.track    [是否将该次写入计入 Undo & Redo]
          */
-        this.write = (contents, cursor = null, {
+        this.write = (contents, coordOrCursor = null, {
             isInsert = false,
             track = true,
         } = {}) => {
@@ -61,7 +61,7 @@ class DocMgr {
                 contents = [contents]
             }
 
-            const coord = (cursor && cursor.coord) || cursor || this.cursorMgr.getPrimary().coord
+            const coord = (coordOrCursor && coordOrCursor.coord) || coordOrCursor || this.cursorMgr.getPrimary().coord
 
             this.correctCoord(coord)
 
@@ -188,7 +188,6 @@ class DocMgr {
         )
     }
 
-    /* APIs */
     writePrototype(contents, coord = new Coord, isInsert = false) {
         if (!Array.isArray(contents)) {
             contents = [contents]
@@ -422,6 +421,29 @@ class DocMgr {
         coord.x = x < 0 ? 0 : x > xMax ? xMax : x
 
         return coord
+    }
+
+    extract() {
+        return this.doc.getLeaves().map(line => {
+            return line.extract()
+        })
+    }
+
+    rebuild(doc) {
+        if (!doc) {
+            this.doc = new Doc
+            this.writePrototype('')
+
+            return
+        }
+
+        this.doc = new Doc
+
+        const contents = doc.map(line => {
+            return line[1]
+        })
+
+        this.writePrototype(contents)
     }
 }
 

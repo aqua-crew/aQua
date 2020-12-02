@@ -19,7 +19,9 @@ class ViewportObserver {
             viewport.height = contentRect.height
             viewport.width = contentRect.width
 
-            this.aqua.renderer.renderViewport(viewport)
+            this.aqua.docWatcher.emit('change', {
+                effectLines: this.aqua.docMgr.getLines(0, this.aqua.docMgr.size),
+            })
         })
     }
 

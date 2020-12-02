@@ -1,5 +1,4 @@
 const CursorRenderer = require('./CursorRenderer')
-const DetailBarRenderer = require('./DetailBarRenderer')
 const InputerRenderer = require('./InputerRenderer')
 const LineNumRenderer = require('./LineNumRenderer')
 const LineRenderer = require('./LineRenderer')
@@ -14,7 +13,6 @@ const TrackerRenderer = require('./TrackerRenderer')
 
 module.exports = {
     CursorRenderer,
-    DetailBarRenderer,
     InputerRenderer,
     LineNumRenderer,
     LineRenderer,

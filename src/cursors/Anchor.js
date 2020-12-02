@@ -163,7 +163,6 @@ class Anchor {
         this.coord = coord.clone()
     }
 
-    /* Extract */
     extract() {
         const data = Object.create(null)
 

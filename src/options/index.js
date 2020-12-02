@@ -26,7 +26,7 @@ module.exports = {
     },
 
     scroller: {
-
+        y: 0,
     },
 
     options: {

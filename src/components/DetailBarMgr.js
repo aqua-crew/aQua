@@ -64,42 +64,6 @@ const Aqua = new CatalogueNode({
     ],
 })
 
-const Pekora = new CatalogueNode({
-    name: 'Pekora',
-    type: CatalogueNodeType.Project,
-    src: '\'',
-    children: [
-        new CatalogueNode({
-            name: 'babel.config',
-            ext: 'js',
-            type: CatalogueNodeType.File,
-        }),
-        new CatalogueNode({
-            name: 'node_modules',
-            type: CatalogueNodeType.Folder,
-        }),
-        new CatalogueNode({
-            name: 'src',
-            type: CatalogueNodeType.Folder,
-        }),
-        new CatalogueNode({
-            name: 'index',
-            ext: 'html',
-            type: CatalogueNodeType.File,
-        }),
-        new CatalogueNode({
-            name: 'index',
-            ext: 'css',
-            type: CatalogueNodeType.File,
-        }),
-        new CatalogueNode({
-            name: 'usagi',
-            ext: 'png',
-            type: CatalogueNodeType.File,
-        }),
-    ],
-})
-
 class DetailBarMgr {
     constructor(aqua, catalogue = []) {
         this.aqua = aqua
@@ -109,7 +73,7 @@ class DetailBarMgr {
     }
 
     init() {
-        this.aqua.renderer.render('detailBar', [Aqua, Pekora])
+        this.aqua.renderer.render('detailBar', [Aqua])
     }
 }
 

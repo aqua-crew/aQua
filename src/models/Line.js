@@ -317,20 +317,6 @@ class Line {
         return this.status === LineStatus.UPDATED
     }
 
-    toString() {
-        if (typeof this.data === 'string') {
-            return this.data
-        }
-
-        let str = ''
-
-        this.traverse(asset => {
-            str = str + asset.toString()
-        })
-
-        return str
-    }
-
     flushHeightBuffer() {
         const buffer = this._heightBuffer
         this._heightBuffer = 0
@@ -429,6 +415,19 @@ class Line {
                 startAsset.prev.setNext(startAsset.next)
             }
         }
+    }
+
+    extract() {
+        if (typeof this.data === 'string') {
+            return ['StringLiteral', this.data]
+        }
+
+        const assets = []
+        this.traverse(asset => {
+            assets.push(assets.type, assets.data)
+        })
+
+        return assets
     }
 }
 

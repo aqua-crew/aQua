@@ -142,7 +142,6 @@ class OffsetMap {
         let xAndOffsetCoordGenerator = null
 
         let yAndXObjectMap = null
-        let lastXAndOffsetCoord = null
         let offsetCoordList = null
 
         let offsetIndex = -1
@@ -333,7 +332,6 @@ class CursorMgr {
         viewport = this.aqua.viewport,
         cursors = this.cursors,
         filter = cursor => true,
-        force = false,
         detect = true,
         after = null,
         track = true,
@@ -731,34 +729,6 @@ class CursorMgr {
         }
     }
 
-    /* Extract */
-    extract() {
-        const cursors = []
-
-        this.pureTraverse(cursor => {
-            cursors.push(cursor.extract())
-        })
-
-        return {
-            primary: this.cursors.indexOf(this.primary),
-            cursors,
-        }
-    }
-
-    rebuild(data) {
-        const { primary, cursors } = data
-        const creator = this.useCreator()
-
-        for (let i = 0; i < cursors.length; i++) {
-            creator.push(cursor => {
-                cursor.rebuild(cursors[i])
-            })
-        }
-
-        this.cursors = creator.create()
-        this.setPrimary(this.cursors[primary])
-    }
-
     /**
      * Line 与 Mode 存的是实例, 因为他们是一个 Handler. Cursor 存的是构造函数, 因为需要返回实例
      * @param  {Cursor} Cursor [Cursor 的构造函数]
@@ -773,6 +743,45 @@ class CursorMgr {
         }
 
         return this
+    }
+
+    extract() {
+        const cursors = []
+
+        this.pureTraverse(cursor => {
+            cursors.push(cursor.extract())
+        })
+
+        return {
+            primary: this.cursors.indexOf(this.primary),
+            cursors,
+        }
+    }
+
+    rebuild(data) {
+        if (!data) {
+            this.cursors = []
+            this.create()
+
+            this.traverse(cursor => {
+                cursor.y = 0
+                cursor.x = 0
+            })
+
+            return
+        }
+
+        const { primary, cursors } = data
+        const creator = this.useCreator()
+
+        for (let i = 0; i < cursors.length; i++) {
+            creator.push(cursor => {
+                cursor.rebuild(cursors[i])
+            })
+        }
+
+        this.cursors = creator.create()
+        this.setPrimary(this.cursors[primary])
     }
 }
 

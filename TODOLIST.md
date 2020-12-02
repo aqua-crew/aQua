@@ -17,3 +17,21 @@
 - Imporvment
     - Measure 效率低
     - 尝试使用通用的 diff
+    - 尝试对 line diff 使用更精细的 diff, 可能精细到每一个 token
+
+
+
+- Minato
+    - 1st level menu
+        - USER
+        - workspace
+        - search
+        - marine
+        - ground
+        - UPDATE
+        - SETTING
+    
+    - 2st level menu
+        - search & filter
+        - projects
+        

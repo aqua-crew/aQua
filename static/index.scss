@@ -1,0 +1,263 @@
+.aqua {
+    display: flex;
+    position: relative;
+    height: 100%;
+    font-size: 0;
+    contain: strict;
+    background-color: rgba(35, 35, 35, .7);
+    .aqua-editor {
+        flex: 1 1 auto;
+        position: relative;
+        height: 100%;
+        font-family: Consolas;
+    }
+    .aqua-bg {
+        display: inline-block;
+        box-sizing: border-box;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        border: 2px solid transparent;
+        background-color: rgba(42, 46, 58, .95);
+        .bg-image {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            opacity:  .95;
+            max-width: 50%;
+            max-height: 80%;
+        }
+    }
+    .aqua-viewport {
+        position: relative;
+        display: flex;
+        height: 100%;
+        overflow-y: hidden;
+        .inputer-container {}
+        .aqua-scroller {
+            flex: 1 1 auto;
+            transform: translateY(0);
+            transition: transform 0.15s ease-out;
+            .aqua-variables {
+                --line-width: 0;
+                --ram-width: 0;
+            }
+            .aqua-components {
+                position: relative;
+                cursor: text;
+                .full-width-container {
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                }
+                .line-width-container {
+                    position: relative;
+                    margin-left: var(--ram-width);
+                    height: 0;
+                }
+            }
+        }
+    }
+}
+
+.inputer-container {
+    position: absolute;
+    .inputer-locator {
+        position: relative;
+        overflow: hidden;
+    }
+    .inputer {
+        position: absolute;
+        left: 0;
+        top: 0;
+        border: 0;
+        resize: none;
+        width: 0;
+        height: 22px;
+        line-height: 22px;
+        opacity: 0;
+        outline: currentcolor none medium;
+        white-space: pre;
+    }
+}
+
+.selected-line-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    .selected-line {
+        position: absolute;
+        height: 0;
+        top: 0;
+        opacity: 0;
+        border-left: 1px solid rgba(255, 255, 255, .6);
+        /* 使用 transition: height,top,opaicty,; 在火狐下几率会失效 */
+        transition-property: height, top, opacity;
+        transition-duration: 0.2s;
+        transition-timing-function: ease-out;
+        background-color: rgba(255, 255, 255, .05);
+    }
+}
+
+.measurer-container {
+    position: absolute;
+    visibility: hidden;
+    opacity: 0;
+    right: 0;
+    left: 0;
+    .rem-measurer {
+        position: absolute;
+    }
+    .line-measurer {
+        position: absolute;
+    }
+    .ram-measurer {
+        position: absolute;
+    }
+}
+
+.cursor-container {
+    position: absolute;
+    opacity: 1;
+    transition: opacity .25s ease-out;
+    .anchor {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1px;
+        height: 22px;
+        background-color: rgba(118, 218, 255, .85);
+        transition-property: transform, background-color;
+        transition-duration: 0.2s;
+        transition-timing-function: ease-out;
+    }
+}
+
+.selection-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    .selection {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        height: 25px;
+        background-color: rgba(255, 255, 255, .15);
+        transition-property: background-color;
+        transition-duration: 0.2s;
+        transition-timing-function: ease-out;
+    }
+}
+
+.line-container {}
+.line {
+    position: relative;
+    line-height: 25px;
+    font-size: 12px;
+    .prefix {
+        position: absolute;
+        transform: translateX(-100%);
+        padding: 0 20px 0 20px;
+        text-align: right;
+        cursor: default;
+        user-select: none;
+    }
+        .line-num {
+            color: rgba(118, 218, 255, .5);
+            width: var(--line-width);
+        }
+    .suffix {
+        margin: 0;
+        overflow-wrap: anywhere;
+        white-space: pre-wrap;
+        word-break: normal;
+        // color: rgba(255, 255, 255, 1);
+        color: rgba(163, 211, 245, .9);
+    }
+    code {
+        line-height: 25px;
+        margin-right: 0.1px; /* 修复 chrome 下的 getClientRects 不符合预期行为的问题, 以及撑开行高 */
+        font-family: inherit;
+    }
+}
+
+.dictionary-container {}
+
+.aqua-loading {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    opacity: 1;
+    background-color: rgba(42, 46, 58, 1);
+    text-align: center;
+    transition: opacity .25s ease-out;
+    .loading {
+        display: inline-block;
+        position: relative;
+        vertical-align: middle;
+        width: 80%;
+        height: 6px;
+        border-radius: 10px;
+        background-color: rgba(255, 255, 255, .1);
+        contain: strict;
+        .progress {
+            --progress: -100%;
+            visibility: visible;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            transform: translateX(var(--progress));
+            background-color: rgba(255, 255, 255, .35);
+            border-radius: 10px;
+            transition-property: transform, visibility;
+            transition-duration: 0.25s;
+            transition-timing-function: ease-out;
+        }
+    }
+    .strut {
+        display: inline-block;
+        vertical-align: middle;
+        height: 100%;
+    }
+}
+
+.aqua-fixed {
+    position: relative;
+    flex: 0 0 200px;
+    .side-bar-container {
+        .aqua-minimap {}
+        .aqua-scroll-bar {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background-color: rgba(118, 218, 255, .05);
+        }
+        .aqua-slider {
+            position: absolute;
+            left: 0;
+            right: 0;
+            background-color: rgba(118, 218, 255, .15);
+            height: 0;
+            transition-property: transform, height;
+            transition-duration: 0.2s;
+            transition-timing-function: ease-out;
+        }
+        .aqua-cursor-mark {
+            position: absolute;
+            left: 0;
+            right: 0;
+            transform: translateY(0);
+            height: 5px;
+            background-color: rgba(255, 255, 255, .6);
+        }
+    }
+}

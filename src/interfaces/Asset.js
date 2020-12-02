@@ -68,10 +68,6 @@ class Asset {
     delete(start, end) {}
     /* Override Request */
     get(start, end) {}
-    /* Override */
-    toString() {
-        return ''
-    }
 }
 
 module.exports = Asset

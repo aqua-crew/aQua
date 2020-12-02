@@ -1,6 +1,5 @@
 const { DataTransferItemHandler, Iterator, Khala, Kizuna, Marker, Noop, Progress } = require('./utils/index')
-const { DefaultOptions } = require('./options/index')
-const { ActionMgr, Chronicle, ContentMgr, CursorMgr, DetailBarMgr, DocMgr, History, Inputer, Korwa, LineMgr, Locator, OptionMgr, PluginMgr, ProcessorMgr, Renderer, Scroller, State, UIMgr, ViewportMgr, WorkerMgr } = require('./components/index')
+const { ActionMgr, Chronicle, ContentMgr, CursorMgr, DocMgr, Inputer, Korwa, LineMgr, Locator, OptionMgr, PluginMgr, ProcessorMgr, Renderer, Scroller, Serializer, State, UIMgr, ViewportMgr, WorkerMgr } = require('./components/index')
 const { Coord, Content } = require('./models/index')
 const Lines = require('./lines/index')
 const Cursors = require('./cursors/index')
@@ -40,8 +39,6 @@ class Aqua {
         this.lifetimes.emit('setup', this)
         this.progress.set(0)
 
-        this.detailBar = new DetailBarMgr(this) /* @Temp */
-
         this.chronicle = new Chronicle(this)
         this.scroller = new Scroller(this)
         this.processorMgr = new ProcessorMgr(this)
@@ -55,6 +52,7 @@ class Aqua {
         this.viewportMgr = new ViewportMgr(this)
         this.renderer = new Renderer(this)
         this.inputer = new Inputer(this)
+        this.serializer = new Serializer(this)
 
         this.progress.set(20)
 
@@ -79,11 +77,6 @@ class Aqua {
 
         this.releaseExtendPlugins()
         this.progress = null
-
-
-
-
-
 
         /* Dev test */
         window.aqua = this
@@ -126,8 +119,6 @@ class Aqua {
     }
 
     init() {
-        this.detailBar.init()
-
         this.lineMgr.init()
         this.korwa.init()
         this.docMgr.init()
@@ -181,32 +172,29 @@ class Aqua {
     mountUI() {
         const structure = `
             aqua
-                functionBar
-                detailBar
-                stage
-                    editor
-                        bgCntr
-                        viewport
-                            inputerCntr
-                                inputerLocator
-                                    inputer
-                            scroller
-                                components
-                                    fullWidthCntr
-                                        selectedLineCntr
-                                    lineWidthCntr
-                                        measurerCntr
-                                            ramMeasurer
-                                            lineMeasurer
-                                            remMeasurer
-                                        cursorCntr
-                                        selectionCntr
-                                        lineCntr
-                            fixed
-                                sideBarCntr
-                                    minimap
-                                    scrollBar
-                        fgCntr
+                editor
+                    bgCntr
+                    viewport
+                        inputerCntr
+                            inputerLocator
+                                inputer
+                        scroller
+                            components
+                                fullWidthCntr
+                                    selectedLineCntr
+                                lineWidthCntr
+                                    measurerCntr
+                                        ramMeasurer
+                                        lineMeasurer
+                                        remMeasurer
+                                    cursorCntr
+                                    selectionCntr
+                                    lineCntr
+                        fixed
+                            sideBarCntr
+                                minimap
+                                scrollBar
+                    fgCntr
         `
 
         const $aqua = this.uiMgr.mountByString(structure, {
@@ -328,8 +316,6 @@ class Aqua {
         })
 
         this.kizuna.on($inputer, 'paste', event => {
-            // this.inputer.poll()
-
             this.actionMgr.exec('Paste', event)
 
             // const items = event.clipboardData.items
@@ -396,18 +382,58 @@ class Aqua {
         })
 
         this.kizuna.on(document, 'visibilitychange', event => {
-            if (document.hidden && this.state.mousedown) {
-                this.state.mousedown = false
-            }
-
-            document.title = document.hidden ? 'Minato' : 'Aqua'
         })
     }
 
-    /* Extract */
-    extract() {
-        const doc = this.docMgr.extract()
-        const cursors = this.cursors.extract()
+    extract({
+        doc = true,
+        cursor = true,
+        chronicle = true,
+        option = true,
+    } = {}) {
+        const result = Object.create(null)
+
+        if (doc) {
+            result.doc = this.docMgr.extract()
+        }
+
+        if (cursor) {
+            result.cursors = this.cursorMgr.extract()
+        }
+
+        if (chronicle) {
+            result.chronicle = this.chronicle.extract()
+        }
+
+        if (option) {
+            result.option = {
+                scroller: {
+                    y: this.scroller.y
+                }
+            }
+        }
+
+        return result
+    }
+
+    rebuild(config) {
+        if (!config) {
+            this.docMgr.rebuild(null)
+            this.cursorMgr.rebuild(null)
+            this.chronicle.rebuild(null)
+            this.scroller.scroll(0, true)
+
+            return
+        }
+
+        this.docMgr.rebuild(config.doc)
+        this.cursorMgr.rebuild(config.cursors)
+        this.chronicle.rebuild(config.chronicle)
+        this.scroller.scroll(config.option.scroller.y, true)
+    }
+
+    release() {
+
     }
 }
 
