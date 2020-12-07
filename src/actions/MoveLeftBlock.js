@@ -7,37 +7,37 @@ class MoveLeftBlock extends Action {
         this.shortcuts = ['Ctrl + ←']
     }
 
-    exec(aqua, event, state = {}) {
-        const fn = (cursor, clearSelection = true) => {
-            if (clearSelection) {
-                cursor.selection.reset()
-            }
+    exec(aqua, event) {
+        aqua.cursorMgr.traverse(cursor => {
+            this.moveToLeftBlock(aqua, cursor, true)
+        })
+    }
 
-            if (cursor.logicalX <= 0) {
-                if (cursor.logicalY === 0) {
-                    return
-                }
-
-                cursor.logicalY = cursor.logicalY - 1
-                cursor.logicalX = Infinity
+    moveToLeftBlock(aqua, cursor, clearSelection = false) {
+        if (clearSelection) {
+            if (!cursor.selection.isCollapsed()) {
+                cursor.resetSelection()
 
                 return
             }
-
-            const block = aqua.lineMgr.getCurrentBlock(cursor.logicalY, cursor.logicalX)
-
-            cursor.logicalX = block.leftBorder
         }
 
-        if (state.cursor) {
-            fn(state.cursor, false)
+        aqua.actionMgr.execWithName('MoveLeft', 'moveLeft', cursor)
 
+        const leftBorder = this.getLeftBlockBorder(aqua, cursor)
+
+        if (cursor.x === leftBorder) {
             return
         }
 
-        aqua.cursorMgr.traverse(fn, {
-            acc: false,
-        })
+        cursor.x = leftBorder
+    }
+
+    getLeftBlockBorder(aqua, cursor) {
+        const line = aqua.lineMgr.extendLine(cursor.y)
+        const block = line.getCurrentBlock(cursor.x)
+
+        return block.leftBorder
     }
 }
 

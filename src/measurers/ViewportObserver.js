@@ -16,6 +16,10 @@ class ViewportObserver {
             const contentRect = entry.contentRect
             const viewport = this.aqua.viewport
 
+            if (contentRect.height === 0 && contentRect.width === 0) {
+                return
+            }
+
             viewport.height = contentRect.height
             viewport.width = contentRect.width
 

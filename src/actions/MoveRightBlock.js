@@ -7,39 +7,37 @@ class MoveRightBlock extends Action {
         this.shortcuts = ['Ctrl + →']
     }
 
-    exec(aqua, event, state = {}) {
-        const fn = (cursor, clearSelection = true) => {
-            if (clearSelection) {
-                cursor.selection.reset()
-            }
+    exec(aqua, event) {
+        aqua.cursorMgr.traverse(cursor => {
+            this.moveToRightBlock(aqua, cursor, true)
+        })
+    }
 
-            const max = aqua.lineMgr.getSize() - 1
-            const lineLen = aqua.lineMgr.getLength(cursor.logicalY)
-
-            if (cursor.logicalX >= lineLen) {
-                if (cursor.logicalY === max) {
-                    return
-                }
-
-                cursor.logicalY = cursor.logicalY + 1
-                cursor.logicalX = 0
+    moveToRightBlock(aqua, cursor, clearSelection = false) {
+        if (clearSelection) {
+            if (!cursor.selection.isCollapsed()) {
+                cursor.resetSelection()
 
                 return
             }
-
-            const block = aqua.lineMgr.getCurrentBlock(cursor.logicalY, cursor.logicalX)
-            cursor.logicalX = block.rightBorder
         }
 
-        if (state.cursor) {
-            fn(state.cursor, false)
+        aqua.actionMgr.execWithName('MoveRight', 'moveRight', cursor)
 
+        const rightBorder = this.getRightBlockBorder(aqua, cursor)
+
+        if (cursor.x === rightBorder) {
             return
         }
 
-        aqua.cursorMgr.traverse(fn, {
-            acc: false,
-        })
+        cursor.x = rightBorder
+    }
+
+    getRightBlockBorder(aqua, cursor) {
+        const line = aqua.lineMgr.extendLine(cursor.y)
+        const block = line.getCurrentBlock(cursor.x)
+
+        return block.rightBorder
     }
 }
 

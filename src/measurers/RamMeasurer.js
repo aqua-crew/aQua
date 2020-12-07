@@ -77,6 +77,11 @@ class RamMeasurer {
         this.traverse($measure => {
             this.resizeObserver.observe($measure, entry => {
                 const target = entry.target
+                const contentRect = entry.contentRect
+
+                if (contentRect.height === 0 && contentRect.width === 0) {
+                    return
+                }
 
                 this.ramWidth = target.clientWidth
                 this.lineNumWidth = target.firstChild.clientWidth
